@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Madison Lions — Availability & Selection Tracker</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
+.container { max-width: 860px; margin: 0 auto; }
+.hdr { margin-bottom: 1.2rem; }
+.hdr h2 { font-size: 18px; font-weight: 500; }
+.hdr p { font-size: 13px; color: #666; margin-top: 4px; }
+.instr { font-size: 13px; color: #555; background: #E6F1FB; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.2rem; line-height: 1.6; }
+.gs { display: flex; gap: 10px; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #666; white-space: nowrap; }
+.gs select { font-size: 15px; padding: 8px 10px; border: 0.5px solid #ccc; border-radius: 8px; background: #fff; flex: 1; min-width: 200px; }
+.slbl { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 1.2rem; }
+@media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+.pc { background: #fff; border: 0.5px solid #ddd; border-radius: 8px; padding: 12px 12px; cursor: pointer; user-select: none; touch-action: manipulation; }
+.pc.av { border-color: #1D9E75; background: #E1F5EE; }
+.pc.av .pn { color: #085041; }
+.pc.sel { border: 2px solid #185FA5; background: #E6F1FB; }
+.pc.sel .pn { color: #0C447C; }
+.pc.av.sel { border: 2px solid #185FA5; background: #E6F1FB; }
+.pn { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+.tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; }
+.ta { background: #9FE1CB; color: #085041; }
+.ts { background: #B5D4F4; color: #0C447C; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.2rem; }
+.sc { background: #f1efe8; border-radius: 8px; padding: 10px 8px; text-align: center; }
+.sn { font-size: 20px; font-weight: 500; color: #1a1a1a; }
+.sl { font-size: 11px; color: #888; margin-top: 2px; }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { font-size: 14px; padding: 10px 14px; border-radius: 8px; cursor: pointer; border: 0.5px solid #ccc; background: transparent; color: #1a1a1a; touch-action: manipulation; }
+.btn-primary { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
+.btn-reset { color: #888; }
+.sep { border: none; border-top: 0.5px solid #ddd; margin: 1.2rem 0; }
+.msg { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 8px; display: none; }
+.msg.ok { background: #E1F5EE; color: #085041; display: block; }
+.msg.err { background: #FCEBEB; color: #791F1F; display: block; }
+.wa-box { background: #fff; border: 0.5px solid #ddd; border-radius: 8px; padding: 14px; margin-top: 1rem; display: none; }
+.wa-box.show { display: block; }
+.wa-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.wa-text { font-size: 13px; color: #1a1a1a; white-space: pre-wrap; line-height: 1.7; background: #f9f9f7; border-radius: 6px; padding: 12px; word-break: break-word; }
+.wa-acts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.copy-hint { font-size: 12px; color: #888; margin-top: 6px; display: none; }
+.copy-hint.show { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hdr">
+    <h2>Madison Lions — availability &amp; selection</h2>
+    <p>Tape T20 2026 &nbsp;·&nbsp; Track availability, select the team, generate WhatsApp announcement.</p>
+  </div>
+
+  <div class="instr">Step 1: Select the game. &nbsp;|&nbsp; Step 2: Tap players — once = available, twice = selected. &nbsp;|&nbsp; Step 3: Generate WhatsApp announcement.</div>
+
+  <div class="gs">
+    <label>Game</label>
+    <select id="gs">
+      <option value="">— pick a game —</option>
+      <option value="FSC">FSC — Mar 1</option>
+      <option value="Great Maratha">Great Maratha — Mar 15</option>
+      <option value="Nashville Underdogs">Nashville Underdogs — Mar 29</option>
+      <option value="Rockvale Risers">Rockvale Risers — Apr 5</option>
+      <option value="Fearless Fighters">Fearless Fighters — Apr 12</option>
+      <option value="Cool Springs Titans">Cool Springs Titans — May 3</option>
+      <option value="Franklin Falcons">Franklin Falcons — May 10</option>
+      <option value="MCA">MCA — May 17</option>
+      <option value="Shoals Strikers">Shoals Strikers — May 30</option>
+      <option value="Star Strikers">Star Strikers — Jun 14</option>
+    </select>
+  </div>
+
+  <div class="stats">
+    <div class="sc"><div class="sn" id="stA">0</div><div class="sl">Available</div></div>
+    <div class="sc"><div class="sn" id="stS" style="color:#185FA5">0</div><div class="sl">Selected</div></div>
+    <div class="sc"><div class="sn" style="color:#888">11</div><div class="sl">Min</div></div>
+    <div class="sc"><div class="sn" id="stX" style="font-size:13px;padding-top:6px;color:#888">—</div><div class="sl">Status</div></div>
+  </div>
+
+  <div class="slbl">Players — tap once = available &nbsp;·&nbsp; tap twice = selected &nbsp;·&nbsp; tap again = reset</div>
+  <div class="grid" id="pg"></div>
+
+  <hr class="sep">
+  <div class="acts">
+    <button class="btn btn-primary" onclick="genWA()">Generate WhatsApp announcement</button>
+    <button class="btn" onclick="exportData()">Export data (Excel)</button>
+    <button class="btn btn-reset" onclick="reset()">Reset</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="wa-box" id="waBox">
+    <div class="wa-label">WhatsApp announcement — tap &amp; hold to copy on mobile</div>
+    <div class="wa-text" id="waText" onclick="selectText(this)"></div>
+    <div class="copy-hint" id="copyHint">Tap the text above to select it, then copy manually.</div>
+    <div class="wa-acts">
+      <button class="btn btn-primary" onclick="copyWA()">Copy to clipboard</button>
+      <button class="btn" onclick="document.getElementById('waBox').classList.remove('show')">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PL = ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Prakrut','Saurabh','Amit','KP','Dyan (N)','Jeel','Gyan'];
+const GM = ['FSC','Great Maratha','Nashville Underdogs','Rockvale Risers','Fearless Fighters','Cool Springs Titans','Franklin Falcons','MCA','Shoals Strikers','Star Strikers'];
+
+const SCHEDULE = {
+  'FSC':                { day:'Sunday',   date:'March 1st',     time:'9:30 AM',  warmup:'8:30 AM',  ground:'FCF2' },
+  'Great Maratha':      { day:'Sunday',   date:'March 15th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2' },
+  'Nashville Underdogs':{ day:'Sunday',   date:'March 29th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2' },
+  'Rockvale Risers':    { day:'Sunday',   date:'April 5th',     time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2' },
+  'Fearless Fighters':  { day:'Sunday',   date:'April 12th',    time:'8:30 AM',  warmup:'7:30 AM',  ground:'FCF2' },
+  'Cool Springs Titans':{ day:'Sunday',   date:'May 3rd',       time:'11:30 AM', warmup:'10:30 AM', ground:'FCF1' },
+  'Franklin Falcons':   { day:'Sunday',   date:'May 10th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF1' },
+  'MCA':                { day:'Sunday',   date:'May 17th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2' },
+  'Shoals Strikers':    { day:'Saturday', date:'May 30th',      time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2' },
+  'Star Strikers':      { day:'Sunday',   date:'June 14th',     time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2' }
+};
+
+const CLOSERS = [
+  "Let's keep the momentum going and get another win. See you all there! \uD83E\uDD81\uD83C\uDFCF",
+  "Come on Lions \u2014 let's hunt! \uD83E\uDD81\uD83D\uDD25",
+  "Back yourselves, play hard, and let's bring it home. Good luck! \uD83C\uDFC6",
+  "One team, one goal. Let's go Lions! \uD83E\uDD81",
+  "Time to roar! Let's get the win \uD83E\uDD81\uD83C\uDFCF\uD83D\uDCAA"
+];
+
+const PRE = {
+  'FSC': {
+    av:  new Set(['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Prakrut','Saurabh','Amit','KP','Dyan (N)','Jeel']),
+    sel: new Set(['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Saurabh','Amit'])
+  },
+  'Great Maratha': {
+    av:  new Set(['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Kirtan','Ravi','Amit','Dyan (N)','Gyan']),
+    sel: new Set(['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mayur R','Kirtan','Ravi','Amit','Dyan (N)','Gyan'])
+  }
+};
+
+const state = {};
+GM.forEach(g => { state[g] = {}; PL.forEach(p => { state[g][p] = PRE[g] ? (PRE[g].sel.has(p) ? 2 : PRE[g].av.has(p) ? 1 : 0) : 0; }); });
+let cur = '';
+
+function init() {
+  const g = document.getElementById('pg');
+  g.innerHTML = '';
+  PL.forEach(p => {
+    const c = document.createElement('div');
+    c.className = 'pc';
+    c.id = 'c-' + p;
+    c.innerHTML = '<div class="pn">' + p + '</div><div class="tags" id="t-' + p + '"></div>';
+    c.addEventListener('click', function(e) { e.preventDefault(); cycle(p); });
+    g.appendChild(c);
+  });
+  updateStats();
+}
+
+function cycle(p) {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  state[cur][p] = state[cur][p] >= 2 ? 0 : state[cur][p] + 1;
+  render(p); updateStats();
+}
+
+function render(p) {
+  const v = cur ? state[cur][p] : 0;
+  const c = document.getElementById('c-' + p), t = document.getElementById('t-' + p);
+  c.className = 'pc'; t.innerHTML = '';
+  if (v === 1) { c.classList.add('av'); t.innerHTML = '<span class="tag ta">Available</span>'; }
+  else if (v === 2) { c.classList.add('av', 'sel'); t.innerHTML = '<span class="tag ta">Available</span><span class="tag ts">Selected</span>'; }
+}
+
+function updateStats() {
+  if (!cur) return;
+  const vals = Object.values(state[cur]);
+  const av = vals.filter(v => v >= 1).length, sel = vals.filter(v => v === 2).length;
+  document.getElementById('stA').textContent = av;
+  document.getElementById('stS').textContent = sel;
+  const x = document.getElementById('stX');
+  if (sel === 0) { x.textContent = '\u2014'; x.style.color = '#888'; x.style.fontSize = '22px'; }
+  else if (sel < 11) { x.textContent = 'Need ' + (11 - sel); x.style.color = '#BA7517'; x.style.fontSize = '16px'; }
+  else if (sel <= 12) { x.textContent = 'Ready!'; x.style.color = '#0F6E56'; x.style.fontSize = '16px'; }
+  else { x.textContent = 'Max 12!'; x.style.color = '#A32D2D'; x.style.fontSize = '15px'; }
+}
+
+document.getElementById('gs').addEventListener('change', function() {
+  cur = this.value; PL.forEach(p => render(p)); updateStats();
+  document.getElementById('waBox').classList.remove('show'); hide();
+});
+
+function exportData() {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  let lines = ['Game: ' + cur + '\n', 'Player\tAvailable\tSelected'];
+  PL.forEach(p => { const v = state[cur][p]; lines.push(p + '\t' + (v >= 1 ? 1 : 0) + '\t' + (v === 2 ? 1 : 0)); });
+  const av = Object.values(state[cur]).filter(v => v >= 1).length;
+  const sel = Object.values(state[cur]).filter(v => v === 2).length;
+  lines.push('\nSummary: ' + av + ' available, ' + sel + ' selected');
+  safeCopy(lines.join('\n'), 'Copied! Paste into your Excel.');
+}
+
+function genWA() {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  const selected = PL.filter(p => state[cur][p] === 2);
+  if (!selected.length) { show('No players selected yet!', 'err'); return; }
+  const s = SCHEDULE[cur];
+  const xi = selected.length > 11 ? 'PLAYING XII' : 'PLAYING XI';
+  const closer = CLOSERS[Math.floor(Math.random() * CLOSERS.length)];
+  let msg = 'Madison Lions - Thank you for voting. Below is the team for our game against ' + cur + '\n';
+  msg += 'on ' + s.day + ' ' + s.date + ' at ' + s.time + ' on ' + s.ground + ':\n\n';
+  selected.forEach((p, i) => msg += (i + 1) + '. ' + p + '\n');
+  msg += '\nPlease arrive at the ground by ' + s.warmup + ' SHARP for warmup & team huddle.\n';
+  msg += closer;
+  document.getElementById('waText').textContent = msg;
+  document.getElementById('waBox').classList.add('show');
+  document.getElementById('copyHint').classList.remove('show');
+  document.getElementById('waBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyWA() {
+  const txt = document.getElementById('waText').textContent;
+  safeCopy(txt, 'WhatsApp message copied!');
+}
+
+function safeCopy(text, successMsg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => show(successMsg, 'ok'))
+      .catch(() => fallbackCopy(text, successMsg));
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+}
+
+function fallbackCopy(text, successMsg) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (ok) { show(successMsg, 'ok'); }
+    else { document.getElementById('copyHint').classList.add('show'); show('Tap the text above and copy manually.', 'err'); }
+  } catch(e) {
+    document.getElementById('copyHint').classList.add('show');
+    show('Tap the text above and copy manually.', 'err');
+  }
+}
+
+function selectText(el) {
+  try {
+    const range = document.createRange(); range.selectNodeContents(el);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  } catch(e) {}
+}
+
+function reset() {
+  if (!cur) return;
+  PL.forEach(p => { state[cur][p] = 0; render(p); });
+  updateStats(); document.getElementById('waBox').classList.remove('show'); show('Reset done.', 'ok');
+}
+
+function show(t, type) { const e = document.getElementById('msg'); e.textContent = t; e.className = 'msg ' + type; setTimeout(() => e.className = 'msg', 3500); }
+function hide() { document.getElementById('msg').className = 'msg'; }
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
