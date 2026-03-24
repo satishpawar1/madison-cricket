@@ -64,8 +64,8 @@ tr:nth-child(even) td.pcol{background:#fafaf8}
   </div>
   <div class="cards">
     <div class="card"><div class="cnum" id="sumG" style="color:#185FA5">0</div><div class="clbl">Games played</div></div>
-    <div class="card"><div class="cnum" id="sumA" style="color:#1D9E75">0</div><div class="clbl">Avg available</div></div>
-    <div class="card"><div class="cnum" id="sumS" style="color:#185FA5">0</div><div class="clbl">Avg selected</div></div>
+    <div class="card"><div class="cnum" id="sumA" style="color:#1D9E75">0%</div><div class="clbl">Team availability rate</div></div>
+    <div class="card"><div class="cnum" id="sumS" style="color:#185FA5">0%</div><div class="clbl">Team selection rate</div></div>
   </div>
   <div class="sort-row">
     <label>Sort by</label>
@@ -163,8 +163,18 @@ function fetchLive() {
 function renderAll() {
   document.getElementById('sumG').textContent = gamesPlayed;
   var n = playerData.length || 1;
-  document.getElementById('sumA').textContent = (playerData.reduce(function(s,p){return s+p.avail;},0)/n).toFixed(1);
-  document.getElementById('sumS').textContent = (playerData.reduce(function(s,p){return s+p.sel;},0)/n).toFixed(1);
+  // Team availability rate = avg % of roster available per game
+  var rosterSize = PLAYERS.length;
+  var totalAvailPct = 0, totalSelPct = 0;
+  completedGames.forEach(function(g) {
+    var avail = playerData.reduce(function(s,p) { return s + (p.games[g] ? p.games[g][0] : 0); }, 0);
+    var sel   = playerData.reduce(function(s,p) { return s + (p.games[g] ? p.games[g][1] : 0); }, 0);
+    totalAvailPct += avail / rosterSize * 100;
+    totalSelPct   += sel   / rosterSize * 100;
+  });
+  var numGames = completedGames.length || 1;
+  document.getElementById('sumA').textContent = Math.round(totalAvailPct / numGames) + '%';
+  document.getElementById('sumS').textContent = Math.round(totalSelPct   / numGames) + '%';
   renderPlayers();
   renderTable();
 }
