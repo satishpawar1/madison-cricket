@@ -129,7 +129,8 @@ function init() {
   CFG.games.forEach(function(g) {
     var opt = document.createElement('option');
     opt.value = g.name;
-    var d = new Date(g.gameDate);
+    var dp = g.gameDate.split('-');
+    var d = new Date(parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]));
     opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
     sel.appendChild(opt);
   });
@@ -187,12 +188,39 @@ function applyFreeze(frozen) {
 
 document.getElementById('gs').addEventListener('change', function() {
   cur = this.value;
-  PL.forEach(function(p) { renderCard(p); });
-  updateStats();
-  applyFreeze(cur && isPast(cur));
   document.getElementById('waBox').classList.remove('show');
   document.getElementById('syncStatus').textContent = '';
   document.getElementById('msg').className = 'msg';
+  if (!cur) { PL.forEach(function(p) { renderCard(p); }); updateStats(); return; }
+
+  // For past games, fetch live data from Sheets to get latest state
+  if (isPast(cur)) {
+    fetch(SCRIPT_URL + '?team=Tigers&game=' + encodeURIComponent(cur))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.status === 'ok' && d.data && d.data.length) {
+          // Update state with live data from Sheets
+          d.data.forEach(function(p) {
+            if (state[cur][p.name] !== undefined) {
+              state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
+            }
+          });
+        }
+        PL.forEach(function(p) { renderCard(p); });
+        updateStats();
+        applyFreeze(true);
+      })
+      .catch(function() {
+        // Fall back to preloaded config data
+        PL.forEach(function(p) { renderCard(p); });
+        updateStats();
+        applyFreeze(true);
+      });
+  } else {
+    PL.forEach(function(p) { renderCard(p); });
+    updateStats();
+    applyFreeze(false);
+  }
 });
 
 function genWA() {
