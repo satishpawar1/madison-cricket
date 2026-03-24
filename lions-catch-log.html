@@ -124,10 +124,13 @@ function onGameChange() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
+      // Fall back to config preloaded if live returned nothing
+      if (!liveData || !liveData.some(function(p){return p.att>0;})) {
+        liveData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
+      }
       buildRows(game, isPast, daysSince, liveData);
     })
     .catch(function() {
-      // Network failed — fall back to config preloaded data
       var preData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
       buildRows(game, isPast, daysSince, preData);
     });
