@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,23 +7,28 @@
 <title>Madison Cricket Club — 2026</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-.container { max-width: 480px; width: 100%; }
-.logo { text-align: center; margin-bottom: 2.5rem; }
-.logo h1 { font-size: 22px; font-weight: 500; color: #1a1a1a; }
-.logo p { font-size: 14px; color: #888; margin-top: 6px; }
-.cards { display: flex; flex-direction: column; gap: 14px; }
-.card { display: block; text-decoration: none; border-radius: 12px; padding: 1.25rem 1.5rem; border: 0.5px solid #ddd; background: #fff; transition: transform 0.1s, box-shadow 0.1s; cursor: pointer; }
-.card:active { transform: scale(0.98); }
-.card-top { display: flex; align-items: center; gap: 14px; }
-.badge { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; min-height: 100vh; padding: 2rem 1.2rem; }
+.container { max-width: 480px; margin: 0 auto; }
+.logo { text-align: center; margin-bottom: 2rem; }
+.logo h1 { font-size: 20px; font-weight: 500; }
+.logo p { font-size: 13px; color: #888; margin-top: 5px; }
+.team-section { margin-bottom: 2rem; }
+.team-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 0.5px solid #e0e0e0; }
+.team-badge { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .badge-lions { background: #E6F1FB; }
 .badge-tigers { background: #FAEEDA; }
-.card-info h2 { font-size: 16px; font-weight: 500; color: #1a1a1a; }
-.card-info p { font-size: 13px; color: #888; margin-top: 3px; }
-.card-lions { border-left: 3px solid #185FA5; }
-.card-tigers { border-left: 3px solid #993C1D; }
-.arrow { margin-left: auto; font-size: 18px; color: #ccc; }
+.team-name { font-size: 16px; font-weight: 500; }
+.team-name.lions { color: #0C447C; }
+.team-name.tigers { color: #633806; }
+.menu { display: flex; flex-direction: column; gap: 8px; }
+.menu-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 12px 14px; text-decoration: none; color: #1a1a1a; touch-action: manipulation; cursor: pointer; }
+.menu-item:active { background: #f5f5f3; }
+.menu-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.num-lions { background: #E6F1FB; color: #0C447C; }
+.num-tigers { background: #FAEEDA; color: #633806; }
+.menu-text h3 { font-size: 14px; font-weight: 500; }
+.menu-text p { font-size: 12px; color: #888; margin-top: 2px; }
+.arrow { margin-left: auto; color: #ccc; font-size: 16px; }
 .footer { text-align: center; margin-top: 2rem; font-size: 12px; color: #bbb; }
 </style>
 </head>
@@ -30,30 +36,67 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="container">
   <div class="logo">
     <h1>🏏 Madison Cricket Club</h1>
-    <p>Tape T20 2026 — Availability Trackers</p>
+    <p>Tape T20 2026</p>
   </div>
-  <div class="cards">
-    <a class="card card-lions" href="lions.html">
-      <div class="card-top">
-        <div class="badge badge-lions">🦁</div>
-        <div class="card-info">
-          <h2>Madison Lions</h2>
-          <p>Availability &amp; selection tracker</p>
-        </div>
+
+  <div class="team-section">
+    <div class="team-header">
+      <div class="team-badge badge-lions">🦁</div>
+      <span class="team-name lions">Madison Lions</span>
+    </div>
+    <div class="menu">
+      <a class="menu-item" href="lions.html">
+        <div class="menu-num num-lions">1</div>
+        <div class="menu-text"><h3>Select team for upcoming game</h3><p>Mark availability, pick XI/XII, publish</p></div>
         <div class="arrow">›</div>
-      </div>
-    </a>
-    <a class="card card-tigers" href="tigers.html">
-      <div class="card-top">
-        <div class="badge badge-tigers">🐯</div>
-        <div class="card-info">
-          <h2>Madison Tigers</h2>
-          <p>Availability &amp; selection tracker</p>
-        </div>
+      </a>
+      <a class="menu-item" href="lions-dashboard.html">
+        <div class="menu-num num-lions">2</div>
+        <div class="menu-text"><h3>Availability &amp; selection dashboard</h3><p>Player stats across completed games</p></div>
         <div class="arrow">›</div>
-      </div>
-    </a>
+      </a>
+      <a class="menu-item" href="lions-catch-log.html">
+        <div class="menu-num num-lions">3</div>
+        <div class="menu-text"><h3>Log catch efficiency</h3><p>Record catches for a completed game</p></div>
+        <div class="arrow">›</div>
+      </a>
+      <a class="menu-item" href="lions-catch-dashboard.html">
+        <div class="menu-num num-lions">4</div>
+        <div class="menu-text"><h3>Catch efficiency dashboard</h3><p>Fielding stats across completed games</p></div>
+        <div class="arrow">›</div>
+      </a>
+    </div>
   </div>
+
+  <div class="team-section">
+    <div class="team-header">
+      <div class="team-badge badge-tigers">🐯</div>
+      <span class="team-name tigers">Madison Tigers</span>
+    </div>
+    <div class="menu">
+      <a class="menu-item" href="tigers.html">
+        <div class="menu-num num-tigers">1</div>
+        <div class="menu-text"><h3>Select team for upcoming game</h3><p>Mark availability, pick XI/XII, publish</p></div>
+        <div class="arrow">›</div>
+      </a>
+      <a class="menu-item" href="tigers-dashboard.html">
+        <div class="menu-num num-tigers">2</div>
+        <div class="menu-text"><h3>Availability &amp; selection dashboard</h3><p>Player stats across completed games</p></div>
+        <div class="arrow">›</div>
+      </a>
+      <a class="menu-item" href="tigers-catch-log.html">
+        <div class="menu-num num-tigers">3</div>
+        <div class="menu-text"><h3>Log catch efficiency</h3><p>Record catches for a completed game</p></div>
+        <div class="arrow">›</div>
+      </a>
+      <a class="menu-item" href="tigers-catch-dashboard.html">
+        <div class="menu-num num-tigers">4</div>
+        <div class="menu-text"><h3>Catch efficiency dashboard</h3><p>Fielding stats across completed games</p></div>
+        <div class="arrow">›</div>
+      </a>
+    </div>
+  </div>
+
   <div class="footer">Madison Cricket Club · 2026</div>
 </div>
 </body>
