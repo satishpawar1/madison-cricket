@@ -1,202 +1,92 @@
+
+<script src="config.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Tigers — Availability & Selection Dashboard</title>
+<title>Madison Tigers — Dashboard</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
-.container { max-width: 860px; margin: 0 auto; }
-.hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-.hdr a { font-size: 22px; text-decoration: none; color: #888; }
-.hdr-text h2 { font-size: 18px; font-weight: 500; }
-.hdr-text p { font-size: 13px; color: #666; margin-top: 3px; }
-.summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-.sc { background: #f1efe8; border-radius: 8px; padding: 12px; text-align: center; }
-.sn { font-size: 22px; font-weight: 500; }
-.sl { font-size: 11px; color: #888; margin-top: 3px; }
-.section-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
-.player-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
-.player-row { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 12px 14px; }
-.player-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.player-name { font-size: 14px; font-weight: 500; }
-.badges { display: flex; gap: 6px; }
-.badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; }
-.badge-avail { background: #FAEEDA; color: #633806; }
-.badge-sel { background: #FAECE7; color: #4A1B0C; }
-.bars { display: flex; flex-direction: column; gap: 5px; }
-.bar-row { display: flex; align-items: center; gap: 8px; }
-.bar-label { font-size: 11px; color: #888; width: 60px; flex-shrink: 0; }
-.bar-track { flex: 1; background: #eee; border-radius: 4px; height: 7px; overflow: hidden; }
-.bar-fill-avail { height: 100%; background: #BA7517; border-radius: 4px; }
-.bar-fill-sel { height: 100%; background: #993C1D; border-radius: 4px; }
-.bar-pct { font-size: 11px; font-weight: 500; width: 34px; text-align: right; flex-shrink: 0; }
-.sort-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-.sort-row label { font-size: 12px; color: #888; }
-.sort-row select { font-size: 13px; padding: 5px 8px; border: 0.5px solid #ccc; border-radius: 6px; background: #fff; }
-.game-grid { margin-bottom: 1.5rem; overflow-x: auto; }
-.game-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
-.game-table th { background: #f1efe8; padding: 7px 10px; text-align: center; font-weight: 500; border: 0.5px solid #ddd; }
-.game-table th.player-col { text-align: left; position: sticky; left: 0; background: #f1efe8; z-index: 1; }
-.game-table td { padding: 7px 10px; text-align: center; border: 0.5px solid #eee; }
-.game-table td.player-col { text-align: left; font-weight: 500; position: sticky; left: 0; background: #fff; z-index: 1; }
-.game-table tr:nth-child(even) td { background: #fafaf8; }
-.game-table tr:nth-child(even) td.player-col { background: #fafaf8; }
-.cell-av { color: #633806; font-weight: 500; }
-.cell-sel { color: #4A1B0C; font-weight: 500; }
-.cell-no { color: #ccc; }
-.sep { border: none; border-top: 0.5px solid #ddd; margin: 1.5rem 0; }
-.loading { text-align: center; color: #888; font-size: 14px; padding: 2rem; }
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}.container{max-width:860px;margin:0 auto}.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}.hdr a{font-size:22px;text-decoration:none;color:#888}.hdr-text h2{font-size:18px;font-weight:500}.hdr-text p{font-size:13px;color:#666;margin-top:3px}.summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}.sc{background:#f1efe8;border-radius:8px;padding:12px;text-align:center}.sn{font-size:22px;font-weight:500}.sl{font-size:11px;color:#888;margin-top:3px}.section-label{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.player-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}.player-row{background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:12px 14px}.player-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.player-name{font-size:14px;font-weight:500}.badges{display:flex;gap:6px}.badge{font-size:11px;padding:3px 8px;border-radius:20px}.badge-avail{background:#FAEEDA;color:#633806}.badge-sel{background:#FAECE7;color:#4A1B0C}.bars{display:flex;flex-direction:column;gap:5px}.bar-row{display:flex;align-items:center;gap:8px}.bar-label{font-size:11px;color:#888;width:60px;flex-shrink:0}.bar-track{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden}.bar-fill-avail{height:100%;background:#BA7517;border-radius:4px}.bar-fill-sel{height:100%;background:#993C1D;border-radius:4px}.bar-pct{font-size:11px;font-weight:500;width:34px;text-align:right;flex-shrink:0}.sort-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}.sort-row label{font-size:12px;color:#888}.sort-row select{font-size:13px;padding:5px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff}.game-grid{margin-bottom:1.5rem;overflow-x:auto}.game-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}.game-table th{background:#f1efe8;padding:7px 10px;text-align:center;font-weight:500;border:0.5px solid #ddd}.game-table th.pc{text-align:left;position:sticky;left:0;background:#f1efe8;z-index:1}.game-table td{padding:7px 10px;text-align:center;border:0.5px solid #eee}.game-table td.pc{text-align:left;font-weight:500;position:sticky;left:0;background:#fff;z-index:1}.game-table tr:nth-child(even) td{background:#fafaf8}.game-table tr:nth-child(even) td.pc{background:#fafaf8}.ca{color:#633806;font-weight:500}.cs{color:#4A1B0C;font-weight:500}.cn{color:#ccc}.sep{border:none;border-top:0.5px solid #ddd;margin:1.5rem 0}.loading{text-align:center;color:#888;font-size:14px;padding:2rem}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="hdr">
-    <a href="index.html">‹</a>
-    <div class="hdr-text">
-      <h2>Madison Tigers — dashboard</h2>
-      <p>Availability &amp; selection across completed games</p>
-    </div>
-  </div>
-
-  <div id="loading" class="loading">Loading data from Google Sheets...</div>
+  <div class="hdr"><a href="index.html">&#8249;</a><div class="hdr-text"><h2>Madison Tigers &mdash; dashboard</h2><p>Availability &amp; selection across completed games</p></div></div>
+  <div id="loading" class="loading">Loading from Google Sheets&hellip;</div>
   <div id="content" style="display:none">
     <div class="summary-cards">
-      <div class="sc"><div class="sn" id="sumGames" style="color:#993C1D">—</div><div class="sl">Games played</div></div>
-      <div class="sc"><div class="sn" id="sumAvail" style="color:#BA7517">—</div><div class="sl">Avg available</div></div>
-      <div class="sc"><div class="sn" id="sumSel" style="color:#993C1D">—</div><div class="sl">Avg selected</div></div>
+      <div class="sc"><div class="sn" id="sumGames" style="color:#993C1D">0</div><div class="sl">Games played</div></div>
+      <div class="sc"><div class="sn" id="sumAvail" style="color:#BA7517">0</div><div class="sl">Avg available</div></div>
+      <div class="sc"><div class="sn" id="sumSel" style="color:#993C1D">0</div><div class="sl">Avg selected</div></div>
     </div>
-
-    <div class="sort-row">
-      <label>Sort by</label>
-      <select id="sortBy" onchange="renderPlayers()">
-        <option value="avail">Availability %</option>
-        <option value="sel">Selection %</option>
-        <option value="name">Name</option>
-      </select>
-    </div>
-
+    <div class="sort-row"><label>Sort by</label><select id="sortBy" onchange="renderPlayers()"><option value="avail">Availability %</option><option value="sel">Selection %</option><option value="name">Name</option></select></div>
     <div class="section-label">Player availability &amp; selection</div>
     <div class="player-list" id="playerList"></div>
-
     <hr class="sep">
     <div class="section-label">Game-by-game breakdown</div>
     <div class="game-grid"><table class="game-table" id="gameTable"></table></div>
   </div>
 </div>
-
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec';
-const TEAM = 'Tigers';
-const GAMES = ['Star Strikers','Franklin Falcons','FSC','Great Maratha','Fearless Fighters','Afghan Eagles','Rockvale Risers','MCA','Mumbai Risers','Shoals Strikers'];
-const PLAYERS = ['Naren ©','Kiran','Vamsi','Sharath','Tiru','Sai Teja','Surya','Murali (Wk)','Suresh','Sunny P','GP','Mayur L','Siva','Sahith','Prapul','Anurag'];
-
-let playerData = [];
-let gamesPlayed = 0;
-let completedGames = [];
+const CFG = MCC_CONFIG.tigers;
+const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+const PLAYERS = CFG.players;
+const GAMES = CFG.games.map(g => g.name);
+let playerData=[], gamesPlayed=0, completedGames=[];
 
 function fetchData() {
-  if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec') { showContent(); return; }
   Promise.all(GAMES.map(g =>
-    fetch(SCRIPT_URL + '?team=' + TEAM + '&game=' + encodeURIComponent(g))
-      .then(r => r.json()).catch(() => ({ status:'ok', data:[] }))
+    fetch(SCRIPT_URL+'?team=Tigers&game='+encodeURIComponent(g))
+      .then(r=>r.json()).catch(()=>({status:'ok',data:[]}))
   )).then(results => {
-    const liveData = {};
-    PLAYERS.forEach(p => { liveData[p] = { avail:0, sel:0, games:{} }; });
-    completedGames = [];
-    results.forEach((res, gi) => {
-      const game = GAMES[gi];
-      if (!res.data || !res.data.length) return;
-      const hasData = res.data.some(p => p.available > 0 || p.selected > 0);
-      if (!hasData) return;
+    const ld={}; PLAYERS.forEach(p=>{ld[p]={avail:0,sel:0,games:{}};});
+    completedGames=[];
+    results.forEach((res,gi)=>{
+      const game=GAMES[gi];
+      if(!res.data||!res.data.length) return;
+      if(!res.data.some(p=>p.available>0||p.selected>0)) return;
       completedGames.push(game);
-      res.data.forEach(p => {
-        if (!liveData[p.name]) return;
-        liveData[p.name].avail += p.available;
-        liveData[p.name].sel   += p.selected;
-        liveData[p.name].games[game] = [p.available, p.selected];
-      });
+      res.data.forEach(p=>{if(!ld[p.name])return;ld[p.name].avail+=p.available;ld[p.name].sel+=p.selected;ld[p.name].games[game]=[p.available,p.selected];});
     });
-    gamesPlayed = completedGames.length;
-    playerData = PLAYERS.map(name => {
-      const d = liveData[name];
-      return { name, avail:d.avail, sel:d.sel,
-        avPct:  gamesPlayed ? d.avail/gamesPlayed : 0,
-        selPct: d.avail ? d.sel/d.avail : 0,
-        games: d.games };
-    });
+    gamesPlayed=completedGames.length;
+    playerData=PLAYERS.map(name=>{const d=ld[name];return{name,avail:d.avail,sel:d.sel,avPct:gamesPlayed?d.avail/gamesPlayed:0,selPct:d.avail?d.sel/d.avail:0,games:d.games};});
     showContent();
-  }).catch(() => showContent());
+  }).catch(()=>showContent());
 }
 
-function showContent() {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('content').style.display = 'block';
-  document.getElementById('sumGames').textContent = gamesPlayed;
-  const avgAv  = playerData.length ? playerData.reduce((s,p) => s+p.avail,0)/playerData.length : 0;
-  const avgSel = playerData.length ? playerData.reduce((s,p) => s+p.sel,0)/playerData.length   : 0;
-  document.getElementById('sumAvail').textContent = avgAv.toFixed(1);
-  document.getElementById('sumSel').textContent   = avgSel.toFixed(1);
-  renderPlayers();
-  renderGameTable();
+function showContent(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  document.getElementById('sumGames').textContent=gamesPlayed;
+  document.getElementById('sumAvail').textContent=playerData.length?(playerData.reduce((s,p)=>s+p.avail,0)/playerData.length).toFixed(1):0;
+  document.getElementById('sumSel').textContent=playerData.length?(playerData.reduce((s,p)=>s+p.sel,0)/playerData.length).toFixed(1):0;
+  renderPlayers(); renderGameTable();
 }
 
-function renderPlayers() {
-  const sort = document.getElementById('sortBy').value;
-  const sorted = [...playerData].sort((a,b) => {
-    if (sort==='avail') return b.avPct-a.avPct;
-    if (sort==='sel')   return b.selPct-a.selPct;
-    return a.name.localeCompare(b.name);
+function renderPlayers(){
+  const sort=document.getElementById('sortBy').value;
+  const sorted=[...playerData].sort((a,b)=>sort==='avail'?b.avPct-a.avPct:sort==='sel'?b.selPct-a.selPct:a.name.localeCompare(b.name));
+  document.getElementById('playerList').innerHTML=sorted.map((p,i)=>
+    `<div class="player-row"><div class="player-top"><span class="player-name">${i+1}. ${p.name}</span><div class="badges"><span class="badge badge-avail">${p.avail}/${gamesPlayed} avail</span><span class="badge badge-sel">${p.sel}/${p.avail||0} sel</span></div></div><div class="bars"><div class="bar-row"><span class="bar-label">Availability</span><div class="bar-track"><div class="bar-fill-avail" style="width:${Math.round(p.avPct*100)}%"></div></div><span class="bar-pct" style="color:#BA7517">${Math.round(p.avPct*100)}%</span></div><div class="bar-row"><span class="bar-label">Selection</span><div class="bar-track"><div class="bar-fill-sel" style="width:${Math.round(p.selPct*100)}%"></div></div><span class="bar-pct" style="color:#993C1D">${Math.round(p.selPct*100)}%</span></div></div></div>`
+  ).join('');
+}
+
+function renderGameTable(){
+  if(!completedGames.length) return;
+  let html='<thead><tr><th class="pc">Player</th>';
+  completedGames.forEach(g=>html+=`<th colspan="2">${g.length>10?g.slice(0,10)+'…':g}</th>`);
+  html+='</tr><tr><th class="pc"></th>';
+  completedGames.forEach(()=>html+='<th>Av</th><th>Sel</th>');
+  html+='</tr></thead><tbody>';
+  PLAYERS.forEach(p=>{
+    html+=`<tr><td class="pc">${p}</td>`;
+    const pd=playerData.find(x=>x.name===p);
+    completedGames.forEach(g=>{const gd=pd&&pd.games[g],av=gd?gd[0]:null,sel=gd?gd[1]:null;html+=av===null?'<td class="cn">—</td><td class="cn">—</td>':`<td class="${av?'ca':'cn'}">${av?'✓':'✗'}</td><td class="${sel?'cs':'cn'}">${sel?'✓':'—'}</td>`;});
+    html+='</tr>';
   });
-  document.getElementById('playerList').innerHTML = sorted.map((p,i) => `
-    <div class="player-row">
-      <div class="player-top">
-        <span class="player-name">${i+1}. ${p.name}</span>
-        <div class="badges">
-          <span class="badge badge-avail">${p.avail}/${gamesPlayed} avail</span>
-          <span class="badge badge-sel">${p.sel}/${p.avail||0} selected</span>
-        </div>
-      </div>
-      <div class="bars">
-        <div class="bar-row">
-          <span class="bar-label">Availability</span>
-          <div class="bar-track"><div class="bar-fill-avail" style="width:${Math.round(p.avPct*100)}%"></div></div>
-          <span class="bar-pct" style="color:#BA7517">${Math.round(p.avPct*100)}%</span>
-        </div>
-        <div class="bar-row">
-          <span class="bar-label">Selection</span>
-          <div class="bar-track"><div class="bar-fill-sel" style="width:${Math.round(p.selPct*100)}%"></div></div>
-          <span class="bar-pct" style="color:#993C1D">${Math.round(p.selPct*100)}%</span>
-        </div>
-      </div>
-    </div>`).join('');
+  document.getElementById('gameTable').innerHTML=html+'</tbody>';
 }
-
-function renderGameTable() {
-  if (!completedGames.length) return;
-  const table = document.getElementById('gameTable');
-  let html = '<thead><tr><th class="player-col">Player</th>';
-  completedGames.forEach(g => html += `<th colspan="2">${g.length>10?g.slice(0,10)+'…':g}</th>`);
-  html += '</tr><tr><th class="player-col"></th>';
-  completedGames.forEach(() => html += '<th>Av</th><th>Sel</th>');
-  html += '</tr></thead><tbody>';
-  PLAYERS.forEach(p => {
-    html += `<tr><td class="player-col">${p}</td>`;
-    const pd = playerData.find(x => x.name===p);
-    completedGames.forEach(g => {
-      const gd = pd && pd.games[g];
-      const av=gd?gd[0]:null, sel=gd?gd[1]:null;
-      html += av===null ? '<td class="cell-no">—</td><td class="cell-no">—</td>'
-        : `<td class="${av?'cell-av':'cell-no'}">${av?'✓':'✗'}</td><td class="${sel?'cell-sel':'cell-no'}">${sel?'✓':'—'}</td>`;
-    });
-    html += '</tr>';
-  });
-  html += '</tbody>';
-  table.innerHTML = html;
-}
-
 fetchData();
 </script>
-</body>
-</html>
+</body></html>
