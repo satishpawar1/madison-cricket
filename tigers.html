@@ -5,267 +5,263 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Tigers — Availability & Selection Tracker</title>
+<title>Madison Tigers — Availability & Selection</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
-.container { max-width: 860px; margin: 0 auto; }
-.hdr { margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px; }
-.hdr-back { font-size: 22px; text-decoration: none; color: #888; }
-.hdr-text h2 { font-size: 18px; font-weight: 500; }
-.hdr-text p { font-size: 13px; color: #666; margin-top: 3px; }
-.instr { font-size: 13px; color: #555; background: #FAEEDA; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.2rem; line-height: 1.6; }
-.gs { display: flex; gap: 10px; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
-.gs label { font-size: 13px; color: #666; white-space: nowrap; }
-.gs select { font-size: 15px; padding: 8px 10px; border: 0.5px solid #ccc; border-radius: 8px; background: #fff; flex: 1; min-width: 200px; }
-.slbl { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 1.2rem; }
-@media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-.pc { background: #fff; border: 0.5px solid #ddd; border-radius: 8px; padding: 12px; cursor: pointer; user-select: none; touch-action: manipulation; }
-.pc.av { border-color: #BA7517; background: #FAEEDA; }
-.pc.av .pn { color: #633806; }
-.pc.sel { border: 2px solid #993C1D; background: #FAECE7; }
-.pc.sel .pn { color: #4A1B0C; }
-.pc.av.sel { border: 2px solid #993C1D; background: #FAECE7; }
-.pn { font-size: 14px; font-weight: 500; color: #1a1a1a; }
-.tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
-.tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; }
-.ta { background: #FAC775; color: #633806; }
-.ts { background: #F5C4B3; color: #4A1B0C; }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.2rem; }
-.sc { background: #f1efe8; border-radius: 8px; padding: 10px 8px; text-align: center; }
-.sn { font-size: 20px; font-weight: 500; color: #1a1a1a; }
-.sl { font-size: 11px; color: #888; margin-top: 2px; }
-.sep { border: none; border-top: 0.5px solid #ddd; margin: 1.2rem 0; }
-.acts { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { font-size: 14px; padding: 10px 14px; border-radius: 8px; cursor: pointer; border: 0.5px solid #ccc; background: transparent; color: #1a1a1a; touch-action: manipulation; }
-.btn-primary { background: #993C1D; color: #FAECE7; border-color: #993C1D; }
-.btn-record { background: #0F6E56; color: #E1F5EE; border-color: #0F6E56; }
-.btn-record:disabled { background: #aaa; border-color: #aaa; cursor: not-allowed; }
-.btn-reset { color: #888; }
-.msg { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 8px; display: none; }
-.msg.ok { background: #E1F5EE; color: #085041; display: block; }
-.msg.err { background: #FCEBEB; color: #791F1F; display: block; }
-.msg.info { background: #E6F1FB; color: #0C447C; display: block; }
-.wa-box { background: #fff; border: 0.5px solid #ddd; border-radius: 8px; padding: 14px; margin-top: 1rem; display: none; }
-.wa-box.show { display: block; }
-.wa-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-.wa-text { font-size: 13px; color: #1a1a1a; white-space: pre-wrap; line-height: 1.7; background: #f9f9f7; border-radius: 6px; padding: 12px; word-break: break-word; }
-.wa-acts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.sync-status { font-size: 12px; color: #888; margin-top: 6px; }
-.sync-status.synced { color: #0F6E56; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}
+.container{max-width:860px;margin:0 auto}
+.hdr{margin-bottom:1.2rem;display:flex;align-items:center;gap:10px}
+.hdr a{font-size:22px;text-decoration:none;color:#888}
+.hdr-text h2{font-size:18px;font-weight:500}
+.hdr-text p{font-size:13px;color:#666;margin-top:3px}
+.instr{font-size:13px;color:#555;background:#FAEEDA;border-radius:8px;padding:10px 14px;margin-bottom:1.2rem;line-height:1.6}
+.gs{display:flex;gap:10px;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap}
+.gs label{font-size:13px;color:#666;white-space:nowrap}
+.gs select{font-size:15px;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;background:#fff;flex:1;min-width:200px}
+.slbl{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:1.2rem}
+@media(max-width:480px){.grid{grid-template-columns:repeat(2,1fr)}}
+.pc{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:12px;cursor:pointer;user-select:none;touch-action:manipulation}
+.pc.av{border-color:#BA7517;background:#FAEEDA}
+.pc.av .pn{color:#633806}
+.pc.sel{border:2px solid #993C1D;background:#FAECE7}
+.pc.sel .pn{color:#4A1B0C}
+.pc.av.sel{border:2px solid #993C1D;background:#FAECE7}
+.pn{font-size:14px;font-weight:500;color:#1a1a1a}
+.tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px}
+.ta{background:#FAC775;color:#633806}
+.ts{background:#F5C4B3;color:#4A1B0C}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.2rem}
+.sc{background:#f1efe8;border-radius:8px;padding:10px 8px;text-align:center}
+.sn{font-size:20px;font-weight:500;color:#1a1a1a}
+.sl{font-size:11px;color:#888;margin-top:2px}
+.freeze{display:none;background:#FCEBEB;color:#791F1F;border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:13px}
+.sep{border:none;border-top:0.5px solid #ddd;margin:1.2rem 0}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font-size:14px;padding:10px 14px;border-radius:8px;cursor:pointer;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;touch-action:manipulation}
+.btn-primary{background:#993C1D;color:#FAECE7;border-color:#993C1D}
+.btn-record{background:#0F6E56;color:#E1F5EE;border-color:#0F6E56}
+.btn-record:disabled{background:#aaa;border-color:#aaa;cursor:not-allowed;opacity:0.6}
+.btn-reset{color:#888}
+.sync{font-size:12px;color:#888;margin-top:6px}
+.sync.ok{color:#0F6E56}
+.msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}
+.msg.ok{background:#E1F5EE;color:#085041;display:block}
+.msg.err{background:#FCEBEB;color:#791F1F;display:block}
+.msg.info{background:#E6F1FB;color:#0C447C;display:block}
+.wa-box{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:14px;margin-top:1rem;display:none}
+.wa-box.show{display:block}
+.wa-lbl{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.wa-txt{font-size:13px;color:#1a1a1a;white-space:pre-wrap;line-height:1.7;background:#f9f9f7;border-radius:6px;padding:12px;word-break:break-word}
+.wa-acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="hdr">
-    <a class="hdr-back" href="index.html">‹</a>
+    <a href="index.html">&#8249;</a>
     <div class="hdr-text">
-      <h2>Madison Tigers — availability &amp; selection</h2>
-      <p>Tape T20 2026 &nbsp;·&nbsp; Track, select, publish &amp; record.</p>
+      <h2>Madison Tigers &mdash; availability &amp; selection</h2>
+      <p>Tape T20 2026 &nbsp;&middot;&nbsp; Track, select, publish &amp; record.</p>
     </div>
   </div>
-
-  <div class="instr">Step 1: Select the game. &nbsp;|&nbsp; Step 2: Tap players — once = available, twice = selected. &nbsp;|&nbsp; Step 3: Generate WhatsApp. &nbsp;|&nbsp; Step 4: Record to Google Sheets.</div>
-
+  <div class="instr">Step 1: Select the game. | Step 2: Tap players &mdash; once = available, twice = selected. | Step 3: Generate WhatsApp. | Step 4: Record to Google Sheets.</div>
   <div class="gs">
     <label>Game</label>
-    <select id="gs">
-      <option value="">— pick a game —</option>
-    </select>
-    <script>
-      window.addEventListener('DOMContentLoaded', function() {
-        const sel = document.getElementById('gs');
-        MCC_CONFIG.tigers.games.forEach(g => {
-          const opt = document.createElement('option');
-          opt.value = g.name;
-          const d = new Date(g.gameDate);
-          const mo = d.toLocaleString('default',{month:'short'});
-          opt.textContent = g.name + ' — ' + mo + ' ' + d.getDate();
-          sel.appendChild(opt);
-        });
-      });
-    </script>
+    <select id="gs"><option value="">&#8212; pick a game &#8212;</option></select>
   </div>
-
   <div class="stats">
     <div class="sc"><div class="sn" id="stA">0</div><div class="sl">Available</div></div>
     <div class="sc"><div class="sn" id="stS" style="color:#993C1D">0</div><div class="sl">Selected</div></div>
     <div class="sc"><div class="sn" style="color:#888">11</div><div class="sl">Min</div></div>
-    <div class="sc"><div class="sn" id="stX" style="font-size:13px;padding-top:6px;color:#888">—</div><div class="sl">Status</div></div>
+    <div class="sc"><div class="sn" id="stX" style="font-size:13px;padding-top:6px;color:#888">&#8212;</div><div class="sl">Status</div></div>
   </div>
-
-  <div id="freezeBanner" style="display:none; background:#FCEBEB; color:#791F1F; border-radius:8px; padding:10px 14px; margin-bottom:1rem; font-size:13px;">
-  🔒 This game is in the past — team is locked. No changes or recording allowed.
-</div>
-<div class="slbl">Players — tap once = available &nbsp;·&nbsp; tap twice = selected &nbsp;·&nbsp; tap again = reset</div>
+  <div class="freeze" id="freezeBanner">&#128274; This game is in the past &mdash; team is locked. No changes or recording allowed.</div>
+  <div class="slbl">Players &mdash; tap once = available &middot; tap twice = selected &middot; tap again = reset</div>
   <div class="grid" id="pg"></div>
-
   <hr class="sep">
   <div class="acts">
     <button class="btn btn-primary" onclick="genWA()">Generate WhatsApp</button>
     <button class="btn btn-record" id="recordBtn" onclick="recordTeam()" disabled>Record to Sheets</button>
-    <button class="btn btn-reset" onclick="reset()">Reset</button>
+    <button class="btn btn-reset" onclick="resetGame()">Reset</button>
   </div>
-  <div class="sync-status" id="syncStatus"></div>
+  <div class="sync" id="syncStatus"></div>
   <div class="msg" id="msg"></div>
-
   <div class="wa-box" id="waBox">
-    <div class="wa-label">WhatsApp announcement — tap text to select, then copy</div>
-    <div class="wa-text" id="waText" onclick="selectText(this)"></div>
+    <div class="wa-lbl">WhatsApp announcement &mdash; tap text to select, then copy</div>
+    <div class="wa-txt" id="waText" onclick="selectAll(this)"></div>
     <div class="wa-acts">
       <button class="btn btn-primary" onclick="copyWA()">Copy to clipboard</button>
       <button class="btn" onclick="document.getElementById('waBox').classList.remove('show')">Dismiss</button>
     </div>
   </div>
 </div>
-
 <script>
-const CFG = MCC_CONFIG.tigers;
-const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
-const TEAM = 'Tigers';
-const PL = CFG.players;
-const GM = CFG.games.map(g => g.name);
+var CFG = MCC_CONFIG.tigers;
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var TEAM = 'Tigers';
+var PL = CFG.players;
+var state = {};
+
+// Build state from preloaded data
+CFG.games.forEach(function(g) {
+  state[g.name] = {};
+  var pre = CFG.preloaded[g.name];
+  PL.forEach(function(p) {
+    state[g.name][p] = pre ? (pre.sel.indexOf(p) >= 0 ? 2 : pre.av.indexOf(p) >= 0 ? 1 : 0) : 0;
+  });
+});
+
+var cur = '';
 
 function isPast(game) {
-  const g = CFG.games.find(x => x.name===game);
+  var g = CFG.games.filter(function(x) { return x.name === game; })[0];
   if (!g) return false;
-  const today=new Date(); today.setHours(0,0,0,0);
-  const gd=new Date(g.gameDate); gd.setHours(0,0,0,0);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var gd = new Date(g.gameDate); gd.setHours(0,0,0,0);
   return today > gd;
 }
 
-function applyFreezeUI(frozen) {
-  const banner=document.getElementById('freezeBanner');
-  const recordBtn=document.getElementById('recordBtn');
-  if (frozen) {
-    banner.style.display='block';
-    PL.forEach(p=>{const c=document.getElementById('c-'+p);if(c){c.style.opacity='0.6';c.style.cursor='not-allowed';c.style.pointerEvents='none';}});
-    if(recordBtn){recordBtn.disabled=true;recordBtn.style.opacity='0.4';}
-  } else {
-    banner.style.display='none';
-    PL.forEach(p=>{const c=document.getElementById('c-'+p);if(c){c.style.opacity='';c.style.cursor='';c.style.pointerEvents='';}});
-    updateStats();
-  }
-}
+function init() {
+  // Populate game dropdown
+  var sel = document.getElementById('gs');
+  CFG.games.forEach(function(g) {
+    var opt = document.createElement('option');
+    opt.value = g.name;
+    var d = new Date(g.gameDate);
+    opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    sel.appendChild(opt);
+  });
 
-const state={};
-GM.forEach(g=>{
-  state[g]={};
-  const pre=CFG.preloaded[g];
-  PL.forEach(p=>{state[g][p]=pre?(pre.sel.includes(p)?2:pre.av.includes(p)?1:0):0;});
-});
-let cur='';
-
-function init(){
-  const g=document.getElementById('pg');g.innerHTML='';
-  PL.forEach(p=>{
-    const c=document.createElement('div');c.className='pc';c.id='c-'+p;
-    c.innerHTML='<div class="pn">'+p+'</div><div class="tags" id="t-'+p+'"></div>';
-    c.addEventListener('click',function(e){e.preventDefault();cycle(p);});
-    g.appendChild(c);
+  // Build player grid
+  var grid = document.getElementById('pg');
+  PL.forEach(function(p) {
+    var c = document.createElement('div');
+    c.className = 'pc'; c.id = 'pc-' + p;
+    c.innerHTML = '<div class="pn">' + p + '</div><div class="tags" id="tg-' + p + '"></div>';
+    c.addEventListener('click', function(e) { e.preventDefault(); cycle(p); });
+    grid.appendChild(c);
   });
   updateStats();
 }
 
-function cycle(p){
-  if(!cur){show('Pick a game first!','err');return;}
-  if(isPast(cur)){show('This game is locked — no changes allowed for past games.','err');return;}
-  state[cur][p]=state[cur][p]>=2?0:state[cur][p]+1;
-  render(p);updateStats();
+function cycle(p) {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  if (isPast(cur)) { show('This game is locked — no changes allowed.', 'err'); return; }
+  state[cur][p] = state[cur][p] >= 2 ? 0 : state[cur][p] + 1;
+  renderCard(p); updateStats();
 }
 
-function render(p){
-  const v=cur?state[cur][p]:0;
-  const c=document.getElementById('c-'+p),t=document.getElementById('t-'+p);
-  c.className='pc';t.innerHTML='';
-  if(v===1){c.classList.add('av');t.innerHTML='<span class="tag ta">Available</span>';}
-  else if(v===2){c.classList.add('av','sel');t.innerHTML='<span class="tag ta">Available</span><span class="tag ts">Selected</span>';}
+function renderCard(p) {
+  var v = cur ? state[cur][p] : 0;
+  var c = document.getElementById('pc-' + p);
+  var t = document.getElementById('tg-' + p);
+  c.className = 'pc'; t.innerHTML = '';
+  if (v === 1) { c.classList.add('av'); t.innerHTML = '<span class="tag ta">Available</span>'; }
+  else if (v === 2) { c.classList.add('av', 'sel'); t.innerHTML = '<span class="tag ta">Available</span><span class="tag ts">Selected</span>'; }
 }
 
-function updateStats(){
-  if(!cur)return;
-  const vals=Object.values(state[cur]);
-  const av=vals.filter(v=>v>=1).length,sel=vals.filter(v=>v===2).length;
-  document.getElementById('stA').textContent=av;
-  document.getElementById('stS').textContent=sel;
-  const x=document.getElementById('stX');
-  if(sel===0){x.textContent='—';x.style.color='#888';x.style.fontSize='22px';}
-  else if(sel<11){x.textContent='Need '+(11-sel);x.style.color='#BA7517';x.style.fontSize='16px';}
-  else if(sel<=12){x.textContent='Ready!';x.style.color='#0F6E56';x.style.fontSize='16px';}
-  else{x.textContent='Max 12!';x.style.color='#A32D2D';x.style.fontSize='15px';}
-  document.getElementById('recordBtn').disabled=(sel<11);
+function updateStats() {
+  if (!cur) return;
+  var vals = Object.keys(state[cur]).map(function(k) { return state[cur][k]; });
+  var av = vals.filter(function(v) { return v >= 1; }).length;
+  var sel = vals.filter(function(v) { return v === 2; }).length;
+  document.getElementById('stA').textContent = av;
+  document.getElementById('stS').textContent = sel;
+  var x = document.getElementById('stX');
+  if (sel === 0) { x.textContent = '—'; x.style.color = '#888'; x.style.fontSize = '22px'; }
+  else if (sel < 11) { x.textContent = 'Need ' + (11-sel); x.style.color = '#BA7517'; x.style.fontSize = '16px'; }
+  else if (sel <= 12) { x.textContent = 'Ready!'; x.style.color = '#0F6E56'; x.style.fontSize = '16px'; }
+  else { x.textContent = 'Max 12!'; x.style.color = '#A32D2D'; x.style.fontSize = '15px'; }
+  document.getElementById('recordBtn').disabled = (sel < 11 || isPast(cur));
 }
 
-document.getElementById('gs').addEventListener('change',function(){
-  cur=this.value;PL.forEach(p=>render(p));updateStats();
+function applyFreeze(frozen) {
+  document.getElementById('freezeBanner').style.display = frozen ? 'block' : 'none';
+  PL.forEach(function(p) {
+    var c = document.getElementById('pc-' + p);
+    if (c) { c.style.opacity = frozen ? '0.6' : ''; c.style.pointerEvents = frozen ? 'none' : ''; }
+  });
+}
+
+document.getElementById('gs').addEventListener('change', function() {
+  cur = this.value;
+  PL.forEach(function(p) { renderCard(p); });
+  updateStats();
+  applyFreeze(cur && isPast(cur));
   document.getElementById('waBox').classList.remove('show');
-  document.getElementById('syncStatus').textContent='';
-  hide();
-  applyFreezeUI(cur&&isPast(cur));
+  document.getElementById('syncStatus').textContent = '';
+  document.getElementById('msg').className = 'msg';
 });
 
-function genWA(){
-  if(!cur){show('Pick a game first!','err');return;}
-  const selected=PL.filter(p=>state[cur][p]===2);
-  if(!selected.length){show('No players selected yet!','err');return;}
-  const s=CFG.games.find(g=>g.name===cur);
-  const xi=selected.length>11?'PLAYING XII':'PLAYING XI';
-  const closer=CFG.closers[Math.floor(Math.random()*CFG.closers.length)];
-  let msg='Madison Tigers: '+xi+' for our game against '+cur+'
-';
-  msg+=s.day+', '+s.date+' at '+s.time+' at '+s.ground+'
-
-';
-  selected.forEach((p,i)=>msg+=(i+1)+'. '+p+'
-');
-  msg+='
-Be at the ground by '+s.warmup+' SHARP for warmup & team huddle.
-';
-  msg+=closer;
-  document.getElementById('waText').textContent=msg;
+function genWA() {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  var selected = PL.filter(function(p) { return state[cur][p] === 2; });
+  if (!selected.length) { show('No players selected yet!', 'err'); return; }
+  var s = CFG.games.filter(function(g) { return g.name === cur; })[0];
+  var xi = selected.length > 11 ? 'PLAYING XII' : 'PLAYING XI';
+  var closers = CFG.closers;
+  var closer = closers[Math.floor(Math.random() * closers.length)];
+  var msg = 'Madison Tigers: ' + xi + ' for our game against ' + cur + '\n' + s.day + ', ' + s.date + ' at ' + s.time + ' at ' + s.ground + '\n\n';
+  selected.forEach(function(p, i) { msg += (i+1) + '. ' + p + '\n'; });
+  msg += '\nBe at the ground by ' + s.warmup + ' SHARP for warmup & team huddle.\n';
+  msg += closer;
+  document.getElementById('waText').textContent = msg;
   document.getElementById('waBox').classList.add('show');
-  document.getElementById('waBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('waBox').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-function copyWA(){safeCopy(document.getElementById('waText').textContent,'WhatsApp message copied!');}
+function copyWA() { safeCopy(document.getElementById('waText').textContent, 'WhatsApp message copied!'); }
 
-function recordTeam(){
-  if(!cur){show('Pick a game first!','err');return;}
-  const sel=PL.filter(p=>state[cur][p]===2).length;
-  if(sel<11){show('Select at least 11 players first.','err');return;}
-  if(isPast(cur)){show('This game is locked.','err');return;}
-  const btn=document.getElementById('recordBtn');
-  btn.disabled=true;btn.textContent='Recording...';
-  show('Sending to Google Sheets...','info');
-  const payload={team:TEAM,game:cur,players:PL.map(p=>({name:p,available:state[cur][p]>=1?1:0,selected:state[cur][p]===2?1:0}))};
-  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)})
-    .then(r=>r.json())
-    .then(d=>{
-      btn.disabled=false;btn.textContent='Record to Sheets';
-      if(d.status==='ok'){
-        show('Recorded! Google Sheet updated.','ok');
-        const st=document.getElementById('syncStatus');
-        st.textContent='Last synced: '+new Date().toLocaleTimeString();
-        st.className='sync-status synced';
-      } else show('Error: '+d.message,'err');
+function recordTeam() {
+  if (!cur) { show('Pick a game first!', 'err'); return; }
+  if (isPast(cur)) { show('This game is locked.', 'err'); return; }
+  var selCount = PL.filter(function(p) { return state[cur][p] === 2; }).length;
+  if (selCount < 11) { show('Select at least 11 players first.', 'err'); return; }
+  var btn = document.getElementById('recordBtn');
+  btn.disabled = true; btn.textContent = 'Recording...';
+  show('Sending to Google Sheets...', 'info');
+  var payload = { team: TEAM, game: cur, players: PL.map(function(p) { return { name:p, available:state[cur][p]>=1?1:0, selected:state[cur][p]===2?1:0 }; }) };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload) })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      btn.disabled = false; btn.textContent = 'Record to Sheets';
+      if (d.status === 'ok') {
+        show('Recorded! Google Sheet updated.', 'ok');
+        var st = document.getElementById('syncStatus');
+        st.textContent = 'Last synced: ' + new Date().toLocaleTimeString();
+        st.className = 'sync ok';
+      } else { show('Error: ' + d.message, 'err'); }
     })
-    .catch(()=>{btn.disabled=false;btn.textContent='Record to Sheets';show('Network error. Try again.','err');});
+    .catch(function() { btn.disabled=false; btn.textContent='Record to Sheets'; show('Network error. Try again.', 'err'); });
 }
 
-function safeCopy(text,successMsg){
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>show(successMsg,'ok')).catch(()=>fallbackCopy(text,successMsg));}
-  else{fallbackCopy(text,successMsg);}
+function safeCopy(text, msg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() { show(msg, 'ok'); }).catch(function() { fallbackCopy(text, msg); });
+  } else { fallbackCopy(text, msg); }
 }
-function fallbackCopy(text,successMsg){
-  try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();if(document.execCommand('copy'))show(successMsg,'ok');else show('Tap the text above to select, then copy manually.','err');document.body.removeChild(ta);}catch(e){show('Tap the text above to select, then copy manually.','err');}
+function fallbackCopy(text, msg) {
+  try {
+    var ta = document.createElement('textarea'); ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    if (document.execCommand('copy')) { show(msg, 'ok'); } else { show('Tap text above to copy manually.', 'err'); }
+    document.body.removeChild(ta);
+  } catch(e) { show('Tap text above to copy manually.', 'err'); }
 }
-function selectText(el){try{const r=document.createRange();r.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(r);}catch(e){}}
-function reset(){if(!cur)return;PL.forEach(p=>{state[cur][p]=0;render(p);});updateStats();document.getElementById('waBox').classList.remove('show');show('Reset done.','ok');}
-function show(t,type){const e=document.getElementById('msg');e.textContent=t;e.className='msg '+type;setTimeout(()=>e.className='msg',4000);}
-function hide(){document.getElementById('msg').className='msg';}
+function selectAll(el) {
+  try { var r=document.createRange(); r.selectNodeContents(el); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch(e) {}
+}
+function resetGame() {
+  if (!cur) return;
+  PL.forEach(function(p) { state[cur][p] = 0; renderCard(p); });
+  updateStats(); document.getElementById('waBox').classList.remove('show'); show('Reset done.', 'ok');
+}
+function show(t, type) { var e=document.getElementById('msg'); e.textContent=t; e.className='msg '+type; setTimeout(function(){e.className='msg';},4000); }
 
-document.addEventListener('DOMContentLoaded',init);
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
