@@ -2,62 +2,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
 <title>Madison Lions &mdash; Log Catches</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}
-.container{max-width:640px;margin:0 auto}
-.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
-.hdr a{font-size:22px;text-decoration:none;color:#888}
-.hdr-text h2{font-size:18px;font-weight:500}
-.hdr-text p{font-size:13px;color:#666;margin-top:3px}
-.gs{display:flex;gap:10px;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap}
-.gs label{font-size:13px;color:#666}
-.gs select{font-size:14px;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;background:#fff;flex:1}
-.banner{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem;display:none}
-.b-lock{background:#FCEBEB;color:#791F1F}
-.b-pre{background:#E6F1FB;color:#185FA5}
-.b-past{background:#FAEEDA;color:#633806}
-.b-new{background:#E1F5EE;color:#085041}
-.slbl{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.col-hdr{display:grid;grid-template-columns:1fr 58px 58px 58px;gap:6px;padding:0 14px;margin-bottom:4px}
-.col-hdr span{font-size:11px;color:#888;text-align:center}
-.col-hdr span:first-child{text-align:left}
-.prows{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}
-.pr{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:8px 14px;display:grid;grid-template-columns:1fr 58px 58px 58px;gap:6px;align-items:center}
-.pr.pre{border-color:#185FA5;background:#E6F1FB}
-.pr.locked{opacity:0.55}
-.prname{font-size:14px;font-weight:500}
-.pr input{font-size:14px;padding:5px 4px;border:0.5px solid #ccc;border-radius:6px;text-align:center;width:100%}
-.pr.pre input{border-color:#185FA5}
-.pr input:disabled{background:#f1efe8;color:#888;border-color:#ddd;cursor:not-allowed}
-.summary{background:#f1efe8;border-radius:8px;padding:10px 14px;font-size:13px;color:#555;margin-bottom:1rem}
-.sep{border:none;border-top:0.5px solid #ddd;margin:1.2rem 0}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.btn{font-size:14px;padding:10px 16px;border-radius:8px;cursor:pointer;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;touch-action:manipulation}
-.btn-primary{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
-.btn-primary:disabled{background:#aaa;border-color:#aaa;cursor:not-allowed}
-.btn-clear{color:#888}
-.msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}
-.msg.ok{background:#E1F5EE;color:#085041;display:block}
-.msg.err{background:#FCEBEB;color:#791F1F;display:block}
-.msg.info{background:#E6F1FB;color:#0C447C;display:block}
+*{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
+body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}}
+.container{{max-width:640px;margin:0 auto}}
+.hdr{{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}}
+.hdr a{{font-size:22px;text-decoration:none;color:#888}}
+.hdr-text h2{{font-size:18px;font-weight:500}}
+.hdr-text p{{font-size:13px;color:#666;margin-top:3px}}
+.gs{{display:flex;gap:10px;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap}}
+.gs label{{font-size:13px;color:#666}}
+.gs select{{font-size:14px;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;background:#fff;flex:1}}
+.banner{{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem;display:none}}
+.b-lock{{background:#FCEBEB;color:#791F1F}}
+.b-pre{{background:#E6F1FB;color:#185FA5}}
+.b-past{{background:#FAEEDA;color:#633806}}
+.b-new{{background:#E1F5EE;color:#085041}}
+.slbl{{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}}
+.col-hdr{{display:grid;grid-template-columns:1fr 58px 58px 58px;gap:6px;padding:0 14px;margin-bottom:4px}}
+.col-hdr span{{font-size:11px;color:#888;text-align:center}}
+.col-hdr span:first-child{{text-align:left}}
+.prows{{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}}
+.pr{{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:8px 14px;display:grid;grid-template-columns:1fr 58px 58px 58px;gap:6px;align-items:center}}
+.pr.pre{{border-color:#185FA5;background:#E6F1FB}}
+.pr.locked{{opacity:0.55}}
+.prname{{font-size:14px;font-weight:500}}
+.pr input{{font-size:14px;padding:5px 4px;border:0.5px solid #ccc;border-radius:6px;text-align:center;width:100%}}
+.pr.pre input{{border-color:#185FA5}}
+.pr input:disabled{{background:#f1efe8;color:#888;border-color:#ddd;cursor:not-allowed}}
+.summary{{background:#f1efe8;border-radius:8px;padding:10px 14px;font-size:13px;color:#555;margin-bottom:1rem}}
+.sep{{border:none;border-top:0.5px solid #ddd;margin:1.2rem 0}}
+.acts{{display:flex;gap:8px;flex-wrap:wrap}}
+.btn{{font-size:14px;padding:10px 16px;border-radius:8px;cursor:pointer;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;touch-action:manipulation}}
+.btn-primary{{background:#185FA5;color:#E6F1FB;border-color:#185FA5}}
+.btn-primary:disabled{{background:#aaa;border-color:#aaa;cursor:not-allowed}}
+.btn-clear{{color:#888}}
+.msg{{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}}
+.msg.ok{{background:#E1F5EE;color:#085041;display:block}}
+.msg.err{{background:#FCEBEB;color:#791F1F;display:block}}
+.msg.info{{background:#E6F1FB;color:#0C447C;display:block}}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="hdr">
     <a href="index.html">&#8249;</a>
-    <div class="hdr-text"><h2>Madison Lions &mdash; log catches</h2><p>Record catch efficiency per game</p></div>
+    <div class="hdr-text">
+      <h2>Madison Lions &mdash; log catches</h2>
+      <p>Record catch efficiency per game</p>
+    </div>
   </div>
-  <div class="gs"><label>Game</label><select id="gs" onchange="onGameChange()"><option value="">&#8212; pick a game &#8212;</option></select></div>
+  <div class="gs">
+    <label>Game</label>
+    <select id="gs"><option value="">&#8212; pick a game &#8212;</option></select>
+  </div>
   <div class="banner" id="banner"></div>
   <div id="playerSection" style="display:none">
     <div class="slbl">Catches per player</div>
-    <div class="col-hdr"><span>Player</span><span>Attempted</span><span>Taken</span><span>Dropped</span></div>
+    <div class="col-hdr">
+      <span>Player</span><span>Attempted</span><span>Taken</span><span>Dropped</span>
+    </div>
     <div class="prows" id="prows"></div>
     <div class="summary" id="summary"></div>
     <hr class="sep">
@@ -74,135 +82,180 @@ var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var PL = CFG.players;
 var isLocked = false;
 
+// Populate dropdown — all games, past marked with checkmark
 window.addEventListener('DOMContentLoaded', function() {
   var sel = document.getElementById('gs');
+  var today = new Date(); today.setHours(0,0,0,0);
   CFG.games.forEach(function(g) {
     var opt = document.createElement('option');
     opt.value = g.name;
-    var d = new Date(g.gameDate);
-    var today = new Date(); today.setHours(0,0,0,0); d.setHours(0,0,0,0);
-    var lbl = g.name + ' \u2014 ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    if (today > d) lbl += ' \u2713';
-    opt.textContent = lbl;
+    var d = new Date(g.gameDate); d.setHours(0,0,0,0);
+    opt.textContent = g.name + ' - ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'})
+                    + (today > d ? ' (played)' : '');
     sel.appendChild(opt);
   });
+  sel.addEventListener('change', onGameChange);
 });
 
 function onGameChange() {
-  var game = document.getElementById('gs').value;
+  var game = this.value;
   var section = document.getElementById('playerSection');
   if (!game) { section.style.display='none'; hideBanner(); return; }
   section.style.display = 'block';
 
-  var gCfg = CFG.games.filter(function(x){return x.name===game;})[0];
-  var gameDate = new Date(gCfg.gameDate); gameDate.setHours(0,0,0,0);
   var today = new Date(); today.setHours(0,0,0,0);
-  var daysSince = Math.floor((today - gameDate)/(1000*60*60*24));
+  var gCfg = null;
+  for (var i=0; i<CFG.games.length; i++) {
+    if (CFG.games[i].name === game) { gCfg = CFG.games[i]; break; }
+  }
+  var gameDate = new Date(gCfg.gameDate); gameDate.setHours(0,0,0,0);
+  var daysSince = Math.floor((today - gameDate) / (1000*60*60*24));
   var isPast = today > gameDate;
-
   isLocked = isPast && daysSince > 5;
 
-  var preData = CFG.catchByGame && CFG.catchByGame[game];
+  var preData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
+
+  // Banner
   var banner = document.getElementById('banner');
   banner.style.display = 'block';
-
   if (isLocked) {
     banner.className = 'banner b-lock';
-    banner.textContent = 'This game was played ' + daysSince + ' days ago \u2014 catch data is locked and cannot be edited.';
+    banner.textContent = 'This game was played ' + daysSince + ' days ago - catch data is locked.';
   } else if (preData) {
     banner.className = 'banner b-pre';
     banner.textContent = 'Pre-filled with recorded data. Edit and save to update.';
   } else if (isPast) {
     banner.className = 'banner b-past';
-    banner.textContent = 'Past game \u2014 enter or update catch data below.';
+    banner.textContent = 'Past game - enter or update catch data below.';
   } else {
     banner.className = 'banner b-new';
-    banner.textContent = 'Upcoming game \u2014 enter catch data after the match.';
+    banner.textContent = 'Upcoming game - enter catch data after the match.';
   }
 
-  document.getElementById('prows').innerHTML = PL.map(function(p) {
-    var pre = preData && preData.filter(function(x){return x.name===p;})[0];
+  // Build player rows — NO inline event handlers, attach via JS after
+  var rows = document.getElementById('prows');
+  rows.innerHTML = '';
+  PL.forEach(function(p) {
+    var pre = null;
+    if (preData) {
+      for (var i=0; i<preData.length; i++) {
+        if (preData[i].name === p) { pre = preData[i]; break; }
+      }
+    }
     var att  = pre ? pre.att : 0;
     var tak  = pre ? pre.tak : 0;
     var drop = att - tak;
     var cls  = isLocked ? 'pr locked' : (pre && pre.att > 0 ? 'pr pre' : 'pr');
-    var dis  = isLocked ? ' disabled' : '';
-    return '<div class="' + cls + '">'
-      + '<span class="prname">' + p + '</span>'
-      + '<input type="number" min="0" max="20" value="' + att  + '" id="att-' + p + '" oninput="syncDropped('' + p + '')"' + dis + '>'
-      + '<input type="number" min="0" max="20" value="' + tak  + '" id="tak-' + p + '" oninput="syncDropped('' + p + '')"' + dis + '>'
-      + '<input type="number" min="0" max="20" value="' + drop + '" id="drp-' + p + '" oninput="syncFromDropped('' + p + '')"' + dis + '>'
-      + '</div>';
-  }).join('');
+
+    var row = document.createElement('div');
+    row.className = cls;
+
+    var nameEl = document.createElement('span');
+    nameEl.className = 'prname';
+    nameEl.textContent = p;
+
+    var attEl = document.createElement('input');
+    attEl.type = 'number'; attEl.min = '0'; attEl.max = '20';
+    attEl.value = att; attEl.id = 'att-' + p;
+    attEl.disabled = isLocked;
+
+    var takEl = document.createElement('input');
+    takEl.type = 'number'; takEl.min = '0'; takEl.max = '20';
+    takEl.value = tak; takEl.id = 'tak-' + p;
+    takEl.disabled = isLocked;
+
+    var drpEl = document.createElement('input');
+    drpEl.type = 'number'; drpEl.min = '0'; drpEl.max = '20';
+    drpEl.value = drop; drpEl.id = 'drp-' + p;
+    drpEl.disabled = isLocked;
+
+    // Attach events via closure
+    (function(player) {
+      attEl.addEventListener('input', function() { syncDropped(player); });
+      takEl.addEventListener('input', function() { syncDropped(player); });
+      drpEl.addEventListener('input', function() { syncFromDropped(player); });
+    })(p);
+
+    row.appendChild(nameEl);
+    row.appendChild(attEl);
+    row.appendChild(takEl);
+    row.appendChild(drpEl);
+    rows.appendChild(row);
+  });
 
   document.getElementById('saveBtn').disabled = isLocked;
   updateSummary();
 }
 
 function syncDropped(p) {
-  var att = parseInt(document.getElementById('att-'+p).value)||0;
-  var tak = parseInt(document.getElementById('tak-'+p).value)||0;
+  var att = parseInt(document.getElementById('att-'+p).value) || 0;
+  var tak = parseInt(document.getElementById('tak-'+p).value) || 0;
   if (tak > att) { tak = att; document.getElementById('tak-'+p).value = tak; }
   document.getElementById('drp-'+p).value = att - tak;
   updateSummary();
 }
 
 function syncFromDropped(p) {
-  var att = parseInt(document.getElementById('att-'+p).value)||0;
-  var drp = parseInt(document.getElementById('drp-'+p).value)||0;
+  var att = parseInt(document.getElementById('att-'+p).value) || 0;
+  var drp = parseInt(document.getElementById('drp-'+p).value) || 0;
   if (drp > att) { drp = att; document.getElementById('drp-'+p).value = drp; }
   document.getElementById('tak-'+p).value = att - drp;
   updateSummary();
 }
 
 function updateSummary() {
-  var att=0, tak=0;
+  var att = 0, tak = 0;
   PL.forEach(function(p) {
-    att += parseInt(document.getElementById('att-'+p).value)||0;
-    tak += parseInt(document.getElementById('tak-'+p).value)||0;
+    att += parseInt(document.getElementById('att-'+p).value) || 0;
+    tak += parseInt(document.getElementById('tak-'+p).value) || 0;
   });
   var eff = att ? Math.round(tak/att*100) : 0;
   document.getElementById('summary').textContent =
-    'Total: ' + att + ' attempted \u2022 ' + tak + ' taken \u2022 ' + (att-tak) + ' dropped \u2022 ' + eff + '% efficiency';
+    'Total: ' + att + ' attempted, ' + tak + ' taken, ' + (att-tak) + ' dropped, ' + eff + '% efficiency';
 }
 
 function clearAll() {
-  if (isLocked) { show('This game is locked.','err'); return; }
+  if (isLocked) { show('This game is locked.', 'err'); return; }
   PL.forEach(function(p) {
-    document.getElementById('att-'+p).value=0;
-    document.getElementById('tak-'+p).value=0;
-    document.getElementById('drp-'+p).value=0;
+    document.getElementById('att-'+p).value = 0;
+    document.getElementById('tak-'+p).value = 0;
+    document.getElementById('drp-'+p).value = 0;
   });
   updateSummary();
 }
 
 function submitCatches() {
-  if (isLocked) { show('This game is locked.','err'); return; }
+  if (isLocked) { show('This game is locked.', 'err'); return; }
   var game = document.getElementById('gs').value;
-  if (!game) { show('Pick a game first!','err'); return; }
-  var catches = PL.map(function(p) {
-    var att = parseInt(document.getElementById('att-'+p).value)||0;
-    var tak = parseInt(document.getElementById('tak-'+p).value)||0;
-    return {name:p, attempted:att, taken:tak, dropped:att-tak};
+  if (!game) { show('Pick a game first!', 'err'); return; }
+  var catches = [];
+  PL.forEach(function(p) {
+    var att = parseInt(document.getElementById('att-'+p).value) || 0;
+    var tak = parseInt(document.getElementById('tak-'+p).value) || 0;
+    catches.push({name:p, attempted:att, taken:tak, dropped:att-tak});
   });
-  show('Saving...','info');
-  fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({type:'catches',team:'Lions',game:game,catches:catches})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.status==='ok') show('Saved! Google Sheet updated.','ok');
-      else show('Error: '+d.message,'err');
-    })
-    .catch(function(){show('Network error. Try again.','err');});
+  show('Saving...', 'info');
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({type:'catches', team:'Lions', game:game, catches:catches})
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.status === 'ok') show('Saved! Google Sheet updated.', 'ok');
+    else show('Error: ' + d.message, 'err');
+  })
+  .catch(function() { show('Network error. Try again.', 'err'); });
 }
 
 function hideBanner() {
-  var b=document.getElementById('banner');
-  b.style.display='none'; b.className='banner';
+  var b = document.getElementById('banner');
+  b.style.display = 'none'; b.className = 'banner';
 }
-function show(t,type){
-  var e=document.getElementById('msg');
-  e.textContent=t; e.className='msg '+type;
-  setTimeout(function(){e.className='msg';},4000);
+
+function show(t, type) {
+  var e = document.getElementById('msg');
+  e.textContent = t; e.className = 'msg ' + type;
+  setTimeout(function() { e.className = 'msg'; }, 4000);
 }
 </script>
 </body>
