@@ -109,7 +109,9 @@ function onGameChange() {
   for (var i=0; i<CFG.games.length; i++) {
     if (CFG.games[i].name === game) { gCfg = CFG.games[i]; break; }
   }
-  var gameDate = new Date(gCfg.gameDate); gameDate.setHours(0,0,0,0);
+  var gdParts = gCfg.gameDate.split('-');
+  var gameDate = new Date(parseInt(gdParts[0]), parseInt(gdParts[1])-1, parseInt(gdParts[2]));
+  gameDate.setHours(0,0,0,0);
   var daysSince = Math.floor((today - gameDate) / (1000*60*60*24));
   var isPast = today > gameDate;
   isLocked = isPast && daysSince > 5;
