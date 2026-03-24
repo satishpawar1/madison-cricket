@@ -165,7 +165,7 @@ function renderCard(p) {
 
 function updateStats() {
   if (!cur) return;
-  var vals = Object.keys(state[cur]).map(function(k) { return state[cur][k]; });
+  var vals = PL.map(function(p) { return state[cur][p] || 0; });
   var av = vals.filter(function(v) { return v >= 1; }).length;
   var sel = vals.filter(function(v) { return v === 2; }).length;
   document.getElementById('stA').textContent = av;
@@ -201,9 +201,8 @@ document.getElementById('gs').addEventListener('change', function() {
         if (d.status === 'ok' && d.data && d.data.length) {
           // Update state with live data from Sheets
           d.data.forEach(function(p) {
-            if (state[cur][p.name] !== undefined) {
-              state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
-            }
+            // Always set — even if player wasn't in preloaded state (e.g. newly added)
+            state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
           });
         }
         PL.forEach(function(p) { renderCard(p); });
