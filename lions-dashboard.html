@@ -5,88 +5,213 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Lions — Dashboard</title>
+<title>Madison Lions &mdash; Dashboard</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}.container{max-width:860px;margin:0 auto}.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}.hdr a{font-size:22px;text-decoration:none;color:#888}.hdr-text h2{font-size:18px;font-weight:500}.hdr-text p{font-size:13px;color:#666;margin-top:3px}.summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}.sc{background:#f1efe8;border-radius:8px;padding:12px;text-align:center}.sn{font-size:22px;font-weight:500}.sl{font-size:11px;color:#888;margin-top:3px}.section-label{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.player-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}.player-row{background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:12px 14px}.player-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.player-name{font-size:14px;font-weight:500}.badges{display:flex;gap:6px}.badge{font-size:11px;padding:3px 8px;border-radius:20px}.badge-avail{background:#E1F5EE;color:#085041}.badge-sel{background:#E6F1FB;color:#0C447C}.bars{display:flex;flex-direction:column;gap:5px}.bar-row{display:flex;align-items:center;gap:8px}.bar-label{font-size:11px;color:#888;width:60px;flex-shrink:0}.bar-track{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden}.bar-fill-avail{height:100%;background:#1D9E75;border-radius:4px}.bar-fill-sel{height:100%;background:#185FA5;border-radius:4px}.bar-pct{font-size:11px;font-weight:500;width:34px;text-align:right;flex-shrink:0}.sort-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}.sort-row label{font-size:12px;color:#888}.sort-row select{font-size:13px;padding:5px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff}.game-grid{margin-bottom:1.5rem;overflow-x:auto}.game-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}.game-table th{background:#f1efe8;padding:7px 10px;text-align:center;font-weight:500;border:0.5px solid #ddd}.game-table th.pc{text-align:left;position:sticky;left:0;background:#f1efe8;z-index:1}.game-table td{padding:7px 10px;text-align:center;border:0.5px solid #eee}.game-table td.pc{text-align:left;font-weight:500;position:sticky;left:0;background:#fff;z-index:1}.game-table tr:nth-child(even) td{background:#fafaf8}.game-table tr:nth-child(even) td.pc{background:#fafaf8}.ca{color:#085041;font-weight:500}.cs{color:#0C447C;font-weight:500}.cn{color:#ccc}.sep{border:none;border-top:0.5px solid #ddd;margin:1.5rem 0}.loading{text-align:center;color:#888;font-size:14px;padding:2rem}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}
+.container{max-width:860px;margin:0 auto}
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.hdr a{font-size:22px;text-decoration:none;color:#888}
+.hdr-text h2{font-size:18px;font-weight:500}
+.hdr-text p{font-size:13px;color:#666;margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.card{background:#f1efe8;border-radius:8px;padding:12px;text-align:center}
+.cnum{font-size:22px;font-weight:500}
+.clbl{font-size:11px;color:#888;margin-top:3px}
+.slbl{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.sort-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.sort-row label{font-size:12px;color:#888}
+.sort-row select{font-size:13px;padding:5px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff}
+.plist{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.prow{background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:12px 14px}
+.ptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.pname{font-size:14px;font-weight:500}
+.badges{display:flex;gap:6px}
+.bdg{font-size:11px;padding:3px 8px;border-radius:20px}
+.bdg-av{background:#E1F5EE;color:#085041}
+.bdg-sel{background:#E6F1FB;color:#0C447C}
+.bars{display:flex;flex-direction:column;gap:5px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-lbl{font-size:11px;color:#888;width:60px;flex-shrink:0}
+.bar-track{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden}
+.bfav{height:100%;background:#1D9E75;border-radius:4px}
+.bfsel{height:100%;background:#185FA5;border-radius:4px}
+.bar-pct{font-size:11px;font-weight:500;width:34px;text-align:right;flex-shrink:0}
+.sep{border:none;border-top:0.5px solid #ddd;margin:1.5rem 0}
+.tbl-wrap{overflow-x:auto;margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
+th{background:#f1efe8;padding:7px 10px;text-align:center;font-weight:500;border:0.5px solid #ddd}
+th.pcol{text-align:left;position:sticky;left:0;background:#f1efe8;z-index:1}
+td{padding:7px 10px;text-align:center;border:0.5px solid #eee}
+td.pcol{text-align:left;font-weight:500;position:sticky;left:0;background:#fff;z-index:1}
+tr:nth-child(even) td{background:#fafaf8}
+tr:nth-child(even) td.pcol{background:#fafaf8}
+.ca{color:#085041;font-weight:500}
+.cs{color:#0C447C;font-weight:500}
+.cn{color:#ccc}
+.live{font-size:11px;color:#888;margin-left:6px;font-weight:400}
+.live.ok{color:#0F6E56}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="hdr"><a href="index.html">&#8249;</a><div class="hdr-text"><h2>Madison Lions &mdash; dashboard</h2><p>Availability &amp; selection across completed games</p></div></div>
-  <div id="loading" class="loading">Loading from Google Sheets&hellip;</div>
-  <div id="content" style="display:none">
-    <div class="summary-cards">
-      <div class="sc"><div class="sn" id="sumGames" style="color:#185FA5">0</div><div class="sl">Games played</div></div>
-      <div class="sc"><div class="sn" id="sumAvail" style="color:#1D9E75">0</div><div class="sl">Avg available</div></div>
-      <div class="sc"><div class="sn" id="sumSel" style="color:#185FA5">0</div><div class="sl">Avg selected</div></div>
+  <div class="hdr">
+    <a href="index.html">&#8249;</a>
+    <div class="hdr-text">
+      <h2>Madison Lions &mdash; dashboard <span class="live" id="liveTag"></span></h2>
+      <p>Availability &amp; selection across completed games</p>
     </div>
-    <div class="sort-row"><label>Sort by</label><select id="sortBy" onchange="renderPlayers()"><option value="avail">Availability %</option><option value="sel">Selection %</option><option value="name">Name</option></select></div>
-    <div class="section-label">Player availability &amp; selection</div>
-    <div class="player-list" id="playerList"></div>
-    <hr class="sep">
-    <div class="section-label">Game-by-game breakdown</div>
-    <div class="game-grid"><table class="game-table" id="gameTable"></table></div>
   </div>
+  <div class="cards">
+    <div class="card"><div class="cnum" id="sumG" style="color:#185FA5">0</div><div class="clbl">Games played</div></div>
+    <div class="card"><div class="cnum" id="sumA" style="color:#1D9E75">0</div><div class="clbl">Avg available</div></div>
+    <div class="card"><div class="cnum" id="sumS" style="color:#185FA5">0</div><div class="clbl">Avg selected</div></div>
+  </div>
+  <div class="sort-row">
+    <label>Sort by</label>
+    <select id="sortBy" onchange="renderPlayers()">
+      <option value="avail">Availability %</option>
+      <option value="sel">Selection %</option>
+      <option value="name">Name</option>
+    </select>
+  </div>
+  <div class="slbl">Player availability &amp; selection</div>
+  <div class="plist" id="plist"></div>
+  <hr class="sep">
+  <div class="slbl">Game-by-game breakdown</div>
+  <div class="tbl-wrap"><table id="gtbl"></table></div>
 </div>
 <script>
-const CFG = MCC_CONFIG.lions;
-const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
-const PLAYERS = CFG.players;
-const GAMES = CFG.games.map(g => g.name);
-let playerData = [], gamesPlayed = 0, completedGames = [];
+var CFG = MCC_CONFIG.lions;
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var PLAYERS = CFG.players;
+var GAMES = CFG.games.map(function(g){return g.name;});
+var playerData = [];
+var gamesPlayed = 0;
+var completedGames = [];
 
-function fetchData() {
-  Promise.all(GAMES.map(g =>
-    fetch(SCRIPT_URL + '?team=Lions&game=' + encodeURIComponent(g))
-      .then(r => r.json()).catch(() => ({status:'ok',data:[]}))
-  )).then(results => {
-    const ld = {}; PLAYERS.forEach(p => { ld[p] = {avail:0,sel:0,games:{}}; });
-    completedGames = [];
-    results.forEach((res,gi) => {
-      const game = GAMES[gi];
-      if (!res.data||!res.data.length) return;
-      if (!res.data.some(p => p.available>0||p.selected>0)) return;
-      completedGames.push(game);
-      res.data.forEach(p => { if(!ld[p.name]) return; ld[p.name].avail+=p.available; ld[p.name].sel+=p.selected; ld[p.name].games[game]=[p.available,p.selected]; });
+function buildFromPreloaded() {
+  var ld = {};
+  PLAYERS.forEach(function(p) { ld[p] = {avail:0,sel:0,games:{}}; });
+  completedGames = [];
+  var pre = CFG.preloaded;
+  Object.keys(pre).forEach(function(game) {
+    completedGames.push(game);
+    PLAYERS.forEach(function(p) {
+      var av  = pre[game].av.indexOf(p)  >= 0 ? 1 : 0;
+      var sel = pre[game].sel.indexOf(p) >= 0 ? 1 : 0;
+      ld[p].avail += av;
+      ld[p].sel   += sel;
+      ld[p].games[game] = [av, sel];
     });
-    gamesPlayed = completedGames.length;
-    playerData = PLAYERS.map(name => { const d=ld[name]; return {name,avail:d.avail,sel:d.sel,avPct:gamesPlayed?d.avail/gamesPlayed:0,selPct:d.avail?d.sel/d.avail:0,games:d.games}; });
-    showContent();
-  }).catch(() => showContent());
+  });
+  gamesPlayed = completedGames.length;
+  playerData = PLAYERS.map(function(name) {
+    var d = ld[name];
+    return {name:name,avail:d.avail,sel:d.sel,
+      avPct: gamesPlayed ? d.avail/gamesPlayed : 0,
+      selPct: d.avail ? d.sel/d.avail : 0,
+      games: d.games};
+  });
 }
 
-function showContent() {
-  document.getElementById('loading').style.display='none';
-  document.getElementById('content').style.display='block';
-  document.getElementById('sumGames').textContent = gamesPlayed;
-  document.getElementById('sumAvail').textContent = playerData.length ? (playerData.reduce((s,p)=>s+p.avail,0)/playerData.length).toFixed(1) : 0;
-  document.getElementById('sumSel').textContent   = playerData.length ? (playerData.reduce((s,p)=>s+p.sel,0)/playerData.length).toFixed(1) : 0;
-  renderPlayers(); renderGameTable();
+function fetchLive() {
+  document.getElementById('liveTag').textContent = 'updating...';
+  var promises = GAMES.map(function(g) {
+    return fetch(SCRIPT_URL + '?team=Lions&game=' + encodeURIComponent(g))
+      .then(function(r){return r.json();})
+      .catch(function(){return {status:'ok',data:[]};});
+  });
+  Promise.all(promises).then(function(results) {
+    var ld = {};
+    PLAYERS.forEach(function(p){ld[p]={avail:0,sel:0,games:{}};});
+    var lc = [];
+    var hasData = false;
+    results.forEach(function(res,gi) {
+      var game = GAMES[gi];
+      if (!res.data||!res.data.length) return;
+      if (!res.data.some(function(p){return p.available>0||p.selected>0;})) return;
+      hasData = true;
+      lc.push(game);
+      res.data.forEach(function(p) {
+        if (!ld[p.name]) return;
+        ld[p.name].avail += p.available;
+        ld[p.name].sel   += p.selected;
+        ld[p.name].games[game] = [p.available, p.selected];
+      });
+    });
+    if (hasData) {
+      completedGames = lc;
+      gamesPlayed = completedGames.length;
+      playerData = PLAYERS.map(function(name) {
+        var d=ld[name];
+        return {name:name,avail:d.avail,sel:d.sel,
+          avPct:gamesPlayed?d.avail/gamesPlayed:0,
+          selPct:d.avail?d.sel/d.avail:0,games:d.games};
+      });
+      renderAll();
+      document.getElementById('liveTag').textContent = 'live';
+      document.getElementById('liveTag').className = 'live ok';
+    } else {
+      document.getElementById('liveTag').textContent = 'cached';
+    }
+  }).catch(function(){
+    document.getElementById('liveTag').textContent = 'cached';
+  });
+}
+
+function renderAll() {
+  document.getElementById('sumG').textContent = gamesPlayed;
+  var n = playerData.length || 1;
+  document.getElementById('sumA').textContent = (playerData.reduce(function(s,p){return s+p.avail;},0)/n).toFixed(1);
+  document.getElementById('sumS').textContent = (playerData.reduce(function(s,p){return s+p.sel;},0)/n).toFixed(1);
+  renderPlayers();
+  renderTable();
 }
 
 function renderPlayers() {
-  const sort = document.getElementById('sortBy').value;
-  const sorted = [...playerData].sort((a,b) => sort==='avail'?b.avPct-a.avPct:sort==='sel'?b.selPct-a.selPct:a.name.localeCompare(b.name));
-  document.getElementById('playerList').innerHTML = sorted.map((p,i) =>
-    `<div class="player-row"><div class="player-top"><span class="player-name">${i+1}. ${p.name}</span><div class="badges"><span class="badge badge-avail">${p.avail}/${gamesPlayed} avail</span><span class="badge badge-sel">${p.sel}/${p.avail||0} sel</span></div></div><div class="bars"><div class="bar-row"><span class="bar-label">Availability</span><div class="bar-track"><div class="bar-fill-avail" style="width:${Math.round(p.avPct*100)}%"></div></div><span class="bar-pct" style="color:#1D9E75">${Math.round(p.avPct*100)}%</span></div><div class="bar-row"><span class="bar-label">Selection</span><div class="bar-track"><div class="bar-fill-sel" style="width:${Math.round(p.selPct*100)}%"></div></div><span class="bar-pct" style="color:#185FA5">${Math.round(p.selPct*100)}%</span></div></div></div>`
-  ).join('');
+  var sort = document.getElementById('sortBy').value;
+  var sorted = playerData.slice().sort(function(a,b) {
+    if(sort==='avail') return b.avPct-a.avPct;
+    if(sort==='sel')   return b.selPct-a.selPct;
+    return a.name.localeCompare(b.name);
+  });
+  document.getElementById('plist').innerHTML = sorted.map(function(p,i) {
+    var ap = Math.round(p.avPct*100), sp = Math.round(p.selPct*100);
+    return '<div class="prow"><div class="ptop"><span class="pname">'+(i+1)+'. '+p.name+'</span>'
+      +'<div class="badges"><span class="bdg bdg-av">'+p.avail+'/'+gamesPlayed+' avail</span>'
+      +'<span class="bdg bdg-sel">'+p.sel+'/'+(p.avail||0)+' sel</span></div></div>'
+      +'<div class="bars">'
+      +'<div class="bar-row"><span class="bar-lbl">Availability</span><div class="bar-track"><div class="bfav" style="width:'+ap+'%"></div></div><span class="bar-pct" style="color:#1D9E75">'+ap+'%</span></div>'
+      +'<div class="bar-row"><span class="bar-lbl">Selection</span><div class="bar-track"><div class="bfsel" style="width:'+sp+'%"></div></div><span class="bar-pct" style="color:#185FA5">'+sp+'%</span></div>'
+      +'</div></div>';
+  }).join('');
 }
 
-function renderGameTable() {
+function renderTable() {
   if (!completedGames.length) return;
-  let html = '<thead><tr><th class="pc">Player</th>';
-  completedGames.forEach(g => html += `<th colspan="2">${g.length>10?g.slice(0,10)+'…':g}</th>`);
-  html += '</tr><tr><th class="pc"></th>';
-  completedGames.forEach(() => html += '<th>Av</th><th>Sel</th>');
-  html += '</tr></thead><tbody>';
-  PLAYERS.forEach(p => {
-    html += `<tr><td class="pc">${p}</td>`;
-    const pd = playerData.find(x=>x.name===p);
-    completedGames.forEach(g => { const gd=pd&&pd.games[g],av=gd?gd[0]:null,sel=gd?gd[1]:null; html+=av===null?'<td class="cn">—</td><td class="cn">—</td>':`<td class="${av?'ca':'cn'}">${av?'✓':'✗'}</td><td class="${sel?'cs':'cn'}">${sel?'✓':'—'}</td>`; });
-    html += '</tr>';
+  var h = '<thead><tr><th class="pcol">Player</th>';
+  completedGames.forEach(function(g){h+='<th colspan="2">'+(g.length>10?g.slice(0,9)+'&hellip;':g)+'</th>';});
+  h+='</tr><tr><th class="pcol"></th>';
+  completedGames.forEach(function(){h+='<th>Av</th><th>Sel</th>';});
+  h+='</tr></thead><tbody>';
+  PLAYERS.forEach(function(p) {
+    h+='<tr><td class="pcol">'+p+'</td>';
+    var pd=playerData.filter(function(x){return x.name===p;})[0];
+    completedGames.forEach(function(g) {
+      var gd=pd&&pd.games[g],av=gd?gd[0]:null,sel=gd?gd[1]:null;
+      if(av===null){h+='<td class="cn">&mdash;</td><td class="cn">&mdash;</td>';}
+      else{h+='<td class="'+(av?'ca':'cn')+'">'+(av?'&#10003;':'&#10007;')+'</td><td class="'+(sel?'cs':'cn')+'">'+(sel?'&#10003;':'&mdash;')+'</td>';}
+    });
+    h+='</tr>';
   });
-  document.getElementById('gameTable').innerHTML = html + '</tbody>';
+  document.getElementById('gtbl').innerHTML = h+'</tbody>';
 }
-fetchData();
+
+window.addEventListener('DOMContentLoaded', function() {
+  buildFromPreloaded();
+  renderAll();
+  fetchLive();
+});
 </script>
 </body></html>
