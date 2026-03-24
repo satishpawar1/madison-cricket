@@ -90,7 +90,8 @@ window.addEventListener('DOMContentLoaded', function() {
   CFG.games.forEach(function(g) {
     var opt = document.createElement('option');
     opt.value = g.name;
-    var d = new Date(g.gameDate); d.setHours(0,0,0,0);
+    var parts = g.gameDate.split('-');
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
     opt.textContent = g.name + ' - ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'})
                     + (today > d ? ' (played)' : '');
     sel.appendChild(opt);
