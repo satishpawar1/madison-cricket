@@ -1,132 +1,63 @@
 
+<script src="config.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Lions — Catch Efficiency Dashboard</title>
+<title>Madison Lions — Catch Efficiency</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
-.container { max-width: 860px; margin: 0 auto; }
-.hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-.hdr a { font-size: 22px; text-decoration: none; color: #888; }
-.hdr-text h2 { font-size: 18px; font-weight: 500; }
-.hdr-text p { font-size: 13px; color: #666; margin-top: 3px; }
-.summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-.sc { background: #f1efe8; border-radius: 8px; padding: 12px; text-align: center; }
-.sn { font-size: 22px; font-weight: 500; }
-.sl { font-size: 11px; color: #888; margin-top: 3px; }
-.section-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
-.player-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
-.player-row { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 12px 14px; }
-.player-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.player-name { font-size: 14px; font-weight: 500; }
-.badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #E6F1FB; color: #0C447C; }
-.bar-row { display: flex; align-items: center; gap: 8px; }
-.bar-label { font-size: 11px; color: #888; width: 60px; flex-shrink: 0; }
-.bar-track { flex: 1; background: #eee; border-radius: 4px; height: 7px; overflow: hidden; }
-.bar-fill { height: 100%; background: #185FA5; border-radius: 4px; }
-.bar-pct { font-size: 11px; font-weight: 500; width: 34px; text-align: right; color: #185FA5; flex-shrink: 0; }
-.sort-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-.sort-row label { font-size: 12px; color: #888; }
-.sort-row select { font-size: 13px; padding: 5px 8px; border: 0.5px solid #ccc; border-radius: 6px; background: #fff; }
-.note { font-size: 13px; color: #888; background: #f1efe8; border-radius: 8px; padding: 10px 14px; }
-.loading { text-align: center; color: #888; font-size: 14px; padding: 2rem; }
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}.container{max-width:860px;margin:0 auto}.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}.hdr a{font-size:22px;text-decoration:none;color:#888}.hdr-text h2{font-size:18px;font-weight:500}.hdr-text p{font-size:13px;color:#666;margin-top:3px}.summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}.sc{background:#f1efe8;border-radius:8px;padding:12px;text-align:center}.sn{font-size:22px;font-weight:500}.sl{font-size:11px;color:#888;margin-top:3px}.section-label{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.player-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}.player-row{background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:12px 14px}.player-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.player-name{font-size:14px;font-weight:500}.badge{font-size:11px;padding:3px 8px;border-radius:20px;background:#E6F1FB;color:#0C447C}.bar-row{display:flex;align-items:center;gap:8px}.bar-label{font-size:11px;color:#888;width:60px;flex-shrink:0}.bar-track{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden}.bar-fill{height:100%;background:#185FA5;border-radius:4px}.bar-pct{font-size:11px;font-weight:500;width:34px;text-align:right;color:#185FA5;flex-shrink:0}.sort-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}.sort-row label{font-size:12px;color:#888}.sort-row select{font-size:13px;padding:5px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff}.note{font-size:13px;color:#888;background:#f1efe8;border-radius:8px;padding:10px 14px}.loading{text-align:center;color:#888;font-size:14px;padding:2rem}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="hdr">
-    <a href="index.html">&#8249;</a>
-    <div class="hdr-text">
-      <h2>Madison Lions &mdash; catch efficiency</h2>
-      <p>Fielding stats across completed games</p>
-    </div>
-  </div>
-
-  <div id="loading" class="loading">Loading catch data...</div>
+  <div class="hdr"><a href="index.html">&#8249;</a><div class="hdr-text"><h2>Madison Lions &mdash; catch efficiency</h2><p>Fielding stats across completed games</p></div></div>
+  <div id="loading" class="loading">Loading&hellip;</div>
   <div id="content" style="display:none">
     <div class="summary-cards">
       <div class="sc"><div class="sn" id="sumAtt" style="color:#185FA5">0</div><div class="sl">Total attempted</div></div>
       <div class="sc"><div class="sn" id="sumTak" style="color:#0F6E56">0</div><div class="sl">Catches taken</div></div>
       <div class="sc"><div class="sn" id="sumEff" style="color:#185FA5">0%</div><div class="sl">Team efficiency</div></div>
     </div>
-    <div class="sort-row">
-      <label>Sort by</label>
-      <select id="sortBy" onchange="render()">
-        <option value="eff">Efficiency</option>
-        <option value="att">Catches attempted</option>
-        <option value="name">Name</option>
-      </select>
-    </div>
+    <div class="sort-row"><label>Sort by</label><select id="sortBy" onchange="render()"><option value="eff">Efficiency</option><option value="att">Catches attempted</option><option value="name">Name</option></select></div>
     <div class="section-label">Player catch efficiency</div>
     <div class="player-list" id="playerList"></div>
   </div>
 </div>
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec';
+const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 const TEAM = 'Lions';
-const PRELOADED = [
-  {name:'Sunny(W) ©', att:7, tak:6, dropped:1},
-  {name:'Chinmay',    att:1, tak:0, dropped:1},
-  {name:'Hardik',     att:0, tak:0, dropped:0},
-  {name:'Manish',     att:1, tak:1, dropped:0},
-  {name:'Mahesh',     att:1, tak:1, dropped:0},
-  {name:'Mayur R',    att:1, tak:1, dropped:0},
-  {name:'Satish',     att:1, tak:0, dropped:1},
-  {name:'Ravi',       att:1, tak:0, dropped:1},
-  {name:'Prakrut',    att:0, tak:0, dropped:0},
-  {name:'Saurabh',    att:1, tak:1, dropped:0},
-  {name:'Amit',       att:1, tak:1, dropped:0},
-  {name:'KP',         att:0, tak:0, dropped:0},
-  {name:'Dyan (N)',   att:1, tak:0, dropped:1},
-  {name:'Jeel',       att:0, tak:0, dropped:0},
-  {name:'Kirtan',     att:0, tak:0, dropped:0},
-  {name:'Gyan',       att:1, tak:1, dropped:0}
-];
-let catchData = PRELOADED;
+let catchData = MCC_CONFIG.lions.catchData || [];
 
 function fetchData() {
-  if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec') { showContent(); return; }
-  fetch(SCRIPT_URL + '?type=catches&team=' + TEAM)
-    .then(r => r.json())
-    .then(d => { if (d.status==='ok' && d.data && d.data.length) catchData = d.data; showContent(); })
-    .catch(() => showContent());
+  fetch(SCRIPT_URL+'?type=catches&team='+TEAM)
+    .then(r=>r.json())
+    .then(d=>{ if(d.status==='ok'&&d.data&&d.data.length) catchData=d.data; showContent(); })
+    .catch(()=>showContent());
 }
 
 function showContent() {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('content').style.display = 'block';
-  if (!catchData.length) {
-    document.getElementById('playerList').innerHTML = '<div class="note">No catch data yet. Use Log catch efficiency to add data.</div>';
-    return;
-  }
-  const withData = catchData.filter(p => p.att > 0);
-  const totalAtt = withData.reduce((s,p) => s+p.att, 0);
-  const totalTak = withData.reduce((s,p) => s+p.tak, 0);
-  document.getElementById('sumAtt').textContent = totalAtt;
-  document.getElementById('sumTak').textContent = totalTak;
-  document.getElementById('sumEff').textContent = totalAtt ? Math.round(totalTak/totalAtt*100)+'%' : '0%';
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  const withData=catchData.filter(p=>p.att>0);
+  const totalAtt=withData.reduce((s,p)=>s+p.att,0);
+  const totalTak=withData.reduce((s,p)=>s+p.tak,0);
+  document.getElementById('sumAtt').textContent=totalAtt;
+  document.getElementById('sumTak').textContent=totalTak;
+  document.getElementById('sumEff').textContent=totalAtt?Math.round(totalTak/totalAtt*100)+'%':'0%';
   render();
 }
 
 function render() {
-  const sort = document.getElementById('sortBy').value;
-  const withData = catchData.filter(p => p.att > 0);
-  const sorted = [...withData].sort((a,b) => {
-    const effA = a.att ? a.tak/a.att : 0, effB = b.att ? b.tak/b.att : 0;
-    if (sort==='eff') return effB-effA;
-    if (sort==='att') return b.att-a.att;
-    return a.name.localeCompare(b.name);
-  });
-  document.getElementById('playerList').innerHTML = sorted.map((p,i) => {
-    const eff = p.att ? Math.round(p.tak/p.att*100) : 0;
+  const sort=document.getElementById('sortBy').value;
+  const withData=catchData.filter(p=>p.att>0);
+  const sorted=[...withData].sort((a,b)=>{ const eA=a.att?a.tak/a.att:0,eB=b.att?b.tak/b.att:0; if(sort==='eff') return eB-eA; if(sort==='att') return b.att-a.att; return a.name.localeCompare(b.name); });
+  document.getElementById('playerList').innerHTML=sorted.map((p,i)=>{
+    const eff=p.att?Math.round(p.tak/p.att*100):0;
     return '<div class="player-row"><div class="player-top"><span class="player-name">'+(i+1)+'. '+p.name+'</span><span class="badge">'+p.tak+'/'+p.att+' taken</span></div><div class="bar-row"><span class="bar-label">Efficiency</span><div class="bar-track"><div class="bar-fill" style="width:'+eff+'%"></div></div><span class="bar-pct">'+eff+'%</span></div></div>';
-  }).join('') || '<div class="note">No catch data recorded yet.</div>';
+  }).join('')||'<div class="note">No catch data recorded yet. Use Log catch efficiency to add data.</div>';
 }
-
 fetchData();
 </script>
-</body>
-</html>
+</body></html>
