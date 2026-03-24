@@ -91,7 +91,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="sc"><div class="sn" id="stX" style="font-size:13px;padding-top:6px;color:#888">—</div><div class="sl">Status</div></div>
   </div>
 
-  <div class="slbl">Players — tap once = available &nbsp;·&nbsp; tap twice = selected &nbsp;·&nbsp; tap again = reset</div>
+  <div id="freezeBanner" style="display:none; background:#FCEBEB; color:#791F1F; border-radius:8px; padding:10px 14px; margin-bottom:1rem; font-size:13px;">
+  🔒 This game is in the past — team is locked. No changes or recording allowed.
+</div>
+<div class="slbl">Players — tap once = available &nbsp;·&nbsp; tap twice = selected &nbsp;·&nbsp; tap again = reset</div>
   <div class="grid" id="pg"></div>
 
   <hr class="sep">
@@ -122,16 +125,16 @@ const PL = ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Ni
 const GM = ['FSC','Great Maratha','Nashville Underdogs','Rockvale Risers','Fearless Fighters','Cool Springs Titans','Franklin Falcons','MCA','Shoals Strikers','Star Strikers'];
 
 const SCHEDULE = {
-  'FSC':                { day:'Sunday',   date:'March 1st',     time:'9:30 AM',  warmup:'8:30 AM',  ground:'FCF2' },
-  'Great Maratha':      { day:'Sunday',   date:'March 15th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2' },
-  'Nashville Underdogs':{ day:'Sunday',   date:'March 29th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2' },
-  'Rockvale Risers':    { day:'Sunday',   date:'April 5th',     time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2' },
-  'Fearless Fighters':  { day:'Sunday',   date:'April 12th',    time:'8:30 AM',  warmup:'7:30 AM',  ground:'FCF2' },
-  'Cool Springs Titans':{ day:'Sunday',   date:'May 3rd',       time:'11:30 AM', warmup:'10:30 AM', ground:'FCF1' },
-  'Franklin Falcons':   { day:'Sunday',   date:'May 10th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF1' },
-  'MCA':                { day:'Sunday',   date:'May 17th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2' },
-  'Shoals Strikers':    { day:'Saturday', date:'May 30th',      time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2' },
-  'Star Strikers':      { day:'Sunday',   date:'June 14th',     time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2' }
+  'FSC':                { day:'Sunday',   date:'March 1st',     time:'9:30 AM',  warmup:'8:30 AM',  ground:'FCF2', gameDate: new Date('2026-03-01') },
+  'Great Maratha':      { day:'Sunday',   date:'March 15th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2', gameDate: new Date('2026-03-15') },
+  'Nashville Underdogs':{ day:'Sunday',   date:'March 29th',    time:'1:00 PM',  warmup:'12:00 PM', ground:'FCF2', gameDate: new Date('2026-03-29') },
+  'Rockvale Risers':    { day:'Sunday',   date:'April 5th',     time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2', gameDate: new Date('2026-04-05') },
+  'Fearless Fighters':  { day:'Sunday',   date:'April 12th',    time:'8:30 AM',  warmup:'7:30 AM',  ground:'FCF2', gameDate: new Date('2026-04-12') },
+  'Cool Springs Titans':{ day:'Sunday',   date:'May 3rd',       time:'11:30 AM', warmup:'10:30 AM', ground:'FCF1', gameDate: new Date('2026-05-03') },
+  'Franklin Falcons':   { day:'Sunday',   date:'May 10th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF1', gameDate: new Date('2026-05-10') },
+  'MCA':                { day:'Sunday',   date:'May 17th',      time:'3:00 PM',  warmup:'2:00 PM',  ground:'FCF2', gameDate: new Date('2026-05-17') },
+  'Shoals Strikers':    { day:'Saturday', date:'May 30th',      time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2', gameDate: new Date('2026-05-30') },
+  'Star Strikers':      { day:'Sunday',   date:'June 14th',     time:'11:30 AM', warmup:'10:30 AM', ground:'FCF2', gameDate: new Date('2026-06-14') }
 };
 
 const CLOSERS = [
@@ -151,6 +154,34 @@ const state = {};
 GM.forEach(g => { state[g] = {}; PL.forEach(p => { state[g][p] = PRE[g] ? (PRE[g].sel.has(p) ? 2 : PRE[g].av.has(p) ? 1 : 0) : 0; }); });
 let cur = '';
 
+function isPast(game) {
+  if (!SCHEDULE[game]) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const gd = new Date(SCHEDULE[game].gameDate); gd.setHours(0,0,0,0);
+  return today > gd;
+}
+
+function applyFreezeUI(frozen) {
+  const banner = document.getElementById('freezeBanner');
+  const recordBtn = document.getElementById('recordBtn');
+  if (frozen) {
+    banner.style.display = 'block';
+    // Disable all player cards
+    PL.forEach(p => {
+      const c = document.getElementById('c-' + p);
+      if (c) { c.style.opacity = '0.6'; c.style.cursor = 'not-allowed'; c.style.pointerEvents = 'none'; }
+    });
+    if (recordBtn) { recordBtn.disabled = true; recordBtn.style.opacity = '0.4'; }
+  } else {
+    banner.style.display = 'none';
+    PL.forEach(p => {
+      const c = document.getElementById('c-' + p);
+      if (c) { c.style.opacity = ''; c.style.cursor = ''; c.style.pointerEvents = ''; }
+    });
+    updateStats(); // re-evaluates recordBtn state
+  }
+}
+
 function init() {
   const g = document.getElementById('pg'); g.innerHTML = '';
   PL.forEach(p => {
@@ -164,6 +195,7 @@ function init() {
 
 function cycle(p) {
   if (!cur) { show('Pick a game first!', 'err'); return; }
+  if (isPast(cur)) { show('This game is locked — no changes allowed for past games.', 'err'); return; }
   state[cur][p] = state[cur][p] >= 2 ? 0 : state[cur][p] + 1;
   render(p); updateStats();
 }
@@ -196,6 +228,7 @@ document.getElementById('gs').addEventListener('change', function() {
   document.getElementById('waBox').classList.remove('show');
   document.getElementById('syncStatus').textContent = '';
   hide();
+  applyFreezeUI(cur && isPast(cur));
 });
 
 function genWA() {
