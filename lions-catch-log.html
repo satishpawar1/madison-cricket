@@ -1,115 +1,71 @@
+
+<script src="config.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Lions — Log Catch Efficiency</title>
+<title>Madison Lions — Log Catches</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
-.container { max-width: 600px; margin: 0 auto; }
-.hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-.hdr a { font-size: 22px; text-decoration: none; color: #888; }
-.hdr-text h2 { font-size: 18px; font-weight: 500; }
-.hdr-text p { font-size: 13px; color: #666; margin-top: 3px; }
-.gs { display: flex; gap: 10px; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.gs label { font-size: 13px; color: #666; }
-.gs select { font-size: 14px; padding: 8px 10px; border: 0.5px solid #ccc; border-radius: 8px; background: #fff; flex: 1; }
-.section-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
-.player-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
-.pr { background: #fff; border: 0.5px solid #ddd; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.pr-name { font-size: 14px; font-weight: 500; flex: 1; min-width: 100px; }
-.pr-inputs { display: flex; gap: 8px; align-items: center; }
-.pr-inputs label { font-size: 11px; color: #888; }
-.pr-inputs input { width: 48px; font-size: 14px; padding: 5px 6px; border: 0.5px solid #ccc; border-radius: 6px; text-align: center; }
-.sep { border: none; border-top: 0.5px solid #ddd; margin: 1.2rem 0; }
-.btn { font-size: 14px; padding: 10px 18px; border-radius: 8px; cursor: pointer; border: 0.5px solid #ccc; background: transparent; color: #1a1a1a; touch-action: manipulation; }
-.btn-primary { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
-.msg { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 8px; display: none; }
-.msg.ok { background: #E1F5EE; color: #085041; display: block; }
-.msg.err { background: #FCEBEB; color: #791F1F; display: block; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}.container{max-width:600px;margin:0 auto}.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}.hdr a{font-size:22px;text-decoration:none;color:#888}.hdr-text h2{font-size:18px;font-weight:500}.hdr-text p{font-size:13px;color:#666;margin-top:3px}.gs{display:flex;gap:10px;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap}.gs label{font-size:13px;color:#666}.gs select{font-size:14px;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;background:#fff;flex:1}.section-label{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.player-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:1.5rem}.pr{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pr-name{font-size:14px;font-weight:500;flex:1;min-width:100px}.pr-inputs{display:flex;gap:8px;align-items:center}.pr-inputs label{font-size:11px;color:#888}.pr-inputs input{width:48px;font-size:14px;padding:5px 6px;border:0.5px solid #ccc;border-radius:6px;text-align:center}.sep{border:none;border-top:0.5px solid #ddd;margin:1.2rem 0}.btn{font-size:14px;padding:10px 18px;border-radius:8px;cursor:pointer;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;touch-action:manipulation}.btn-primary{background:#185FA5;color:#E6F1FB;border-color:#185FA5}.msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}.msg.ok{background:#E1F5EE;color:#085041;display:block}.msg.err{background:#FCEBEB;color:#791F1F;display:block}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="hdr">
-    <a href="index.html">‹</a>
-    <div class="hdr-text">
-      <h2>Madison Lions — log catches</h2>
-      <p>Record catch efficiency for a completed game</p>
-    </div>
-  </div>
-
-  <div class="gs">
-    <label>Game</label>
-    <select id="gs" onchange="onGameChange()">
-      <option value="">— pick a completed game —</option>
-      <option value="FSC">FSC — Mar 1</option>
-      <option value="Great Maratha">Great Maratha — Mar 15</option>
-      <option value="Nashville Underdogs">Nashville Underdogs — Mar 29</option>
-      <option value="Rockvale Risers">Rockvale Risers — Apr 5</option>
-      <option value="Fearless Fighters">Fearless Fighters — Apr 12</option>
-      <option value="Cool Springs Titans">Cool Springs Titans — May 3</option>
-      <option value="Franklin Falcons">Franklin Falcons — May 10</option>
-      <option value="MCA">MCA — May 17</option>
-      <option value="Shoals Strikers">Shoals Strikers — May 30</option>
-      <option value="Star Strikers">Star Strikers — Jun 14</option>
-    </select>
-  </div>
-
+  <div class="hdr"><a href="index.html">&#8249;</a><div class="hdr-text"><h2>Madison Lions &mdash; log catches</h2><p>Record catch efficiency for a completed game</p></div></div>
+  <div class="gs"><label>Game</label><select id="gs" onchange="onGameChange()"><option value="">— pick a completed game —</option></select></div>
   <div id="playerSection" style="display:none">
-    <div class="section-label">Catches per player — enter attempted &amp; taken</div>
+    <div class="section-label">Catches per player &mdash; enter attempted &amp; taken</div>
     <div class="player-rows" id="playerRows"></div>
     <hr class="sep">
     <button class="btn btn-primary" onclick="submitCatches()">Record to Sheets</button>
     <div class="msg" id="msg"></div>
   </div>
 </div>
-
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec';
+const CFG = MCC_CONFIG.lions;
+const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 const TEAM = 'Lions';
-const PL = ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Prakrut','Saurabh','Amit','KP','Dyan (N)','Jeel','Gyan'];
+const PL = CFG.players;
+
+window.addEventListener('DOMContentLoaded', function() {
+  const sel = document.getElementById('gs');
+  CFG.games.forEach(g => {
+    const d = new Date(g.gameDate);
+    if (d < new Date()) {
+      const opt = document.createElement('option');
+      opt.value = g.name;
+      opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      sel.appendChild(opt);
+    }
+  });
+});
 
 function onGameChange() {
   const game = document.getElementById('gs').value;
   const section = document.getElementById('playerSection');
-  if (!game) { section.style.display = 'none'; return; }
-  section.style.display = 'block';
-  const rows = document.getElementById('playerRows');
-  rows.innerHTML = PL.map(p => `
-    <div class="pr">
-      <span class="pr-name">${p}</span>
-      <div class="pr-inputs">
-        <label>Attempted</label>
-        <input type="number" min="0" max="20" value="0" id="att-${p}">
-        <label>Taken</label>
-        <input type="number" min="0" max="20" value="0" id="tak-${p}">
-      </div>
-    </div>`).join('');
+  if (!game) { section.style.display='none'; return; }
+  section.style.display='block';
+  document.getElementById('playerRows').innerHTML = PL.map(p =>
+    `<div class="pr"><span class="pr-name">${p}</span><div class="pr-inputs"><label>Attempted</label><input type="number" min="0" max="20" value="0" id="att-${p}"><label>Taken</label><input type="number" min="0" max="20" value="0" id="tak-${p}"></div></div>`
+  ).join('');
 }
 
 function submitCatches() {
   const game = document.getElementById('gs').value;
-  if (!game) { show('Pick a game first!', 'err'); return; }
-  if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec') { show('Apps Script URL not set.', 'err'); return; }
-
-  const catches = PL.map(p => {
-    const att = parseInt(document.getElementById('att-' + p).value) || 0;
-    const tak = parseInt(document.getElementById('tak-' + p).value) || 0;
-    return { name: p, attempted: att, taken: tak, dropped: att - tak };
-  });
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({ type: 'catches', team: TEAM, game, catches })
-  }).then(r => r.json()).then(d => {
-    if (d.status === 'ok') show('Catches recorded for ' + game + '!', 'ok');
-    else show('Error: ' + d.message, 'err');
-  }).catch(() => show('Network error. Try again.', 'err'));
+  if (!game) { show('Pick a game first!','err'); return; }
+  const catches = PL.map(p => ({
+    name:p,
+    attempted: parseInt(document.getElementById('att-'+p).value)||0,
+    taken:     parseInt(document.getElementById('tak-'+p).value)||0
+  }));
+  catches.forEach(c => c.dropped = c.attempted - c.taken);
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify({type:'catches',team:TEAM,game,catches}) })
+    .then(r=>r.json())
+    .then(d=>{ if(d.status==='ok') show('Catches recorded for '+game+'!','ok'); else show('Error: '+d.message,'err'); })
+    .catch(()=>show('Network error. Try again.','err'));
 }
 
-function show(t, type) { const e = document.getElementById('msg'); e.textContent = t; e.className = 'msg ' + type; setTimeout(() => e.className = 'msg', 4000); }
+function show(t,type){const e=document.getElementById('msg');e.textContent=t;e.className='msg '+type;setTimeout(()=>e.className='msg',4000);}
 </script>
-</body>
-</html>
+</body></html>
