@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <script src="config.js"></script>
-<script src="cricclubs-stats.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Madison Cricket Club — 2026</title>
@@ -121,54 +120,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .footer { text-align: center; padding: 0.5rem 1rem 2rem; font-size: 12px; color: #9CA3AF; }
 
-/* ── Leaderboard ── */
-.lb-tabs {
-  display: flex; gap: 4px; margin-bottom: 1rem;
-  background: #E9EDF2; border-radius: 10px; padding: 4px;
-}
-.lb-tab {
-  flex: 1; text-align: center; padding: 7px 4px;
-  font-size: 12px; font-weight: 600; border-radius: 7px;
-  cursor: pointer; color: #6B7280; transition: all 0.15s;
-  border: none; background: transparent;
-}
-.lb-tab.active { background: #fff; color: #111827; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-
-.lb-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 16px; border-bottom: 1px solid #F9FAFB;
-}
-.lb-row:last-child { border-bottom: none; }
-
-.lb-rank {
-  font-size: 13px; font-weight: 800; color: #D1D5DB;
-  width: 20px; text-align: center; flex-shrink: 0;
-}
-.lb-rank.top1 { color: #F59E0B; }
-.lb-rank.top2 { color: #9CA3AF; }
-.lb-rank.top3 { color: #CD7C2F; }
-
-.lb-info { flex: 1; min-width: 0; }
-.lb-name { font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lb-meta { display: flex; gap: 6px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
-.lb-team-badge {
-  font-size: 10px; font-weight: 700; padding: 2px 7px;
-  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em;
-}
-.lb-team-lions  { background: #E8F1FC; color: #1A56B0; }
-.lb-team-tigers { background: #FEF0E6; color: #C05000; }
-.lb-pts-bar { display: flex; gap: 3px; height: 5px; border-radius: 3px; overflow: hidden; width: 60px; flex-shrink: 0; }
-.lb-pts-bat   { background: #3B82F6; }
-.lb-pts-bowl  { background: #1A8F6A; }
-.lb-pts-field { background: #F59E0B; }
-
-.lb-total { font-size: 16px; font-weight: 800; color: #111827; flex-shrink: 0; min-width: 36px; text-align: right; }
-.lb-mom { font-size: 11px; flex-shrink: 0; }
-
-.lb-updated { font-size: 11px; color: #9CA3AF; text-align: right; padding: 6px 16px 12px; }
-.lb-legend { display: flex; gap: 10px; padding: 8px 16px 4px; border-top: 1px solid #F9FAFB; }
-.lb-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #9CA3AF; }
-.lb-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -255,27 +206,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </a>
   </div>
 
-  <!-- ── Points Leaderboard ── -->
-  <div class="section-title">Points Leaderboard</div>
-  <div class="team-card" id="leaderboardCard">
-    <div style="padding:14px 16px 10px">
-      <div class="lb-tabs">
-        <button class="lb-tab active" onclick="showTab('combined', this)">Overall</button>
-        <button class="lb-tab" onclick="showTab('lions', this)">🦁 Lions</button>
-        <button class="lb-tab" onclick="showTab('tigers', this)">🐯 Tigers</button>
-      </div>
-    </div>
-    <div id="lb-combined"></div>
-    <div id="lb-lions"   style="display:none"></div>
-    <div id="lb-tigers"  style="display:none"></div>
-    <div class="lb-legend">
-      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#3B82F6"></div>Batting</div>
-      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#1A8F6A"></div>Bowling</div>
-      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#F59E0B"></div>Fielding</div>
-    </div>
-    <div class="lb-updated" id="lbUpdated"></div>
-  </div>
-
   <!-- ── Schedules ── -->
   <div class="section-title">2026 Season Schedule</div>
 
@@ -308,65 +238,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="footer">Madison Cricket Club &nbsp;·&nbsp; 2026 Season</div>
 
 <script>
-function buildLeaderboard() {
-  if (typeof CRICCLUBS_STATS === 'undefined') {
-    document.getElementById('leaderboardCard').innerHTML =
-      '<div style="padding:20px;text-align:center;font-size:13px;color:#9CA3AF">Stats not yet loaded. Run the scraper to populate data.</div>';
-    return;
-  }
-
-  var stats = CRICCLUBS_STATS;
-
-  function rowHTML(p, rank) {
-    var maxPts = Math.max(Math.abs(p.batting) + Math.abs(p.bowling) + Math.abs(p.fielding), 1);
-    var batW  = Math.max(0, Math.round(p.batting  / maxPts * 60));
-    var bowlW = Math.max(0, Math.round(p.bowling  / maxPts * 60));
-    var fieldW= Math.max(0, Math.round(p.fielding / maxPts * 60));
-    var isLions = p.team && p.team.includes('Lions');
-    var teamClass = isLions ? 'lb-team-lions' : 'lb-team-tigers';
-    var teamLabel = isLions ? '🦁 Lions' : '🐯 Tigers';
-    var rankClass = rank === 1 ? 'lb-rank top1' : rank === 2 ? 'lb-rank top2' : rank === 3 ? 'lb-rank top3' : 'lb-rank';
-    var momStr = p.mom > 0 ? '<span class="lb-mom">⭐ ×' + p.mom + '</span>' : '';
-    return '<div class="lb-row">'
-      + '<div class="' + rankClass + '">' + rank + '</div>'
-      + '<div class="lb-info">'
-      +   '<div class="lb-name">' + p.name + '</div>'
-      +   '<div class="lb-meta">'
-      +     '<span class="lb-team-badge ' + teamClass + '">' + teamLabel + '</span>'
-      +     '<span style="font-size:10px;color:#9CA3AF">' + p.matches + ' match' + (p.matches !== 1 ? 'es' : '') + '</span>'
-      +     momStr
-      +   '</div>'
-      + '</div>'
-      + '<div class="lb-pts-bar">'
-      +   '<div class="lb-pts-bat"   style="width:' + batW  + 'px"></div>'
-      +   '<div class="lb-pts-bowl"  style="width:' + bowlW + 'px"></div>'
-      +   '<div class="lb-pts-field" style="width:' + fieldW + 'px"></div>'
-      + '</div>'
-      + '<div class="lb-total">' + p.total + '</div>'
-      + '</div>';
-  }
-
-  function renderList(players, containerId, limit) {
-    var top = players.filter(p => p.total > 0).slice(0, limit || 10);
-    document.getElementById(containerId).innerHTML = top.map((p, i) => rowHTML(p, i + 1)).join('');
-  }
-
-  renderList(stats.combined.rankings || [], 'lb-combined', 10);
-  renderList(stats.lions.rankings    || [], 'lb-lions',    10);
-  renderList(stats.tigers.rankings   || [], 'lb-tigers',   10);
-
-  var updated = new Date(stats.lastUpdated);
-  document.getElementById('lbUpdated').textContent = 'Updated ' + updated.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' at ' + updated.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
-}
-
-function showTab(tab, btn) {
-  ['combined','lions','tigers'].forEach(function(t) {
-    document.getElementById('lb-' + t).style.display = t === tab ? 'block' : 'none';
-  });
-  document.querySelectorAll('.lb-tab').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-}
-
 function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
   var today = new Date(); today.setHours(0,0,0,0);
   var completed = 0, upcoming = 0;
@@ -411,7 +282,6 @@ function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  buildLeaderboard();
   buildSchedule(MCC_CONFIG.lions.games,  'lionsGames',  'lionsRecord',  'badge-upcoming-lions');
   buildSchedule(MCC_CONFIG.tigers.games, 'tigersGames', 'tigersRecord', 'badge-upcoming-tigers');
 });
