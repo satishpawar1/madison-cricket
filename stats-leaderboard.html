@@ -21,10 +21,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .content { padding: 1.25rem; max-width: 600px; margin: 0 auto; }
 
-/* ── Tabs ── */
-.tab-group { margin-bottom: 10px; }
+/* ── Team tabs ── */
 .tab-row {
-  display: flex; gap: 4px;
+  display: flex; gap: 4px; margin-bottom: 10px;
   background: #E9EDF2; border-radius: 10px; padding: 4px;
 }
 .tab-btn {
@@ -35,36 +34,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .tab-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 
-.stat-row {
-  display: flex; gap: 4px;
-  margin-bottom: 1rem;
-}
+/* ── Stat type tabs ── */
+.stat-row { display: flex; gap: 6px; margin-bottom: 1rem; }
 .stat-tab {
   flex: 1; text-align: center; padding: 8px 4px;
   font-size: 13px; font-weight: 600; border-radius: 10px;
   cursor: pointer; border: 1.5px solid #E5E7EB;
   background: #fff; color: #6B7280; transition: all 0.15s;
 }
-.stat-tab.active-bat { background: #1A56B0; color: #fff; border-color: #1A56B0; }
-.stat-tab.active-bowl { background: #1A8F6A; color: #fff; border-color: #1A8F6A; }
+.stat-tab.act-bat  { background: #1A56B0; color: #fff; border-color: #1A56B0; }
+.stat-tab.act-bowl { background: #1A8F6A; color: #fff; border-color: #1A8F6A; }
+.stat-tab.act-pts  { background: #7C3AED; color: #fff; border-color: #7C3AED; }
 
-/* ── Player rows ── */
+/* ── List card ── */
 .lb-card {
   background: #fff; border-radius: 16px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   overflow: hidden; margin-bottom: 1rem;
 }
-
 .lb-row {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 16px; border-bottom: 1px solid #F9FAFB;
 }
 .lb-row:last-child { border-bottom: none; }
 
-.lb-rank {
-  font-size: 13px; font-weight: 800; color: #D1D5DB;
-  width: 22px; text-align: center; flex-shrink: 0;
-}
+.lb-rank { font-size: 13px; font-weight: 800; color: #D1D5DB; width: 22px; text-align: center; flex-shrink: 0; }
 .lb-rank.r1 { color: #F59E0B; }
 .lb-rank.r2 { color: #9CA3AF; }
 .lb-rank.r3 { color: #CD7C2F; }
@@ -73,32 +67,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lb-name { font-size: 14px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-badges { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
 
-.team-badge {
-  font-size: 10px; font-weight: 700; padding: 2px 7px;
-  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0;
-}
+.team-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0; }
 .tb-lions  { background: #E8F1FC; color: #1A56B0; }
 .tb-tigers { background: #FEF0E6; color: #C05000; }
 
-.stat-pill {
-  font-size: 10px; font-weight: 600; padding: 2px 7px;
-  border-radius: 20px; color: #6B7280; background: #F3F4F6; flex-shrink: 0;
-}
+.stat-pill { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; color: #6B7280; background: #F3F4F6; flex-shrink: 0; }
 
-.lb-primary {
-  flex-shrink: 0; text-align: right;
-}
-.lb-primary-num {
-  font-size: 20px; font-weight: 800; line-height: 1;
-}
-.lb-primary-lbl {
-  font-size: 10px; color: #9CA3AF; font-weight: 500; text-transform: uppercase; margin-top: 2px;
-}
+.lb-primary { flex-shrink: 0; text-align: right; }
+.lb-primary-num { font-size: 20px; font-weight: 800; line-height: 1; }
+.lb-primary-lbl { font-size: 10px; color: #9CA3AF; font-weight: 500; text-transform: uppercase; margin-top: 2px; }
 
-.no-data {
-  padding: 2.5rem; text-align: center; font-size: 13px; color: #9CA3AF;
-  background: #fff; border-radius: 16px;
-}
+/* Points bar (reused from home) */
+.lb-pts-bar { display: flex; gap: 3px; height: 5px; border-radius: 3px; overflow: hidden; width: 56px; flex-shrink: 0; }
+.lb-pts-bat   { background: #3B82F6; }
+.lb-pts-bowl  { background: #1A8F6A; }
+.lb-pts-field { background: #F59E0B; }
+.lb-legend { display: flex; gap: 10px; padding: 8px 16px 10px; border-top: 1px solid #F9FAFB; }
+.lb-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #9CA3AF; }
+.lb-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.no-data { padding: 2.5rem; text-align: center; font-size: 13px; color: #9CA3AF; background: #fff; border-radius: 16px; }
 .lb-updated { font-size: 11px; color: #9CA3AF; text-align: center; padding-bottom: 0.5rem; }
 </style>
 </head>
@@ -114,20 +102,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <div class="content">
 
-  <div class="tab-group">
-    <div class="tab-row">
-      <button class="tab-btn active" onclick="setTeam('combined', this)">Overall</button>
-      <button class="tab-btn" onclick="setTeam('lions', this)">🦁 Lions</button>
-      <button class="tab-btn" onclick="setTeam('tigers', this)">🐯 Tigers</button>
-    </div>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="setTeam('combined', this)">Overall</button>
+    <button class="tab-btn" onclick="setTeam('lions', this)">🦁 Lions</button>
+    <button class="tab-btn" onclick="setTeam('tigers', this)">🐯 Tigers</button>
   </div>
 
   <div class="stat-row">
-    <button class="stat-tab active-bat" id="batTab" onclick="setStat('batting', this)">🏏 Batting</button>
-    <button class="stat-tab" id="bowlTab" onclick="setStat('bowling', this)">🎯 Bowling</button>
+    <button class="stat-tab act-bat" id="batTab"  onclick="setStat('batting',  this)">🏏 Batting</button>
+    <button class="stat-tab"         id="bowlTab" onclick="setStat('bowling',  this)">🎯 Bowling</button>
+    <button class="stat-tab"         id="ptsTab"  onclick="setStat('points',   this)">⭐ Points</button>
   </div>
 
   <div id="leaderboard"></div>
+  <div id="ptsLegend" class="lb-card" style="display:none">
+    <div class="lb-legend">
+      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#3B82F6"></div>Batting</div>
+      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#1A8F6A"></div>Bowling</div>
+      <div class="lb-legend-item"><div class="lb-legend-dot" style="background:#F59E0B"></div>Fielding</div>
+    </div>
+  </div>
 
   <div class="lb-updated" id="lbUpdated"></div>
 </div>
@@ -145,43 +139,55 @@ function setTeam(team, btn) {
 
 function setStat(stat, btn) {
   currentStat = stat;
-  document.getElementById('batTab').className = 'stat-tab' + (stat === 'batting' ? ' active-bat' : '');
-  document.getElementById('bowlTab').className = 'stat-tab' + (stat === 'bowling' ? ' active-bowl' : '');
+  document.getElementById('batTab').className  = 'stat-tab' + (stat === 'batting' ? ' act-bat'  : '');
+  document.getElementById('bowlTab').className = 'stat-tab' + (stat === 'bowling' ? ' act-bowl' : '');
+  document.getElementById('ptsTab').className  = 'stat-tab' + (stat === 'points'  ? ' act-pts'  : '');
   render();
 }
 
 function getPlayers() {
   if (typeof CRICCLUBS_STATS === 'undefined') return [];
   var s = CRICCLUBS_STATS;
+  var key = currentStat === 'points' ? 'rankings' : currentStat;
+
   if (currentTeam === 'combined') {
-    var lions  = s.lions[currentStat]  || [];
-    var tigers = s.tigers[currentStat] || [];
-    var all = lions.concat(tigers);
-    if (currentStat === 'batting') {
-      all.sort(function(a, b) { return b.runs - a.runs; });
-    } else {
-      all.sort(function(a, b) { return b.wickets - a.wickets; });
+    if (currentStat === 'points') {
+      return (s.combined.rankings || []).slice();
     }
+    var all = (s.lions[key] || []).concat(s.tigers[key] || []);
+    if (currentStat === 'batting') all.sort(function(a,b){ return b.runs - a.runs; });
+    else                           all.sort(function(a,b){ return b.wickets - a.wickets; });
     return all;
   }
-  return (s[currentTeam] && s[currentTeam][currentStat]) || [];
+  return (s[currentTeam] && s[currentTeam][key]) || [];
+}
+
+function showTeamBadge() {
+  return currentTeam === 'combined';
+}
+
+function teamBadgeHTML(p) {
+  if (!showTeamBadge()) return '';
+  var isLions = p.team && p.team.includes('Lions');
+  return '<span class="team-badge ' + (isLions ? 'tb-lions' : 'tb-tigers') + '">'
+    + (isLions ? '🦁 Lions' : '🐯 Tigers') + '</span>';
+}
+
+function rankClass(rank) {
+  return rank === 1 ? 'lb-rank r1' : rank === 2 ? 'lb-rank r2' : rank === 3 ? 'lb-rank r3' : 'lb-rank';
 }
 
 function battingRow(p, rank) {
-  var isLions = p.team && p.team.includes('Lions');
-  var rankClass = rank === 1 ? 'lb-rank r1' : rank === 2 ? 'lb-rank r2' : rank === 3 ? 'lb-rank r3' : 'lb-rank';
-  var teamClass = isLions ? 'team-badge tb-lions' : 'team-badge tb-tigers';
-  var teamLabel = isLions ? '🦁 Lions' : '🐯 Tigers';
   return '<div class="lb-row">'
-    + '<div class="' + rankClass + '">' + rank + '</div>'
+    + '<div class="' + rankClass(rank) + '">' + rank + '</div>'
     + '<div class="lb-info">'
     +   '<div class="lb-name">' + p.name + '</div>'
     +   '<div class="lb-badges">'
-    +     '<span class="' + teamClass + '">' + teamLabel + '</span>'
+    +     teamBadgeHTML(p)
     +     '<span class="stat-pill">Avg ' + (p.average || '-') + '</span>'
     +     '<span class="stat-pill">SR ' + (p.strikeRate || '-') + '</span>'
     +     '<span class="stat-pill">HS ' + (p.highest || '-') + '</span>'
-    +     (p.fifties > 0 ? '<span class="stat-pill">50s ' + p.fifties + '</span>' : '')
+    +     (p.fifties  > 0 ? '<span class="stat-pill">50s ' + p.fifties  + '</span>' : '')
     +     (p.hundreds > 0 ? '<span class="stat-pill">100s ' + p.hundreds + '</span>' : '')
     +   '</div>'
     + '</div>'
@@ -193,16 +199,12 @@ function battingRow(p, rank) {
 }
 
 function bowlingRow(p, rank) {
-  var isLions = p.team && p.team.includes('Lions');
-  var rankClass = rank === 1 ? 'lb-rank r1' : rank === 2 ? 'lb-rank r2' : rank === 3 ? 'lb-rank r3' : 'lb-rank';
-  var teamClass = isLions ? 'team-badge tb-lions' : 'team-badge tb-tigers';
-  var teamLabel = isLions ? '🦁 Lions' : '🐯 Tigers';
   return '<div class="lb-row">'
-    + '<div class="' + rankClass + '">' + rank + '</div>'
+    + '<div class="' + rankClass(rank) + '">' + rank + '</div>'
     + '<div class="lb-info">'
     +   '<div class="lb-name">' + p.name + '</div>'
     +   '<div class="lb-badges">'
-    +     '<span class="' + teamClass + '">' + teamLabel + '</span>'
+    +     teamBadgeHTML(p)
     +     '<span class="stat-pill">Econ ' + (p.economy || '-') + '</span>'
     +     '<span class="stat-pill">Avg ' + (p.average || '-') + '</span>'
     +     '<span class="stat-pill">Best ' + (p.bestFigures || '-') + '</span>'
@@ -216,26 +218,59 @@ function bowlingRow(p, rank) {
     + '</div>';
 }
 
+function pointsRow(p, rank) {
+  var maxPts = Math.max(Math.abs(p.batting||0) + Math.abs(p.bowling||0) + Math.abs(p.fielding||0), 1);
+  var batW   = Math.max(0, Math.round((p.batting  || 0) / maxPts * 56));
+  var bowlW  = Math.max(0, Math.round((p.bowling  || 0) / maxPts * 56));
+  var fieldW = Math.max(0, Math.round((p.fielding || 0) / maxPts * 56));
+  var momStr = p.mom > 0 ? '<span class="stat-pill">⭐ ×' + p.mom + '</span>' : '';
+  return '<div class="lb-row">'
+    + '<div class="' + rankClass(rank) + '">' + rank + '</div>'
+    + '<div class="lb-info">'
+    +   '<div class="lb-name">' + p.name + '</div>'
+    +   '<div class="lb-badges">'
+    +     teamBadgeHTML(p)
+    +     '<span class="stat-pill">' + (p.matches || 0) + ' matches</span>'
+    +     momStr
+    +   '</div>'
+    + '</div>'
+    + '<div class="lb-pts-bar">'
+    +   '<div class="lb-pts-bat"   style="width:' + batW   + 'px"></div>'
+    +   '<div class="lb-pts-bowl"  style="width:' + bowlW  + 'px"></div>'
+    +   '<div class="lb-pts-field" style="width:' + fieldW + 'px"></div>'
+    + '</div>'
+    + '<div class="lb-primary">'
+    +   '<div class="lb-primary-num" style="color:#7C3AED">' + (p.total || 0) + '</div>'
+    +   '<div class="lb-primary-lbl">Points</div>'
+    + '</div>'
+    + '</div>';
+}
+
 function render() {
   var lb = document.getElementById('leaderboard');
 
   if (typeof CRICCLUBS_STATS === 'undefined') {
     lb.innerHTML = '<div class="no-data">Stats not available. Run the scraper to load data.</div>';
+    document.getElementById('ptsLegend').style.display = 'none';
     return;
   }
 
   var players = getPlayers();
-  var teamLabel = currentTeam === 'combined' ? 'All Teams' : currentTeam === 'lions' ? 'Lions' : 'Tigers';
-  document.getElementById('subTitle').textContent = teamLabel + ' · ' + (currentStat === 'batting' ? 'Batting' : 'Bowling') + ' · Ranked by ' + (currentStat === 'batting' ? 'Runs' : 'Wickets');
+  var statLabels = { batting: 'Batting · Ranked by Runs', bowling: 'Bowling · Ranked by Wickets', points: 'Points · Ranked by Total' };
+  var teamLabel  = currentTeam === 'combined' ? 'All Teams' : currentTeam === 'lions' ? 'Lions' : 'Tigers';
+  document.getElementById('subTitle').textContent = teamLabel + ' · ' + statLabels[currentStat];
+  document.getElementById('ptsLegend').style.display = currentStat === 'points' ? '' : 'none';
 
   if (!players.length) {
-    lb.innerHTML = '<div class="no-data">No ' + currentStat + ' data available yet.</div>';
+    lb.innerHTML = '<div class="no-data">No data available yet.</div>';
     return;
   }
 
   var html = '<div class="lb-card">';
   players.forEach(function(p, i) {
-    html += currentStat === 'batting' ? battingRow(p, i + 1) : bowlingRow(p, i + 1);
+    if (currentStat === 'batting')  html += battingRow(p, i + 1);
+    else if (currentStat === 'bowling') html += bowlingRow(p, i + 1);
+    else                            html += pointsRow(p, i + 1);
   });
   html += '</div>';
   lb.innerHTML = html;
