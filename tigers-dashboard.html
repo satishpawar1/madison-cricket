@@ -1,86 +1,115 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Tigers &mdash; Dashboard</title>
+<title>Madison Tigers — Dashboard</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}
-.container{max-width:860px;margin:0 auto}
-.hdr{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
-.hdr a{font-size:22px;text-decoration:none;color:#888}
-.hdr-text h2{font-size:18px;font-weight:500}
-.hdr-text p{font-size:13px;color:#666;margin-top:3px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-.card{background:#f1efe8;border-radius:8px;padding:12px;text-align:center}
-.cnum{font-size:22px;font-weight:500}
-.clbl{font-size:11px;color:#888;margin-top:3px}
-.slbl{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
-.sort-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
-.sort-row label{font-size:12px;color:#888}
-.sort-row select{font-size:13px;padding:5px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff}
-.plist{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
-.prow{background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:12px 14px}
-.ptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.pname{font-size:14px;font-weight:500}
-.badges{display:flex;gap:6px}
-.bdg{font-size:11px;padding:3px 8px;border-radius:20px}
-.bdg-av{background:#FAEEDA;color:#633806}
-.bdg-sel{background:#FAECE7;color:#4A1B0C}
-.bars{display:flex;flex-direction:column;gap:5px}
-.bar-row{display:flex;align-items:center;gap:8px}
-.bar-lbl{font-size:11px;color:#888;width:60px;flex-shrink:0}
-.bar-track{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden}
-.bfav{height:100%;background:#BA7517;border-radius:4px}
-.bfsel{height:100%;background:#993C1D;border-radius:4px}
-.bar-pct{font-size:11px;font-weight:500;width:34px;text-align:right;flex-shrink:0}
-.sep{border:none;border-top:0.5px solid #ddd;margin:1.5rem 0}
-.tbl-wrap{overflow-x:auto;margin-bottom:1.5rem}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
-th{background:#f1efe8;padding:7px 10px;text-align:center;font-weight:500;border:0.5px solid #ddd}
-th.pcol{text-align:left;position:sticky;left:0;background:#f1efe8;z-index:1}
-td{padding:7px 10px;text-align:center;border:0.5px solid #eee}
-td.pcol{text-align:left;font-weight:500;position:sticky;left:0;background:#fff;z-index:1}
-tr:nth-child(even) td{background:#fafaf8}
-tr:nth-child(even) td.pcol{background:#fafaf8}
-.ca{color:#633806;font-weight:500}
-.cs{color:#4A1B0C;font-weight:500}
-.cn{color:#ccc}
-.live{font-size:11px;color:#888;margin-left:6px;font-weight:400}
-.live.ok{color:#0F6E56}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #C05000 0%, #7A3200 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+.live { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-left: 6px; }
+.live.ok { color: #6EE7B7; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc {
+  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sn { font-size: 26px; font-weight: 700; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.slbl { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: .06em; }
+.sort-row { display: flex; gap: 8px; align-items: center; }
+.sort-row label { font-size: 12px; color: #9CA3AF; }
+.sort-row select {
+  font-size: 13px; padding: 6px 10px; border: 1.5px solid #E5E7EB;
+  border-radius: 8px; background: #fff; color: #111827;
+}
+
+.plist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+.prow {
+  background: #fff; border-radius: 12px; padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.ptop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.pname { font-size: 14px; font-weight: 600; }
+.badges { display: flex; gap: 6px; }
+.bdg { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+.bdg-av { background: #FEF3C7; color: #92400E; }
+.bdg-sel { background: #FEF0E6; color: #7A3200; }
+
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar-row { display: flex; align-items: center; gap: 8px; }
+.bar-lbl { font-size: 11px; color: #9CA3AF; width: 65px; flex-shrink: 0; font-weight: 500; }
+.bar-track { flex: 1; background: #F3F4F6; border-radius: 6px; height: 8px; overflow: hidden; }
+.bfav { height: 100%; background: linear-gradient(90deg, #D97706, #FCD34D); border-radius: 6px; transition: width 0.3s; }
+.bfsel { height: 100%; background: linear-gradient(90deg, #C05000, #F97316); border-radius: 6px; transition: width 0.3s; }
+.bar-pct { font-size: 11px; font-weight: 700; width: 36px; text-align: right; flex-shrink: 0; }
+
+.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.5rem 0; }
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; background: #fff; }
+th { background: #FFFBF5; padding: 9px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #FEE9D8; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+th.pcol { text-align: left; position: sticky; left: 0; background: #FFFBF5; z-index: 1; }
+td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #F9FAFB; }
+td.pcol { text-align: left; font-weight: 600; position: sticky; left: 0; background: #fff; z-index: 1; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: #FFFCF8; }
+tr:nth-child(even) td.pcol { background: #FFFCF8; }
+.ca { color: #92400E; font-weight: 700; }
+.cs { color: #7A3200; font-weight: 700; }
+.cn { color: #D1D5DB; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="hdr">
-    <a href="index.html">&#8249;</a>
-    <div class="hdr-text">
-      <h2>Madison Tigers &mdash; dashboard <span class="live" id="liveTag"></span></h2>
-      <p>Availability &amp; selection across completed games</p>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🐯 Tigers Dashboard <span class="live" id="liveTag"></span></h2>
+    <p>Availability &amp; selection across completed games</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="stat-cards">
+    <div class="sc"><div class="sn" id="sumG" style="color:#C05000">0</div><div class="sl">Games played</div></div>
+    <div class="sc"><div class="sn" id="sumA" style="color:#D97706">0</div><div class="sl">Avg available</div></div>
+    <div class="sc"><div class="sn" id="sumS" style="color:#C05000">0</div><div class="sl">Avg selected</div></div>
+  </div>
+
+  <div class="section-header">
+    <div class="slbl">Player availability &amp; selection</div>
+    <div class="sort-row">
+      <label>Sort by</label>
+      <select id="sortBy" onchange="renderPlayers()">
+        <option value="avail">Availability %</option>
+        <option value="sel">Selection %</option>
+        <option value="name">Name</option>
+      </select>
     </div>
   </div>
-  <div class="cards">
-    <div class="card"><div class="cnum" id="sumG" style="color:#993C1D">0</div><div class="clbl">Games played</div></div>
-    <div class="card"><div class="cnum" id="sumA" style="color:#BA7517">0</div><div class="clbl">Avg available</div></div>
-    <div class="card"><div class="cnum" id="sumS" style="color:#993C1D">0</div><div class="clbl">Avg selected</div></div>
-  </div>
-  <div class="sort-row">
-    <label>Sort by</label>
-    <select id="sortBy" onchange="renderPlayers()">
-      <option value="avail">Availability %</option>
-      <option value="sel">Selection %</option>
-      <option value="name">Name</option>
-    </select>
-  </div>
-  <div class="slbl">Player availability &amp; selection</div>
   <div class="plist" id="plist"></div>
+
   <hr class="sep">
-  <div class="slbl">Game-by-game breakdown</div>
+  <div class="slbl" style="margin-bottom:12px">Game-by-game breakdown</div>
   <div class="tbl-wrap"><table id="gtbl"></table></div>
 </div>
+
 <script>
 var CFG = MCC_CONFIG.tigers;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
@@ -182,8 +211,8 @@ function renderPlayers() {
       +'<div class="badges"><span class="bdg bdg-av">'+p.avail+'/'+gamesPlayed+' avail</span>'
       +'<span class="bdg bdg-sel">'+p.sel+'/'+(p.avail||0)+' sel</span></div></div>'
       +'<div class="bars">'
-      +'<div class="bar-row"><span class="bar-lbl">Availability</span><div class="bar-track"><div class="bfav" style="width:'+ap+'%"></div></div><span class="bar-pct" style="color:#BA7517">'+ap+'%</span></div>'
-      +'<div class="bar-row"><span class="bar-lbl">Selection</span><div class="bar-track"><div class="bfsel" style="width:'+sp+'%"></div></div><span class="bar-pct" style="color:#993C1D">'+sp+'%</span></div>'
+      +'<div class="bar-row"><span class="bar-lbl">Availability</span><div class="bar-track"><div class="bfav" style="width:'+ap+'%"></div></div><span class="bar-pct" style="color:#D97706">'+ap+'%</span></div>'
+      +'<div class="bar-row"><span class="bar-lbl">Selection</span><div class="bar-track"><div class="bfsel" style="width:'+sp+'%"></div></div><span class="bar-pct" style="color:#C05000">'+sp+'%</span></div>'
       +'</div></div>';
   }).join('');
 }
@@ -214,4 +243,5 @@ window.addEventListener('DOMContentLoaded', function() {
   fetchLive();
 });
 </script>
-</body></html>
+</body>
+</html>

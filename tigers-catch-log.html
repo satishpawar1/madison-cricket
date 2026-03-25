@@ -1,83 +1,142 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <script src="config.js"></script>
-<title>Madison Tigers &mdash; Log Catches</title>
+<title>Madison Tigers — Log Catches</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f7; color: #1a1a1a; padding: 1.2rem; }
-.container { max-width: 600px; margin: 0 auto; }
-.hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-.hdr a { font-size: 22px; text-decoration: none; color: #888; }
-.hdr-text h2 { font-size: 18px; font-weight: 500; }
-.hdr-text p { font-size: 13px; color: #666; margin-top: 3px; }
-.gs { display: flex; gap: 10px; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
-.gs label { font-size: 13px; color: #666; white-space: nowrap; }
-.gs select { font-size: 14px; padding: 8px 10px; border: 0.5px solid #ccc; border-radius: 8px; background: #fff; flex: 1; min-width: 200px; }
-.banner { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 1.2rem; display: none; line-height: 1.5; }
-.b-lock { background: #FCEBEB; color: #791F1F; }
-.b-pre  { background: #FAEEDA; color: #BA7517; }
-.b-past { background: #FAEEDA; color: #633806; }
-.b-new  { background: #E1F5EE; color: #085041; }
-.b-load { background: #f1efe8; color: #888; }
-.slbl { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
-.col-hdr { display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px; padding: 4px 14px; margin-bottom: 4px; border-bottom: 0.5px solid #ddd; }
-.col-hdr span { font-size: 11px; font-weight: 500; color: #888; text-align: center; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #C05000 0%, #7A3200 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
+}
+
+.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
+.gs select {
+  font-size: 14px; padding: 10px 12px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; flex: 1; min-width: 200px; color: #111827;
+  -webkit-appearance: none; appearance: none;
+}
+.gs select:focus { outline: none; border-color: #C05000; }
+
+.banner { border-radius: 10px; padding: 11px 14px; font-size: 13px; margin-bottom: 1rem; display: none; line-height: 1.5; font-weight: 500; }
+.b-lock { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
+.b-pre  { background: #FEF0E6; color: #7A3200; border-left: 3px solid #C05000; }
+.b-past { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
+.b-new  { background: #E2F5EE; color: #0F5C43; border-left: 3px solid #1A8F6A; }
+.b-load { background: #F3F4F6; color: #9CA3AF; border-left: 3px solid #D1D5DB; }
+
+.slbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+
+.col-hdr {
+  display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px;
+  padding: 6px 14px 8px; margin-bottom: 4px;
+  border-bottom: 1.5px solid #F3F4F6;
+}
+.col-hdr span { font-size: 11px; font-weight: 600; color: #9CA3AF; text-align: center; text-transform: uppercase; letter-spacing: 0.04em; }
 .col-hdr span:first-child { text-align: left; }
-.prows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1rem; }
-.pr { display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px; align-items: center; background: #fff; border: 0.5px solid #e0e0e0; border-radius: 8px; padding: 8px 14px; }
-.pr.pre { border-color: #BA7517; background: #FAEEDA; }
-.pr.locked { opacity: 0.6; }
-.prname { font-size: 14px; font-weight: 500; }
-.pr input { font-size: 15px; padding: 6px 4px; border: 0.5px solid #ccc; border-radius: 6px; text-align: center; width: 100%; background: #fff; color: #1a1a1a; }
-.pr.pre input { border-color: #BA7517; }
-.pr input:disabled { background: #f1efe8; color: #aaa; border-color: #ddd; cursor: not-allowed; }
-.summary { background: #f1efe8; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #555; margin-bottom: 1.2rem; line-height: 1.6; }
-.summary strong { color: #1a1a1a; }
-.sep { border: none; border-top: 0.5px solid #ddd; margin: 1.2rem 0; }
+
+.prows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.pr {
+  display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px;
+  align-items: center; background: #fff;
+  border: 1.5px solid #F3F4F6; border-radius: 10px; padding: 10px 14px;
+}
+.pr.pre { border-color: #C05000; background: #FFF8F4; }
+.pr.locked { opacity: 0.55; }
+
+.prname { font-size: 14px; font-weight: 600; }
+
+.pr input {
+  font-size: 15px; padding: 7px 4px; border: 1.5px solid #E5E7EB;
+  border-radius: 8px; text-align: center; width: 100%;
+  background: #fff; color: #111827; font-weight: 500;
+}
+.pr input:focus { outline: none; border-color: #C05000; }
+.pr.pre input { border-color: #FDBA74; }
+.pr input:disabled { background: #F9FAFB; color: #D1D5DB; border-color: #F3F4F6; cursor: not-allowed; }
+
+.summary {
+  background: #FFFBF5; border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; color: #6B7280; margin-bottom: 1.25rem; line-height: 1.7;
+  border: 1px solid #FEE9D8;
+}
+.summary strong { color: #111827; font-weight: 700; }
+
+.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.25rem 0; }
+
 .acts { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn { font-size: 14px; padding: 10px 18px; border-radius: 8px; cursor: pointer; border: 0.5px solid #ccc; background: transparent; color: #1a1a1a; touch-action: manipulation; }
-.btn-primary { background: #993C1D; color: #FAECE7; border-color: #993C1D; }
-.btn-primary:disabled { background: #bbb; border-color: #bbb; cursor: not-allowed; }
-.btn-clear { color: #888; }
-.msg { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 8px; display: none; }
-.msg.ok   { background: #E1F5EE; color: #085041; display: block; }
-.msg.err  { background: #FCEBEB; color: #791F1F; display: block; }
-.msg.info { background: #E6F1FB; color: #0C447C; display: block; }
+.btn {
+  font-size: 14px; padding: 11px 20px; border-radius: 10px;
+  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: #C05000; color: #fff; }
+.btn-primary:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
+.btn-clear { background: #F3F4F6; color: #6B7280; }
+
+.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
+.msg.ok   { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err  { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.info { background: #FEF0E6; color: #7A3200; display: block; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="hdr">
-    <a href="index.html">&#8249;</a>
-    <div class="hdr-text">
-      <h2>Madison Tigers &mdash; log catches</h2>
-      <p>Record catch efficiency per game</p>
-    </div>
-  </div>
-  <div class="gs">
-    <label>Game</label>
-    <select id="gs"><option value="">&#8212; pick a game &#8212;</option></select>
-  </div>
-  <div class="banner" id="banner"></div>
-  <div id="playerSection" style="display:none">
-    <div class="slbl">Catches per player</div>
-    <div class="col-hdr">
-      <span>Player</span><span>Attempted</span><span>Taken</span><span>Dropped</span>
-    </div>
-    <div class="prows" id="prows"></div>
-    <div class="summary" id="summary"></div>
-    <hr class="sep">
-    <div class="acts">
-      <button class="btn btn-primary" id="saveBtn" onclick="submitCatches()">Save to Sheets</button>
-      <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
-    </div>
-    <div class="msg" id="msg"></div>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🐯 Tigers — Log Catches</h2>
+    <p>Record catch efficiency per game</p>
   </div>
 </div>
+
+<div class="content">
+  <div class="card">
+    <div class="gs">
+      <label>Game</label>
+      <select id="gs"><option value="">— pick a game —</option></select>
+    </div>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div id="playerSection" style="display:none">
+    <div class="card" style="padding:12px 16px">
+      <div class="slbl">Catches per player</div>
+      <div class="col-hdr">
+        <span>Player</span><span>Attempted</span><span>Taken</span><span>Dropped</span>
+      </div>
+      <div class="prows" id="prows"></div>
+      <div class="summary" id="summary"></div>
+      <hr class="sep">
+      <div class="acts">
+        <button class="btn btn-primary" id="saveBtn" onclick="submitCatches()">Save to Sheets</button>
+        <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 var CFG = MCC_CONFIG.tigers;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
@@ -116,17 +175,14 @@ function onGameChange() {
   var isPast = today > gameDate;
   isLocked = isPast && daysSince > 5;
 
-  // Show loading banner while fetching
   showBanner('b-load', 'Loading catch data from Google Sheets...');
   section.style.display = 'block';
   document.getElementById('saveBtn').disabled = true;
 
-  // Try to fetch live data from Sheets first, fall back to config.js preloaded
   fetch(SCRIPT_URL + '?type=catches&team=Tigers&game=' + encodeURIComponent(game))
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
-      // Fall back to config preloaded if live returned nothing
       if (!liveData || !liveData.some(function(p){return p.att>0;})) {
         liveData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
       }
@@ -142,13 +198,13 @@ function buildRows(game, isPast, daysSince, data) {
   var hasPrefill = data && data.some(function(p) { return p.att > 0; });
 
   if (isLocked) {
-    showBanner('b-lock', 'This game was played ' + daysSince + ' days ago - catch data is locked.');
+    showBanner('b-lock', '🔒 This game was played ' + daysSince + ' days ago — catch data is locked.');
   } else if (hasPrefill) {
     showBanner('b-pre', 'Pre-filled with recorded data. Edit and save to update.');
   } else if (isPast) {
-    showBanner('b-past', 'Past game - enter catch data below.');
+    showBanner('b-past', 'Past game — enter catch data below.');
   } else {
-    showBanner('b-new', 'Upcoming game - enter catch data after the match.');
+    showBanner('b-new', 'Upcoming game — enter catch data after the match.');
   }
 
   var rows = document.getElementById('prows');

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,96 +6,164 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Madison Lions — Availability & Selection</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:1.2rem}
-.container{max-width:860px;margin:0 auto}
-.hdr{margin-bottom:1.2rem;display:flex;align-items:center;gap:10px}
-.hdr a{font-size:22px;text-decoration:none;color:#888}
-.hdr-text h2{font-size:18px;font-weight:500}
-.hdr-text p{font-size:13px;color:#666;margin-top:3px}
-.instr{font-size:13px;color:#555;background:#E6F1FB;border-radius:8px;padding:10px 14px;margin-bottom:1.2rem;line-height:1.6}
-.gs{display:flex;gap:10px;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap}
-.gs label{font-size:13px;color:#666;white-space:nowrap}
-.gs select{font-size:15px;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;background:#fff;flex:1;min-width:200px}
-.slbl{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:1.2rem}
-@media(max-width:480px){.grid{grid-template-columns:repeat(2,1fr)}}
-.pc{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:12px;cursor:pointer;user-select:none;touch-action:manipulation}
-.pc.av{border-color:#1D9E75;background:#E1F5EE}
-.pc.av .pn{color:#085041}
-.pc.sel{border:2px solid #185FA5;background:#E6F1FB}
-.pc.sel .pn{color:#0C447C}
-.pc.av.sel{border:2px solid #185FA5;background:#E6F1FB}
-.pn{font-size:14px;font-weight:500;color:#1a1a1a}
-.tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
-.tag{font-size:11px;padding:2px 7px;border-radius:20px}
-.ta{background:#9FE1CB;color:#085041}
-.ts{background:#B5D4F4;color:#0C447C}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.2rem}
-.sc{background:#f1efe8;border-radius:8px;padding:10px 8px;text-align:center}
-.sn{font-size:20px;font-weight:500;color:#1a1a1a}
-.sl{font-size:11px;color:#888;margin-top:2px}
-.freeze{display:none;background:#FCEBEB;color:#791F1F;border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:13px}
-.sep{border:none;border-top:0.5px solid #ddd;margin:1.2rem 0}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.btn{font-size:14px;padding:10px 14px;border-radius:8px;cursor:pointer;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;touch-action:manipulation}
-.btn-primary{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
-.btn-record{background:#0F6E56;color:#E1F5EE;border-color:#0F6E56}
-.btn-record:disabled{background:#aaa;border-color:#aaa;cursor:not-allowed;opacity:0.6}
-.btn-reset{color:#888}
-.sync{font-size:12px;color:#888;margin-top:6px}
-.sync.ok{color:#0F6E56}
-.msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}
-.msg.ok{background:#E1F5EE;color:#085041;display:block}
-.msg.err{background:#FCEBEB;color:#791F1F;display:block}
-.msg.info{background:#E6F1FB;color:#0C447C;display:block}
-.wa-box{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:14px;margin-top:1rem;display:none}
-.wa-box.show{display:block}
-.wa-lbl{font-size:12px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.wa-txt{font-size:13px;color:#1a1a1a;white-space:pre-wrap;line-height:1.7;background:#f9f9f7;border-radius:6px;padding:12px;word-break:break-word}
-.wa-acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.page-header a:active { color: #fff; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
+}
+
+.instr {
+  font-size: 13px; color: #374151; background: #E8F1FC;
+  border-radius: 10px; padding: 11px 14px; margin-bottom: 1rem; line-height: 1.6;
+  border-left: 3px solid #1A56B0;
+}
+
+.gs { display: flex; gap: 10px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
+.gs select {
+  font-size: 14px; padding: 10px 12px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; flex: 1; min-width: 200px; color: #111827;
+  -webkit-appearance: none; appearance: none;
+}
+.gs select:focus { outline: none; border-color: #1A56B0; }
+
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1rem; }
+.sc {
+  background: #F8FAFF; border-radius: 12px; padding: 12px 8px; text-align: center;
+  border: 1px solid #E8F1FC;
+}
+.sn { font-size: 22px; font-weight: 700; color: #111827; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.freeze {
+  display: none; background: #FEE2E2; color: #991B1B;
+  border-radius: 10px; padding: 11px 14px; margin-bottom: 1rem; font-size: 13px;
+  border-left: 3px solid #EF4444;
+}
+
+.slbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 8px; margin-bottom: 1rem; }
+@media(max-width:480px) { .grid { grid-template-columns: repeat(2,1fr); } }
+
+.pc {
+  background: #fff; border: 1.5px solid #E5E7EB; border-radius: 12px;
+  padding: 12px; cursor: pointer; user-select: none; touch-action: manipulation;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pc:active { transform: scale(0.97); }
+.pc.av { border-color: #1A8F6A; background: #E8F8F2; }
+.pc.av .pn { color: #0F5C43; }
+.pc.sel { border: 2px solid #1A56B0; background: #E8F1FC; }
+.pc.sel .pn { color: #1A56B0; }
+.pc.av.sel { border: 2px solid #1A56B0; background: #E8F1FC; }
+.pn { font-size: 13px; font-weight: 600; color: #111827; }
+.tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+.ta { background: #C6F0E0; color: #0F5C43; }
+.ts { background: #BDD5F5; color: #1A56B0; }
+
+.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.25rem 0; }
+
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font-size: 14px; padding: 11px 18px; border-radius: 10px;
+  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: #1A56B0; color: #fff; }
+.btn-record { background: #177A5A; color: #fff; }
+.btn-record:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
+.btn-reset { background: #F3F4F6; color: #6B7280; }
+
+.sync { font-size: 12px; color: #9CA3AF; margin-top: 8px; }
+.sync.ok { color: #177A5A; }
+
+.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
+.msg.ok  { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.info { background: #E8F1FC; color: #1A56B0; display: block; }
+
+.wa-box {
+  background: #F9FAFB; border-radius: 12px; padding: 16px; margin-top: 1rem; display: none;
+  border: 1.5px solid #E5E7EB;
+}
+.wa-box.show { display: block; }
+.wa-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.wa-txt {
+  font-size: 13px; color: #111827; white-space: pre-wrap; line-height: 1.75;
+  background: #fff; border-radius: 8px; padding: 14px; word-break: break-word;
+  border: 1px solid #E5E7EB;
+}
+.wa-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="hdr">
-    <a href="index.html">&#8249;</a>
-    <div class="hdr-text">
-      <h2>Madison Lions &mdash; availability &amp; selection</h2>
-      <p>Tape T20 2026 &nbsp;&middot;&nbsp; Track, select, publish &amp; record.</p>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🦁 Madison Lions</h2>
+    <p>Availability &amp; Selection · Tape T20 2026</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="instr">Step 1: Select the game &nbsp;·&nbsp; Step 2: Tap players — once = available, twice = selected &nbsp;·&nbsp; Step 3: Generate WhatsApp &nbsp;·&nbsp; Step 4: Record to Sheets.</div>
+
+  <div class="card">
+    <div class="gs">
+      <label>Game</label>
+      <select id="gs"><option value="">— pick a game —</option></select>
     </div>
+    <div class="stats">
+      <div class="sc"><div class="sn" id="stA">0</div><div class="sl">Available</div></div>
+      <div class="sc"><div class="sn" id="stS" style="color:#1A56B0">0</div><div class="sl">Selected</div></div>
+      <div class="sc"><div class="sn" style="color:#9CA3AF">11</div><div class="sl">Minimum</div></div>
+      <div class="sc"><div class="sn" id="stX" style="font-size:14px;padding-top:6px;color:#9CA3AF">—</div><div class="sl">Status</div></div>
+    </div>
+    <div class="freeze" id="freezeBanner">🔒 This game is in the past — team is locked. No changes allowed.</div>
   </div>
-  <div class="instr">Step 1: Select the game. | Step 2: Tap players &mdash; once = available, twice = selected. | Step 3: Generate WhatsApp. | Step 4: Record to Google Sheets.</div>
-  <div class="gs">
-    <label>Game</label>
-    <select id="gs"><option value="">&#8212; pick a game &#8212;</option></select>
-  </div>
-  <div class="stats">
-    <div class="sc"><div class="sn" id="stA">0</div><div class="sl">Available</div></div>
-    <div class="sc"><div class="sn" id="stS" style="color:#185FA5">0</div><div class="sl">Selected</div></div>
-    <div class="sc"><div class="sn" style="color:#888">11</div><div class="sl">Min</div></div>
-    <div class="sc"><div class="sn" id="stX" style="font-size:13px;padding-top:6px;color:#888">&#8212;</div><div class="sl">Status</div></div>
-  </div>
-  <div class="freeze" id="freezeBanner">&#128274; This game is in the past &mdash; team is locked. No changes or recording allowed.</div>
-  <div class="slbl">Players &mdash; tap once = available &middot; tap twice = selected &middot; tap again = reset</div>
+
+  <div class="slbl">Players — tap once = available · twice = selected · again = reset</div>
   <div class="grid" id="pg"></div>
-  <hr class="sep">
-  <div class="acts">
-    <button class="btn btn-primary" onclick="genWA()">Generate WhatsApp</button>
-    <button class="btn btn-record" id="recordBtn" onclick="recordTeam()" disabled>Record to Sheets</button>
-    <button class="btn btn-reset" onclick="resetGame()">Reset</button>
-  </div>
-  <div class="sync" id="syncStatus"></div>
-  <div class="msg" id="msg"></div>
-  <div class="wa-box" id="waBox">
-    <div class="wa-lbl">WhatsApp announcement &mdash; tap text to select, then copy</div>
-    <div class="wa-txt" id="waText" onclick="selectAll(this)"></div>
-    <div class="wa-acts">
-      <button class="btn btn-primary" onclick="copyWA()">Copy to clipboard</button>
-      <button class="btn" onclick="document.getElementById('waBox').classList.remove('show')">Dismiss</button>
+
+  <div class="card">
+    <div class="acts">
+      <button class="btn btn-primary" onclick="genWA()">Generate WhatsApp</button>
+      <button class="btn btn-record" id="recordBtn" onclick="recordTeam()" disabled>Record to Sheets</button>
+      <button class="btn btn-reset" onclick="resetGame()">Reset</button>
+    </div>
+    <div class="sync" id="syncStatus"></div>
+    <div class="msg" id="msg"></div>
+    <div class="wa-box" id="waBox">
+      <div class="wa-lbl">WhatsApp announcement — tap text to select, then copy</div>
+      <div class="wa-txt" id="waText" onclick="selectAll(this)"></div>
+      <div class="wa-acts">
+        <button class="btn btn-primary" onclick="copyWA()">Copy to clipboard</button>
+        <button class="btn btn-reset" onclick="document.getElementById('waBox').classList.remove('show')">Dismiss</button>
+      </div>
     </div>
   </div>
 </div>
+
 <script>
 var CFG = MCC_CONFIG.lions;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
@@ -171,10 +238,10 @@ function updateStats() {
   document.getElementById('stA').textContent = av;
   document.getElementById('stS').textContent = sel;
   var x = document.getElementById('stX');
-  if (sel === 0) { x.textContent = '—'; x.style.color = '#888'; x.style.fontSize = '22px'; }
-  else if (sel < 11) { x.textContent = 'Need ' + (11-sel); x.style.color = '#BA7517'; x.style.fontSize = '16px'; }
-  else if (sel <= 12) { x.textContent = 'Ready!'; x.style.color = '#0F6E56'; x.style.fontSize = '16px'; }
-  else { x.textContent = 'Max 12!'; x.style.color = '#A32D2D'; x.style.fontSize = '15px'; }
+  if (sel === 0) { x.textContent = '—'; x.style.color = '#9CA3AF'; x.style.fontSize = '22px'; }
+  else if (sel < 11) { x.textContent = 'Need ' + (11-sel); x.style.color = '#B45309'; x.style.fontSize = '16px'; }
+  else if (sel <= 12) { x.textContent = 'Ready!'; x.style.color = '#177A5A'; x.style.fontSize = '16px'; }
+  else { x.textContent = 'Max 12!'; x.style.color = '#B91C1C'; x.style.fontSize = '15px'; }
   document.getElementById('recordBtn').disabled = (sel < 11 || isPast(cur));
 }
 
@@ -199,9 +266,7 @@ document.getElementById('gs').addEventListener('change', function() {
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d.status === 'ok' && d.data && d.data.length) {
-          // Update state with live data from Sheets
           d.data.forEach(function(p) {
-            // Always set — even if player wasn't in preloaded state (e.g. newly added)
             state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
           });
         }
@@ -210,7 +275,6 @@ document.getElementById('gs').addEventListener('change', function() {
         applyFreeze(true);
       })
       .catch(function() {
-        // Fall back to preloaded config data
         PL.forEach(function(p) { renderCard(p); });
         updateStats();
         applyFreeze(true);
