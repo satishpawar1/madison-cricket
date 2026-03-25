@@ -184,6 +184,7 @@ function battingRow(p, rank) {
     +   '<div class="lb-name">' + p.name + '</div>'
     +   '<div class="lb-badges">'
     +     teamBadgeHTML(p)
+    +     '<span class="stat-pill">Inn ' + (p.innings || 0) + '</span>'
     +     '<span class="stat-pill">Avg ' + (p.average || '-') + '</span>'
     +     '<span class="stat-pill">SR ' + (p.strikeRate || '-') + '</span>'
     +     '<span class="stat-pill">HS ' + (p.highest || '-') + '</span>'
@@ -205,6 +206,7 @@ function bowlingRow(p, rank) {
     +   '<div class="lb-name">' + p.name + '</div>'
     +   '<div class="lb-badges">'
     +     teamBadgeHTML(p)
+    +     '<span class="stat-pill">Inn ' + (p.innings || 0) + '</span>'
     +     '<span class="stat-pill">Econ ' + (p.economy || '-') + '</span>'
     +     '<span class="stat-pill">Avg ' + (p.average || '-') + '</span>'
     +     '<span class="stat-pill">Best ' + (p.bestFigures || '-') + '</span>'

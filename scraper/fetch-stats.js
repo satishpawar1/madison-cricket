@@ -102,6 +102,7 @@ async function fetchStats() {
       name: p.firstName + ' ' + p.lastName,
       team: p.teamName,
       matches: p.matches,
+      innings: p.innings || 0,
       overs: oversDisplay,
       wickets: p.wickets,
       runs: runsGiven,
