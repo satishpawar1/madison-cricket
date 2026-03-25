@@ -22,7 +22,10 @@ const PAGES = [
 
 async function fetchStats() {
   console.log('Launching browser...');
-  const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox'] });
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36');
 
