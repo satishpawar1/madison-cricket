@@ -351,9 +351,9 @@ function buildLeaderboard() {
     document.getElementById(containerId).innerHTML = top.map((p, i) => rowHTML(p, i + 1)).join('');
   }
 
-  renderList(stats.combined, 'lb-combined', 10);
-  renderList(stats.lions,    'lb-lions',    10);
-  renderList(stats.tigers,   'lb-tigers',   10);
+  renderList(stats.combined.rankings || [], 'lb-combined', 10);
+  renderList(stats.lions.rankings    || [], 'lb-lions',    10);
+  renderList(stats.tigers.rankings   || [], 'lb-tigers',   10);
 
   var updated = new Date(stats.lastUpdated);
   document.getElementById('lbUpdated').textContent = 'Updated ' + updated.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' at ' + updated.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
