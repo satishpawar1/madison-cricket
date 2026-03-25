@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="cricclubs-stats.js"></script>
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -73,6 +74,12 @@ tr:nth-child(even) td.pcol { background: #FFFCF8; }
 .ca { color: #92400E; font-weight: 700; }
 .cs { color: #7A3200; font-weight: 700; }
 .cn { color: #D1D5DB; }
+
+.tab-nav { display: flex; gap: 4px; }
+.tab-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer; font-weight: 500; }
+.tab-btn.active { background: #C05000; color: #fff; border-color: #C05000; }
+.note { font-size: 13px; color: #9CA3AF; background: #fff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+.hl { font-weight: 700; color: #111827; }
 </style>
 </head>
 <body>
@@ -108,6 +115,18 @@ tr:nth-child(even) td.pcol { background: #FFFCF8; }
   <hr class="sep">
   <div class="slbl" style="margin-bottom:12px">Game-by-game breakdown</div>
   <div class="tbl-wrap"><table id="gtbl"></table></div>
+
+  <hr class="sep">
+  <div class="section-header">
+    <div class="slbl">Cricket Stats</div>
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="showStatsTab('batting',this)">Batting</button>
+      <button class="tab-btn" onclick="showStatsTab('bowling',this)">Bowling</button>
+    </div>
+  </div>
+  <div id="battingStats" class="tbl-wrap"></div>
+  <div id="bowlingStats" class="tbl-wrap" style="display:none"></div>
+  <div id="statsNote" class="note" style="display:none">No stats available. Run the scraper to update cricclubs-stats.js.</div>
 </div>
 
 <script>
@@ -237,10 +256,66 @@ function renderTable() {
   document.getElementById('gtbl').innerHTML = h+'</tbody>';
 }
 
+function showStatsTab(tab, btn) {
+  document.getElementById('battingStats').style.display = tab === 'batting' ? '' : 'none';
+  document.getElementById('bowlingStats').style.display = tab === 'bowling' ? '' : 'none';
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function renderCricStats() {
+  if (typeof CRICCLUBS_STATS === 'undefined') {
+    document.getElementById('statsNote').style.display = 'block';
+    document.getElementById('battingStats').style.display = 'none';
+    return;
+  }
+  var data = CRICCLUBS_STATS.tigers;
+
+  // Batting table
+  var bh = '<table><thead><tr>'
+    + '<th class="pcol">Player</th><th>M</th><th>Inn</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>'
+    + '</tr></thead><tbody>';
+  if (data.batting && data.batting.length) {
+    data.batting.forEach(function(p, i) {
+      bh += '<tr><td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
+        + '<td>' + p.matches + '</td><td>' + p.innings + '</td>'
+        + '<td class="hl">' + p.runs + '</td>'
+        + '<td>' + (p.highest || '-') + '</td>'
+        + '<td class="ca">' + p.average + '</td>'
+        + '<td class="cs">' + p.strikeRate + '</td>'
+        + '<td>' + (p.fours||0) + '</td><td>' + (p.sixes||0) + '</td><td>' + (p.fifties||0) + '</td></tr>';
+    });
+  } else {
+    bh += '<tr><td colspan="10" style="text-align:center;color:#9CA3AF;padding:20px">No batting data yet</td></tr>';
+  }
+  document.getElementById('battingStats').innerHTML = bh + '</tbody></table>';
+
+  // Bowling table
+  var bwh = '<table><thead><tr>'
+    + '<th class="pcol">Player</th><th>M</th><th>Ov</th><th>Wkts</th><th>Runs</th><th>Best</th><th>Avg</th><th>Econ</th><th>SR</th>'
+    + '</tr></thead><tbody>';
+  if (data.bowling && data.bowling.length) {
+    data.bowling.forEach(function(p, i) {
+      bwh += '<tr><td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
+        + '<td>' + p.matches + '</td><td>' + p.overs + '</td>'
+        + '<td class="hl">' + p.wickets + '</td>'
+        + '<td>' + (p.runs||0) + '</td>'
+        + '<td>' + (p.bestFigures||'-') + '</td>'
+        + '<td class="ca">' + (p.average||'-') + '</td>'
+        + '<td class="cs">' + (p.economy||'-') + '</td>'
+        + '<td>' + (p.strikeRate||'-') + '</td></tr>';
+    });
+  } else {
+    bwh += '<tr><td colspan="9" style="text-align:center;color:#9CA3AF;padding:20px">No bowling data yet</td></tr>';
+  }
+  document.getElementById('bowlingStats').innerHTML = bwh + '</tbody></table>';
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   buildFromPreloaded();
   renderAll();
   fetchLive();
+  renderCricStats();
 });
 </script>
 </body>
