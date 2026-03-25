@@ -24,6 +24,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .content { padding: 0 1rem 2rem; max-width: 500px; margin: -2rem auto 0; }
 
+/* ── Team nav cards ── */
 .team-card {
   background: #fff;
   border-radius: 18px;
@@ -42,7 +43,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .lions-icon { background: #E8F1FC; }
 .tigers-icon { background: #FEF0E6; }
-.team-label { }
 .team-name { font-size: 16px; font-weight: 700; line-height: 1.2; }
 .team-name.lions { color: #1A56B0; }
 .team-name.tigers { color: #C05000; }
@@ -69,6 +69,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .menu-text p { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
 .arrow { margin-left: auto; color: #D1D5DB; font-size: 20px; font-weight: 300; }
 
+/* ── Schedule section ── */
+.section-title {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.schedule-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.schedule-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid #F3F4F6;
+}
+.schedule-header .team-icon { width: 36px; height: 36px; font-size: 18px; }
+.schedule-header .team-name { font-size: 14px; }
+.schedule-header .team-sub { font-size: 11px; }
+
+.game-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 18px;
+  border-bottom: 1px solid #F9FAFB;
+}
+.game-row:last-child { border-bottom: none; }
+
+.game-date-block { flex-shrink: 0; width: 38px; text-align: center; }
+.game-date-day { font-size: 16px; font-weight: 800; color: #111827; line-height: 1; }
+.game-date-mon { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; margin-top: 2px; }
+
+.game-divider { width: 1px; height: 32px; background: #F3F4F6; flex-shrink: 0; }
+
+.game-info { flex: 1; min-width: 0; }
+.game-opponent { font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+.game-badge {
+  flex-shrink: 0; font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.badge-done { background: #E2F5EE; color: #0F5C43; }
+.badge-upcoming-lions { background: #E8F1FC; color: #1A56B0; }
+.badge-upcoming-tigers { background: #FEF0E6; color: #C05000; }
+.badge-today { background: #FEF3C7; color: #92400E; }
+
 .footer { text-align: center; padding: 0.5rem 1rem 2rem; font-size: 12px; color: #9CA3AF; }
 </style>
 </head>
@@ -82,10 +131,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <div class="content">
 
+  <!-- ── Team nav cards ── -->
   <div class="team-card">
     <div class="team-header">
       <div class="team-icon lions-icon">🦁</div>
-      <div class="team-label">
+      <div>
         <div class="team-name lions">Madison Lions</div>
         <div class="team-sub">Tape T20 2026</div>
       </div>
@@ -115,7 +165,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="team-card">
     <div class="team-header">
       <div class="team-icon tigers-icon">🐯</div>
-      <div class="team-label">
+      <div>
         <div class="team-name tigers">Madison Tigers</div>
         <div class="team-sub">Tape T20 2026</div>
       </div>
@@ -142,9 +192,86 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </a>
   </div>
 
+  <!-- ── Schedules ── -->
+  <div class="section-title">2026 Season Schedule</div>
+
+  <!-- Lions Schedule -->
+  <div class="schedule-card" id="lionsSchedule">
+    <div class="schedule-header">
+      <div class="team-icon lions-icon">🦁</div>
+      <div>
+        <div class="team-name lions">Madison Lions</div>
+        <div class="team-sub" id="lionsRecord"></div>
+      </div>
+    </div>
+    <div id="lionsGames"></div>
+  </div>
+
+  <!-- Tigers Schedule -->
+  <div class="schedule-card" id="tigersSchedule">
+    <div class="schedule-header">
+      <div class="team-icon tigers-icon">🐯</div>
+      <div>
+        <div class="team-name tigers">Madison Tigers</div>
+        <div class="team-sub" id="tigersRecord"></div>
+      </div>
+    </div>
+    <div id="tigersGames"></div>
+  </div>
+
 </div>
 
 <div class="footer">Madison Cricket Club &nbsp;·&nbsp; 2026 Season</div>
+
+<script>
+function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var completed = 0, upcoming = 0;
+  var html = '';
+
+  games.forEach(function(g) {
+    var parts = g.gameDate.split('-');
+    var gd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    gd.setHours(0,0,0,0);
+
+    var isPast = today > gd;
+    var isToday = today.getTime() === gd.getTime();
+
+    var day = gd.getDate();
+    var mon = gd.toLocaleDateString('en-US', {month:'short'});
+
+    var badge, badgeClass;
+    if (isToday) {
+      badge = 'Today'; badgeClass = 'badge-today';
+    } else if (isPast) {
+      badge = 'Completed'; badgeClass = 'badge-done'; completed++;
+    } else {
+      badge = 'Upcoming'; badgeClass = upcomingBadgeClass; upcoming++;
+    }
+
+    html += '<div class="game-row">'
+      + '<div class="game-date-block">'
+      +   '<div class="game-date-day">' + day + '</div>'
+      +   '<div class="game-date-mon">' + mon + '</div>'
+      + '</div>'
+      + '<div class="game-divider"></div>'
+      + '<div class="game-info">'
+      +   '<div class="game-opponent">vs ' + g.opponent + '</div>'
+      +   '<div class="game-meta">' + g.day + ' · ' + g.time + ' · ' + g.ground + '</div>'
+      + '</div>'
+      + '<span class="game-badge ' + badgeClass + '">' + badge + '</span>'
+      + '</div>';
+  });
+
+  document.getElementById(containerId).innerHTML = html;
+  document.getElementById(recordId).textContent = completed + ' played · ' + upcoming + ' upcoming';
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  buildSchedule(MCC_CONFIG.lions.games,  'lionsGames',  'lionsRecord',  'badge-upcoming-lions');
+  buildSchedule(MCC_CONFIG.tigers.games, 'tigersGames', 'tigersRecord', 'badge-upcoming-tigers');
+});
+</script>
 
 </body>
 </html>
