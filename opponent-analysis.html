@@ -323,8 +323,15 @@ function renderStats(opp) {
   var bowl = opp.bowling  || [];
   var activeBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
   document.getElementById('statBatters').textContent  = activeBatters;
+  // Parse "4.3" overs string → total balls (4*6 + 3 = 27)
+  function oversToAverageBalls(oversStr, innings) {
+    var parts = String(oversStr).split('.');
+    var balls = parseInt(parts[0]) * 6 + (parts[1] ? parseInt(parts[1]) : 0);
+    return innings > 0 ? balls / innings : 0;
+  }
   var mainBowlers = bowl.filter(function(p) {
-    return parseInt(p.overs) >= 2 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
+    var avgBallsPerGame = oversToAverageBalls(p.overs, p.innings || 1);
+    return avgBallsPerGame >= 12 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
   }).length;
   document.getElementById('statBowlers').textContent  = mainBowlers;
   var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
