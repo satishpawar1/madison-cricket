@@ -157,6 +157,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="num" id="statTopWkts" style="color:#1A8F6A">—</div>
         <div class="lbl">Top wickets</div>
       </div>
+      <div class="stat-card">
+        <div class="num" id="statWon" style="color:#0F5C43">—</div>
+        <div class="lbl">Wins</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statLost" style="color:#991B1B">—</div>
+        <div class="lbl">Losses</div>
+      </div>
     </div>
 
     <div class="tab-row">
@@ -276,6 +284,11 @@ function renderStats(opp) {
   var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
   document.getElementById('statTopRuns').textContent  = highestScore;
   document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
+
+  var team = cricclubsTeam(selectedGame);
+  var standing = (CRICCLUBS_STATS.standings || []).filter(function(s) { return s.team === team; })[0];
+  document.getElementById('statWon').textContent  = standing ? standing.won  : '—';
+  document.getElementById('statLost').textContent = standing ? standing.lost : '—';
 }
 
 function showTab(tab, btn) {
