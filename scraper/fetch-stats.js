@@ -56,7 +56,11 @@ async function fetchStats() {
             arr = arr[0].teams.map(t => t.team).filter(Boolean);
           }
           if (Array.isArray(arr) && arr.length > 0) {
-            captured[label] = arr;
+            // Only overwrite if this response has more records (guards against
+            // a smaller duplicate response overwriting the full dataset)
+            if (!captured[label] || arr.length > captured[label].length) {
+              captured[label] = arr;
+            }
             console.log(`  ✓ ${label}: ${arr.length} records`);
             done = true;
             resolve();
