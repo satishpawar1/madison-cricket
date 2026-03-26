@@ -323,7 +323,9 @@ function renderStats(opp) {
   var bowl = opp.bowling  || [];
   var activeBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
   document.getElementById('statBatters').textContent  = activeBatters;
-  var mainBowlers = bowl.filter(function(p) { return (p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10); }).length;
+  var mainBowlers = bowl.filter(function(p) {
+    return parseInt(p.overs) >= 2 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
+  }).length;
   document.getElementById('statBowlers').textContent  = mainBowlers;
   var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
   document.getElementById('statTopRuns').textContent  = highestScore;
