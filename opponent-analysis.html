@@ -273,7 +273,8 @@ function renderStats(opp) {
   document.getElementById('statBatters').textContent  = activeBatters;
   var mainBowlers = bowl.filter(function(p) { return (p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10); }).length;
   document.getElementById('statBowlers').textContent  = mainBowlers;
-  document.getElementById('statTopRuns').textContent  = bat.length  ? bat[0].runs    : '—';
+  var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
+  document.getElementById('statTopRuns').textContent  = highestScore;
   document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
 }
 
