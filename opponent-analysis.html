@@ -114,6 +114,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .no-data-msg { background: #fff; border-radius: 14px; padding: 2rem; text-align: center; font-size: 13px; color: #9CA3AF; }
 .lb-updated { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 0.5rem; }
+
+/* ── Results section ── */
+.results-agg {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;
+}
+.results-agg .stat-card { padding: 10px 8px; }
+.results-agg .stat-card .num { font-size: 20px; }
+
+.result-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid #F9FAFB;
+}
+.result-row:last-child { border-bottom: none; }
+.result-date { flex-shrink: 0; width: 36px; text-align: center; }
+.result-date-day { font-size: 14px; font-weight: 800; color: #111827; line-height: 1; }
+.result-date-mon { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; margin-top: 1px; }
+.result-info { flex: 1; min-width: 0; }
+.result-score { font-size: 13px; font-weight: 700; color: #111827; }
+.result-against { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.result-badge {
+  flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 3px 9px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.badge-win  { background: #E2F5EE; color: #0F5C43; }
+.badge-loss { background: #FEE2E2; color: #991B1B; }
+.badge-tie  { background: #FEF3C7; color: #92400E; }
 </style>
 </head>
 <body>
@@ -182,10 +208,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="tab-row">
       <button class="tab-btn active" onclick="showTab('batting', this)">🏏 Batting</button>
       <button class="tab-btn" onclick="showTab('bowling', this)">🎯 Bowling</button>
+      <button class="tab-btn" onclick="showTab('results', this)">📋 Results</button>
     </div>
 
     <div id="battingList" class="lb-card"></div>
     <div id="bowlingList" class="lb-card" style="display:none"></div>
+    <div id="resultsList" style="display:none"></div>
 
     <div class="lb-updated" id="lbUpdated"></div>
   </div>
@@ -251,7 +279,11 @@ function selectGame(name) {
   document.getElementById('analysis').style.display = 'block';
   renderStrength(team, opp);
   renderStats(opp);
-  renderTab(currentTab, opp);
+  if (currentTab === 'results') {
+    renderResults(team);
+  } else {
+    renderTab(currentTab, opp);
+  }
   document.getElementById('analysis').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -314,9 +346,14 @@ function showTab(tab, btn) {
   btn.classList.add('active');
   document.getElementById('battingList').style.display = tab === 'batting' ? '' : 'none';
   document.getElementById('bowlingList').style.display = tab === 'bowling' ? '' : 'none';
+  document.getElementById('resultsList').style.display = tab === 'results' ? '' : 'none';
   if (selectedGame) {
     var team = cricclubsTeam(selectedGame);
-    renderTab(tab, CRICCLUBS_STATS.opponents[team]);
+    if (tab === 'results') {
+      renderResults(team);
+    } else {
+      renderTab(tab, CRICCLUBS_STATS.opponents[team]);
+    }
   }
 }
 
@@ -362,6 +399,40 @@ function renderTab(tab, opp) {
         + '</div>';
     }).join('');
   }
+}
+
+function renderResults(team) {
+  var container = document.getElementById('resultsList');
+  var results = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[team];
+  if (!results || !results.games || !results.games.length) {
+    container.innerHTML = '<div class="no-data-msg">No match results yet</div>';
+    return;
+  }
+
+  var agg = '<div class="results-agg">'
+    + '<div class="stat-card"><div class="num" style="color:#1A56B0">' + results.highestTotal + '</div><div class="lbl">Highest total</div></div>'
+    + '<div class="stat-card"><div class="num" style="color:#9CA3AF">' + results.lowestTotal + '</div><div class="lbl">Lowest total</div></div>'
+    + '<div class="stat-card"><div class="num" style="color:#1A8F6A">' + results.averageScore + '</div><div class="lbl">Avg score</div></div>'
+    + '</div>';
+
+  var rows = results.games.map(function(g) {
+    var d = new Date(g.date + 'T00:00:00');
+    var day = d.getDate();
+    var mon = d.toLocaleDateString('en-US', {month:'short'});
+    var scoreStr = g.runsScored + '/' + (g.wickets || 0) + ' (' + g.overs + ' ov)';
+    var vs = 'vs ' + g.opponent + ' — conceded ' + g.runsConceded;
+    var resultCls, resultTxt;
+    if (g.runsScored > g.runsConceded) { resultCls = 'badge-win'; resultTxt = 'Won'; }
+    else if (g.runsScored < g.runsConceded) { resultCls = 'badge-loss'; resultTxt = 'Lost'; }
+    else { resultCls = 'badge-tie'; resultTxt = 'Tied'; }
+    return '<div class="result-row">'
+      + '<div class="result-date"><div class="result-date-day">' + day + '</div><div class="result-date-mon">' + mon + '</div></div>'
+      + '<div class="result-info"><div class="result-score">' + scoreStr + '</div><div class="result-against">' + vs + '</div></div>'
+      + '<span class="result-badge ' + resultCls + '">' + resultTxt + '</span>'
+      + '</div>';
+  }).join('');
+
+  container.innerHTML = agg + '<div class="lb-card">' + rows + '</div>';
 }
 
 window.addEventListener('DOMContentLoaded', function() {

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="cricclubs-stats.js"></script>
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -114,6 +115,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
 }
 .badge-done { background: #E2F5EE; color: #0F5C43; }
+.badge-won  { background: #E2F5EE; color: #0F5C43; }
+.badge-lost { background: #FEE2E2; color: #991B1B; }
 .badge-upcoming-lions { background: #E8F1FC; color: #1A56B0; }
 .badge-upcoming-tigers { background: #FEF0E6; color: #C05000; }
 .badge-today { background: #FEF3C7; color: #92400E; }
@@ -246,7 +249,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="footer">Madison Cricket Club &nbsp;·&nbsp; 2026 Season</div>
 
 <script>
-function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
+function getGameResult(g, teamResultsKey) {
+  if (typeof CRICCLUBS_STATS === 'undefined') return null;
+  var teamResults = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[teamResultsKey];
+  if (!teamResults || !teamResults.games) return null;
+  var oppName = g.cricclubsTeam || g.opponent;
+  return teamResults.games.filter(function(r) { return r.opponent === oppName; })[0] || null;
+}
+
+function buildSchedule(games, containerId, recordId, upcomingBadgeClass, teamResultsKey) {
   var today = new Date(); today.setHours(0,0,0,0);
   var completed = 0, upcoming = 0;
   var html = '';
@@ -266,7 +277,14 @@ function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
     if (isToday) {
       badge = 'Today'; badgeClass = 'badge-today';
     } else if (isPast) {
-      badge = 'Completed'; badgeClass = 'badge-done'; completed++;
+      var result = getGameResult(g, teamResultsKey);
+      if (result) {
+        badge = result.won ? 'Won' : 'Lost';
+        badgeClass = result.won ? 'badge-won' : 'badge-lost';
+      } else {
+        badge = 'Completed'; badgeClass = 'badge-done';
+      }
+      completed++;
     } else {
       badge = 'Upcoming'; badgeClass = upcomingBadgeClass; upcoming++;
     }
@@ -290,8 +308,8 @@ function buildSchedule(games, containerId, recordId, upcomingBadgeClass) {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  buildSchedule(MCC_CONFIG.lions.games,  'lionsGames',  'lionsRecord',  'badge-upcoming-lions');
-  buildSchedule(MCC_CONFIG.tigers.games, 'tigersGames', 'tigersRecord', 'badge-upcoming-tigers');
+  buildSchedule(MCC_CONFIG.lions.games,  'lionsGames',  'lionsRecord',  'badge-upcoming-lions',  'Madison Lions');
+  buildSchedule(MCC_CONFIG.tigers.games, 'tigersGames', 'tigersRecord', 'badge-upcoming-tigers', 'Madison Tigers');
 });
 </script>
 
