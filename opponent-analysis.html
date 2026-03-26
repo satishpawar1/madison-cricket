@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="cricclubs-stats.js"></script>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Madison Cricket — Opponent Analysis</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p  { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 600px; margin: 0 auto; }
+
+/* ── Game picker ── */
+.section-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+
+.game-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
+.game-btn {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1.5px solid #E5E7EB; border-radius: 12px;
+  padding: 12px 14px; cursor: pointer; text-align: left; width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.game-btn:active { background: #F9FAFB; }
+.game-btn.selected { border-color: #1A56B0; box-shadow: 0 0 0 3px rgba(26,86,176,0.1); }
+.game-btn.no-data  { opacity: 0.5; cursor: default; }
+
+.game-date-block { flex-shrink: 0; width: 36px; text-align: center; }
+.game-date-day { font-size: 16px; font-weight: 800; color: #111827; line-height: 1; }
+.game-date-mon { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; margin-top: 1px; }
+
+.game-divider { width: 1px; height: 30px; background: #F3F4F6; flex-shrink: 0; }
+
+.game-info { flex: 1; min-width: 0; }
+.game-opponent { font-size: 14px; font-weight: 600; color: #111827; }
+.game-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+.team-chip {
+  flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 3px 8px;
+  border-radius: 20px; text-transform: uppercase;
+}
+.chip-lions  { background: #E8F1FC; color: #1A56B0; }
+.chip-tigers { background: #FEF0E6; color: #C05000; }
+.chip-played { background: #E2F5EE; color: #0F5C43; }
+.chip-nodata { background: #F3F4F6; color: #9CA3AF; }
+
+/* ── Analysis panel ── */
+#analysis { display: none; }
+
+.strength-banner {
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.str-icon { font-size: 28px; flex-shrink: 0; }
+.str-title { font-size: 15px; font-weight: 700; }
+.str-sub   { font-size: 12px; margin-top: 3px; opacity: 0.8; }
+.str-tough   { background: #FEE2E2; color: #991B1B; }
+.str-mid     { background: #FEF3C7; color: #92400E; }
+.str-weak    { background: #E2F5EE; color: #0F5C43; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+.stat-card {
+  background: #fff; border-radius: 12px; padding: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05); text-align: center;
+}
+.stat-card .num { font-size: 24px; font-weight: 800; line-height: 1; }
+.stat-card .lbl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.tab-row {
+  display: flex; gap: 4px; margin-bottom: 1rem;
+  background: #E9EDF2; border-radius: 10px; padding: 4px;
+}
+.tab-btn {
+  flex: 1; text-align: center; padding: 7px 4px;
+  font-size: 12px; font-weight: 600; border-radius: 7px;
+  cursor: pointer; color: #6B7280; border: none; background: transparent;
+}
+.tab-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+.lb-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1rem;
+}
+.lb-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-bottom: 1px solid #F9FAFB;
+}
+.lb-row:last-child { border-bottom: none; }
+
+.lb-rank { font-size: 12px; font-weight: 800; color: #D1D5DB; width: 18px; text-align: center; flex-shrink: 0; }
+.lb-rank.r1 { color: #F59E0B; }
+.lb-rank.r2 { color: #9CA3AF; }
+.lb-rank.r3 { color: #CD7C2F; }
+
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-pills { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+.pill { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 20px; background: #F3F4F6; color: #6B7280; }
+.pill.threat { background: #FEE2E2; color: #991B1B; }
+
+.lb-primary { flex-shrink: 0; text-align: right; }
+.lb-primary-num { font-size: 18px; font-weight: 800; line-height: 1; }
+.lb-primary-lbl { font-size: 10px; color: #9CA3AF; font-weight: 500; text-transform: uppercase; margin-top: 1px; }
+
+.no-data-msg { background: #fff; border-radius: 14px; padding: 2rem; text-align: center; font-size: 13px; color: #9CA3AF; }
+.lb-updated { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🔍 Opponent Analysis</h2>
+    <p>Pick a game to scout the opposition</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section-label" style="margin-bottom:6px">🦁 Lions upcoming games</div>
+  <div class="game-list" id="lionsGames"></div>
+
+  <div class="section-label" style="margin-bottom:6px">🐯 Tigers upcoming games</div>
+  <div class="game-list" id="tigersGames"></div>
+
+  <div id="analysis">
+    <div class="strength-banner" id="strengthBanner">
+      <div class="str-icon" id="strIcon"></div>
+      <div><div class="str-title" id="strTitle"></div><div class="str-sub" id="strSub"></div></div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="num" id="statBatters" style="color:#1A56B0">—</div>
+        <div class="lbl">Active batters</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statBowlers" style="color:#1A8F6A">—</div>
+        <div class="lbl">Active bowlers</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statTopRuns" style="color:#1A56B0">—</div>
+        <div class="lbl">Top score</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statTopWkts" style="color:#1A8F6A">—</div>
+        <div class="lbl">Top wickets</div>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="showTab('batting', this)">🏏 Batting</button>
+      <button class="tab-btn" onclick="showTab('bowling', this)">🎯 Bowling</button>
+    </div>
+
+    <div id="battingList" class="lb-card"></div>
+    <div id="bowlingList" class="lb-card" style="display:none"></div>
+
+    <div class="lb-updated" id="lbUpdated"></div>
+  </div>
+
+</div>
+
+<script>
+var selectedGame = null;
+var currentTab = 'batting';
+
+function cricclubsTeam(game) {
+  return game.cricclubsTeam || game.opponent;
+}
+
+function hasStats(game) {
+  if (typeof CRICCLUBS_STATS === 'undefined') return false;
+  var team = cricclubsTeam(game);
+  var opp = CRICCLUBS_STATS.opponents && CRICCLUBS_STATS.opponents[team];
+  return opp && (opp.batting.length > 0 || opp.bowling.length > 0);
+}
+
+function buildGameList(games, containerId, teamClass) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var html = '';
+  games.forEach(function(g) {
+    var parts = g.gameDate.split('-');
+    var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    var isPast = today > gd;
+    var day = gd.getDate();
+    var mon = gd.toLocaleDateString('en-US', {month:'short'});
+    var stats = hasStats(g);
+    var chipClass, chipText;
+    if (isPast) { chipClass = 'team-chip chip-played'; chipText = 'Played'; }
+    else if (!stats) { chipClass = 'team-chip chip-nodata'; chipText = 'No data yet'; }
+    else { chipClass = 'team-chip ' + teamClass; chipText = isPast ? 'Played' : 'Upcoming'; }
+
+    var disabled = !stats ? ' no-data' : '';
+    var onclick = stats ? ' onclick="selectGame(\'' + g.name + '\')"' : '';
+    html += '<button class="game-btn' + disabled + '"' + onclick + ' data-game="' + g.name + '">'
+      + '<div class="game-date-block"><div class="game-date-day">' + day + '</div><div class="game-date-mon">' + mon + '</div></div>'
+      + '<div class="game-divider"></div>'
+      + '<div class="game-info"><div class="game-opponent">vs ' + g.opponent + '</div><div class="game-meta">' + g.day + ' · ' + g.time + ' · ' + g.ground + '</div></div>'
+      + '<span class="' + chipClass + '">' + chipText + '</span>'
+      + '</button>';
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+
+var allGames = [];
+
+function selectGame(name) {
+  // Deselect all
+  document.querySelectorAll('.game-btn').forEach(function(b) { b.classList.remove('selected'); });
+  document.querySelectorAll('[data-game="' + name + '"]').forEach(function(b) { b.classList.add('selected'); });
+
+  selectedGame = allGames.filter(function(g) { return g.name === name; })[0];
+  if (!selectedGame) return;
+
+  var team = cricclubsTeam(selectedGame);
+  var opp = CRICCLUBS_STATS.opponents[team];
+  if (!opp) return;
+
+  document.getElementById('analysis').style.display = 'block';
+  renderStrength(team, opp);
+  renderStats(opp);
+  renderTab(currentTab, opp);
+  document.getElementById('analysis').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderStrength(team, opp) {
+  var bat = opp.batting || [];
+  var bowl = opp.bowling || [];
+
+  // Threats: batters with 30+ runs, bowlers with 3+ wickets
+  var batThreats  = bat.filter(function(p) { return p.runs >= 30; }).length;
+  var bowlThreats = bowl.filter(function(p) { return p.wickets >= 3; }).length;
+  var score = batThreats * 2 + bowlThreats * 2;
+
+  var banner = document.getElementById('strengthBanner');
+  var icon, title, sub, cls;
+  if (score >= 6) {
+    icon = '⚠️'; cls = 'strength-banner str-tough';
+    title = 'Tough opponent — prepare carefully';
+    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+  } else if (score >= 2) {
+    icon = '⚡'; cls = 'strength-banner str-mid';
+    title = 'Competitive opponent';
+    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+  } else {
+    icon = '✅'; cls = 'strength-banner str-weak';
+    title = 'Beatable — stay focused';
+    sub = 'Limited threats based on current stats';
+  }
+
+  banner.className = cls;
+  document.getElementById('strIcon').textContent  = icon;
+  document.getElementById('strTitle').textContent = title;
+  document.getElementById('strSub').textContent   = sub;
+}
+
+function renderStats(opp) {
+  var bat  = opp.batting  || [];
+  var bowl = opp.bowling  || [];
+  document.getElementById('statBatters').textContent  = bat.length;
+  document.getElementById('statBowlers').textContent  = bowl.length;
+  document.getElementById('statTopRuns').textContent  = bat.length  ? bat[0].runs    : '—';
+  document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
+}
+
+function showTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-row .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('battingList').style.display = tab === 'batting' ? '' : 'none';
+  document.getElementById('bowlingList').style.display = tab === 'bowling' ? '' : 'none';
+  if (selectedGame) {
+    var team = cricclubsTeam(selectedGame);
+    renderTab(tab, CRICCLUBS_STATS.opponents[team]);
+  }
+}
+
+function rankClass(i) {
+  return i === 0 ? 'lb-rank r1' : i === 1 ? 'lb-rank r2' : i === 2 ? 'lb-rank r3' : 'lb-rank';
+}
+
+function renderTab(tab, opp) {
+  if (tab === 'batting') {
+    var bat = opp.batting || [];
+    if (!bat.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
+    document.getElementById('battingList').innerHTML = bat.map(function(p, i) {
+      var isThreat = p.runs >= 30;
+      return '<div class="lb-row">'
+        + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
+        + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
+        + '<div class="lb-pills">'
+        + '<span class="pill">Inn ' + (p.innings||0) + '</span>'
+        + '<span class="pill">Avg ' + (p.average||'-') + '</span>'
+        + '<span class="pill">SR '  + (p.strikeRate||'-') + '</span>'
+        + '<span class="pill">HS '  + (p.highest||'-') + '</span>'
+        + (isThreat ? '<span class="pill threat">Threat</span>' : '')
+        + '</div></div>'
+        + '<div class="lb-primary"><div class="lb-primary-num" style="color:#1A56B0">' + p.runs + '</div><div class="lb-primary-lbl">Runs</div></div>'
+        + '</div>';
+    }).join('');
+  } else {
+    var bowl = opp.bowling || [];
+    if (!bowl.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
+    document.getElementById('bowlingList').innerHTML = bowl.map(function(p, i) {
+      var isThreat = p.wickets >= 3;
+      return '<div class="lb-row">'
+        + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
+        + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
+        + '<div class="lb-pills">'
+        + '<span class="pill">Inn ' + (p.innings||0) + '</span>'
+        + '<span class="pill">Econ ' + (p.economy||'-') + '</span>'
+        + '<span class="pill">Avg '  + (p.average||'-') + '</span>'
+        + '<span class="pill">Best ' + (p.bestFigures||'-') + '</span>'
+        + (isThreat ? '<span class="pill threat">Threat</span>' : '')
+        + '</div></div>'
+        + '<div class="lb-primary"><div class="lb-primary-num" style="color:#1A8F6A">' + p.wickets + '</div><div class="lb-primary-lbl">Wickets</div></div>'
+        + '</div>';
+    }).join('');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof CRICCLUBS_STATS === 'undefined' || typeof MCC_CONFIG === 'undefined') {
+    document.querySelector('.content').innerHTML = '<div class="no-data-msg">Stats not loaded. Run the scraper first.</div>';
+    return;
+  }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  // Combine all games, tag with team, sort by date
+  var lionsGames  = MCC_CONFIG.lions.games.map(function(g)  { return Object.assign({}, g, {_team:'lions'}); });
+  var tigersGames = MCC_CONFIG.tigers.games.map(function(g) { return Object.assign({}, g, {_team:'tigers'}); });
+  allGames = lionsGames.concat(tigersGames);
+
+  buildGameList(lionsGames,  'lionsGames',  'chip-lions');
+  buildGameList(tigersGames, 'tigersGames', 'chip-tigers');
+
+  var updated = new Date(CRICCLUBS_STATS.lastUpdated);
+  document.getElementById('lbUpdated').textContent = 'Stats updated '
+    + updated.toLocaleDateString('en-US', {month:'short', day:'numeric'})
+    + ' at ' + updated.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+});
+</script>
+</body>
+</html>

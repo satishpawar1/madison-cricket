@@ -19,8 +19,8 @@ const MCC_CONFIG = {
       'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth'
     ],
     games: [
-      { name: 'FSC',                opponent: 'FSC',                day: 'Sunday',   date: 'March 1st',     time: '9:30 AM',  warmup: '8:30 AM',  ground: 'FCF2', gameDate: '2026-03-01' },
-      { name: 'Great Maratha',      opponent: 'Great Maratha',      day: 'Sunday',   date: 'March 15th',    time: '1:00 PM',  warmup: '12:00 PM', ground: 'FCF2', gameDate: '2026-03-15' },
+      { name: 'FSC',                opponent: 'FSC',                cricclubsTeam: 'FSC Raptors',   day: 'Sunday',   date: 'March 1st',     time: '9:30 AM',  warmup: '8:30 AM',  ground: 'FCF2', gameDate: '2026-03-01' },
+      { name: 'Great Maratha',      opponent: 'Great Maratha',      cricclubsTeam: 'Great Marathas',day: 'Sunday',   date: 'March 15th',    time: '1:00 PM',  warmup: '12:00 PM', ground: 'FCF2', gameDate: '2026-03-15' },
       { name: 'Nashville Underdogs',opponent: 'Nashville Underdogs',day: 'Sunday',   date: 'March 29th',    time: '1:00 PM',  warmup: '12:00 PM', ground: 'FCF2', gameDate: '2026-03-29' },
       { name: 'Rockvale Risers',    opponent: 'Rockvale Risers',    day: 'Sunday',   date: 'April 5th',     time: '3:00 PM',  warmup: '2:00 PM',  ground: 'FCF2', gameDate: '2026-04-05' },
       { name: 'Fearless Fighters',  opponent: 'Fearless Fighters',  day: 'Sunday',   date: 'April 12th',    time: '8:30 AM',  warmup: '7:30 AM',  ground: 'FCF2', gameDate: '2026-04-12' },
@@ -118,8 +118,8 @@ const MCC_CONFIG = {
     games: [
       { name: 'Star Strikers',    opponent: 'Star Strikers',    day: 'Saturday', date: 'February 28th', time: '9:30 AM',  warmup: '8:30 AM',  ground: 'FCF2', gameDate: '2026-02-28' },
       { name: 'Franklin Falcons', opponent: 'Franklin Falcons', day: 'Sunday',   date: 'March 22nd',    time: '1:00 PM',  warmup: '12:00 PM', ground: 'FCF1', gameDate: '2026-03-22' },
-      { name: 'FSC',              opponent: 'FSC',              day: 'Sunday',   date: 'April 5th',     time: '8:30 AM',  warmup: '7:30 AM',  ground: 'FCF1', gameDate: '2026-04-05' },
-      { name: 'Great Maratha',    opponent: 'Great Maratha',    day: 'Sunday',   date: 'April 12th',    time: '3:00 PM',  warmup: '2:00 PM',  ground: 'FCF2', gameDate: '2026-04-12' },
+      { name: 'FSC',              opponent: 'FSC',              cricclubsTeam: 'FSC Raptors',   day: 'Sunday',   date: 'April 5th',     time: '8:30 AM',  warmup: '7:30 AM',  ground: 'FCF1', gameDate: '2026-04-05' },
+      { name: 'Great Maratha',    opponent: 'Great Maratha',    cricclubsTeam: 'Great Marathas',day: 'Sunday',   date: 'April 12th',    time: '3:00 PM',  warmup: '2:00 PM',  ground: 'FCF2', gameDate: '2026-04-12' },
       { name: 'Fearless Fighters',opponent: 'Fearless Fighters',day: 'Sunday',   date: 'April 19th',    time: '11:30 AM', warmup: '10:30 AM', ground: 'FCF1', gameDate: '2026-04-19' },
       { name: 'Afghan Eagles',    opponent: 'Afghan Eagles',    day: 'Sunday',   date: 'April 26th',    time: '11:30 AM', warmup: '10:30 AM', ground: 'FCF1', gameDate: '2026-04-26' },
       { name: 'Rockvale Risers',  opponent: 'Rockvale Risers',  day: 'Sunday',   date: 'May 3rd',       time: '3:00 PM',  warmup: '2:00 PM',  ground: 'FCF2', gameDate: '2026-05-03' },
