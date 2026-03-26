@@ -147,7 +147,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
       <div class="stat-card">
         <div class="num" id="statBowlers" style="color:#1A8F6A">—</div>
-        <div class="lbl">Active bowlers</div>
+        <div class="lbl">Main bowlers</div>
       </div>
       <div class="stat-card">
         <div class="num" id="statTopRuns" style="color:#1A56B0">—</div>
@@ -271,7 +271,8 @@ function renderStats(opp) {
   var bowl = opp.bowling  || [];
   var activeBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
   document.getElementById('statBatters').textContent  = activeBatters;
-  document.getElementById('statBowlers').textContent  = bowl.length;
+  var mainBowlers = bowl.filter(function(p) { return (p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10); }).length;
+  document.getElementById('statBowlers').textContent  = mainBowlers;
   document.getElementById('statTopRuns').textContent  = bat.length  ? bat[0].runs    : '—';
   document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
 }
