@@ -65,6 +65,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .str-title { font-size: 15px; font-weight: 700; }
 .str-sub   { font-size: 12px; margin-top: 3px; opacity: 0.8; }
 .str-tough   { background: #FEE2E2; color: #991B1B; }
+.str-competitive { background: #FFEDD5; color: #9A3412; }
 .str-mid     { background: #FEF3C7; color: #92400E; }
 .str-weak    { background: #E2F5EE; color: #0F5C43; }
 
@@ -301,6 +302,10 @@ function renderStrength(team, opp) {
   if (score >= 8) {
     icon = '⚠️'; cls = 'strength-banner str-tough';
     title = 'Tough opponent — prepare carefully';
+    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+  } else if (score >= 6) {
+    icon = '🔥'; cls = 'strength-banner str-competitive';
+    title = 'Competitive opponent';
     sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
   } else if (score >= 5) {
     icon = '⚡'; cls = 'strength-banner str-mid';
