@@ -294,21 +294,21 @@ function renderStrength(team, opp) {
   // Threats: batters with 30+ runs, bowlers with 3+ wickets
   var batThreats  = bat.filter(function(p) { return p.runs >= 30; }).length;
   var bowlThreats = bowl.filter(function(p) { return p.wickets >= 3; }).length;
-  var score = batThreats * 2 + bowlThreats * 2;
+  var score = batThreats + bowlThreats;
 
   var banner = document.getElementById('strengthBanner');
   var icon, title, sub, cls;
-  if (score >= 6) {
+  if (score >= 8) {
     icon = '⚠️'; cls = 'strength-banner str-tough';
     title = 'Tough opponent — prepare carefully';
     sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
-  } else if (score >= 2) {
+  } else if (score >= 5) {
     icon = '⚡'; cls = 'strength-banner str-mid';
-    title = 'Competitive opponent';
+    title = 'Average opponent';
     sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
   } else {
     icon = '✅'; cls = 'strength-banner str-weak';
-    title = 'Beatable — stay focused';
+    title = 'Easy opponent — stay focused';
     sub = 'Limited threats based on current stats';
   }
 
