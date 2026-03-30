@@ -292,7 +292,7 @@ function renderStrength(team, opp) {
   var bat = opp.batting || [];
   var bowl = opp.bowling || [];
 
-  var mainBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
+  var mainBatters = bat.filter(function(p) { return p.average >= 25 && p.strikeRate >= 100; }).length;
   function oversToAverageBallsStr(oversStr, innings) {
     var parts = String(oversStr).split('.');
     var balls = parseInt(parts[0]) * 6 + (parts[1] ? parseInt(parts[1]) : 0);
@@ -333,7 +333,7 @@ function renderStrength(team, opp) {
 function renderStats(opp) {
   var bat  = opp.batting  || [];
   var bowl = opp.bowling  || [];
-  var activeBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
+  var activeBatters = bat.filter(function(p) { return p.average >= 25 && p.strikeRate >= 100; }).length;
   document.getElementById('statBatters').textContent  = activeBatters;
   // Parse "4.3" overs string → total balls (4*6 + 3 = 27)
   function oversToAverageBalls(oversStr, innings) {
