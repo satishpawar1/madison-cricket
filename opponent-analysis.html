@@ -292,29 +292,36 @@ function renderStrength(team, opp) {
   var bat = opp.batting || [];
   var bowl = opp.bowling || [];
 
-  // Threats: batters with 30+ runs, bowlers with 3+ wickets
-  var batThreats  = bat.filter(function(p) { return p.runs >= 30; }).length;
-  var bowlThreats = bowl.filter(function(p) { return p.wickets >= 3; }).length;
-  var score = batThreats + bowlThreats;
+  var mainBatters = bat.filter(function(p) { return p.average >= 30 && p.strikeRate >= 100; }).length;
+  function oversToAverageBallsStr(oversStr, innings) {
+    var parts = String(oversStr).split('.');
+    var balls = parseInt(parts[0]) * 6 + (parts[1] ? parseInt(parts[1]) : 0);
+    return innings > 0 ? balls / innings : 0;
+  }
+  var mainBowlers = bowl.filter(function(p) {
+    var avgBalls = oversToAverageBallsStr(p.overs, p.innings || 1);
+    return avgBalls >= 12 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
+  }).length;
+  var score = mainBatters + mainBowlers;
 
   var banner = document.getElementById('strengthBanner');
   var icon, title, sub, cls;
   if (score >= 8) {
     icon = '⚠️'; cls = 'strength-banner str-tough';
     title = 'Tough opponent — prepare carefully';
-    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   } else if (score >= 6) {
     icon = '🔥'; cls = 'strength-banner str-competitive';
     title = 'Competitive opponent';
-    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   } else if (score >= 5) {
     icon = '⚡'; cls = 'strength-banner str-mid';
     title = 'Average opponent';
-    sub = batThreats + ' dangerous batter' + (batThreats!==1?'s':'') + ' · ' + bowlThreats + ' wicket threat' + (bowlThreats!==1?'s':'');
+    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   } else {
     icon = '✅'; cls = 'strength-banner str-weak';
     title = 'Easy opponent — stay focused';
-    sub = 'Limited threats based on current stats';
+    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   }
 
   banner.className = cls;
