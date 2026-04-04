@@ -80,27 +80,20 @@ async function fetchStats() {
             if (!firstPage.length) return;
             done = true;
 
-            // Build base API URL (strip page/size params)
+            // Build base API URL (strip page/size params), then re-fetch all at once
             const baseApi = u.replace(/[?&]page=\d+/g, '').replace(/[?&]size=\d+/g, '');
             const sep = baseApi.includes('?') ? '&' : '?';
-            const pageSize = 50;
-            const totalPages = Math.ceil(total / pageSize);
-            console.log(`  Total matches: ${total}, fetching ${totalPages} pages (size=${pageSize})`);
+            console.log(`  Total matches: ${total}, fetching all at once (size=200)`);
 
-            // Fetch all pages from within the browser (avoids CORS issues)
-            const allMatches = await page.evaluate(async (baseApi, sep, totalPages, pageSize, firstPage) => {
-              const all = [...firstPage];
-              for (let p = 2; p <= totalPages; p++) {
-                try {
-                  const r = await fetch(baseApi + sep + `page=${p}&size=${pageSize}`);
-                  const d = await r.json();
-                  const inner = d.data || d;
-                  const completed = inner.completed || [];
-                  all.push(...completed);
-                } catch(e) {}
-              }
-              return all;
-            }, baseApi, sep, totalPages, pageSize, firstPage);
+            // Fetch all matches in one request from within the browser (avoids CORS issues)
+            const allMatches = await page.evaluate(async (baseApi, sep) => {
+              try {
+                const r = await fetch(baseApi + sep + 'page=1&size=200');
+                const d = await r.json();
+                const inner = d.data || d;
+                return inner.completed || [];
+              } catch(e) { return []; }
+            }, baseApi, sep);
 
             captured[label] = allMatches;
             console.log(`  ✓ ${label}: ${allMatches.length} records`);
