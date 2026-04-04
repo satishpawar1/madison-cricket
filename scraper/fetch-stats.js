@@ -67,12 +67,14 @@ async function fetchStats() {
       // so we get all matches in a single response without pagination.
       await page.setRequestInterception(true);
       page.on('request', (req) => {
-        const u = req.url();
-        if (u.includes(match) && u.includes('size=')) {
-          req.continue({ url: u.replace(/size=\d+/, 'size=200') });
-        } else {
-          req.continue();
-        }
+        try {
+          const u = req.url();
+          if (u.includes(match) && u.includes('size=')) {
+            req.continue({ url: u.replace(/size=\d+/, 'size=200') });
+          } else {
+            req.continue();
+          }
+        } catch(e) {}
       });
 
       await new Promise((resolve) => {
@@ -100,6 +102,7 @@ async function fetchStats() {
           .catch(() => resolve());
       });
 
+      page.removeAllListeners('request');
       await page.setRequestInterception(false);
 
     } else {
