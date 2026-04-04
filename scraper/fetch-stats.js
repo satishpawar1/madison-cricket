@@ -57,45 +57,93 @@ async function fetchStats() {
   const captured = {};
 
   for (const { label, url, match } of PAGES) {
+    const isResults = label === 'results' || label === 'results2025';
     console.log(`\nFetching ${label}...`);
     page.removeAllListeners('response');
 
-    await new Promise((resolve) => {
-      let done = false;
-      page.on('response', async (response) => {
-        if (done) return;
-        const u = response.url();
-        if (!u.includes(match)) return;
-        const ct = response.headers()['content-type'] || '';
-        if (!ct.includes('json')) return;
-        try {
-          const data = await response.json();
-          // getPointsTable nests teams inside data[0].teams
-          // matches endpoint returns object with completed array
-          let arr = data.data || data;
-          if (label === 'standings' && Array.isArray(arr) && arr[0] && arr[0].teams) {
-            arr = arr[0].teams.map(t => t.team).filter(Boolean);
-          }
-          if ((label === 'results' || label === 'results2025') && arr.completed) {
-            arr = arr.completed;
-          }
-          if (Array.isArray(arr) && arr.length > 0) {
-            // Only overwrite if this response has more records (guards against
-            // a smaller duplicate response overwriting the full dataset)
-            if (!captured[label] || arr.length > captured[label].length) {
-              captured[label] = arr;
-            }
-            console.log(`  ✓ ${label}: ${arr.length} records`);
+    if (isResults) {
+      // For results pages: intercept first response to get API URL + total count,
+      // then fetch all pages directly from the browser context.
+      await new Promise((resolve) => {
+        let done = false;
+        page.on('response', async (response) => {
+          if (done) return;
+          const u = response.url();
+          if (!u.includes(match)) return;
+          const ct = response.headers()['content-type'] || '';
+          if (!ct.includes('json')) return;
+          try {
+            const data = await response.json();
+            const inner = data.data || data;
+            const total = inner.totalMatchesCount || inner.allMatchesCount || 0;
+            const firstPage = inner.completed || [];
+            if (!firstPage.length) return;
             done = true;
+
+            // Build base API URL (strip page/size params)
+            const baseApi = u.replace(/[?&]page=\d+/g, '').replace(/[?&]size=\d+/g, '');
+            const sep = baseApi.includes('?') ? '&' : '?';
+            const pageSize = 50;
+            const totalPages = Math.ceil(total / pageSize);
+            console.log(`  Total matches: ${total}, fetching ${totalPages} pages (size=${pageSize})`);
+
+            // Fetch all pages from within the browser (avoids CORS issues)
+            const allMatches = await page.evaluate(async (baseApi, sep, totalPages, pageSize, firstPage) => {
+              const all = [...firstPage];
+              for (let p = 2; p <= totalPages; p++) {
+                try {
+                  const r = await fetch(baseApi + sep + `page=${p}&size=${pageSize}`);
+                  const d = await r.json();
+                  const inner = d.data || d;
+                  const completed = inner.completed || [];
+                  all.push(...completed);
+                } catch(e) {}
+              }
+              return all;
+            }, baseApi, sep, totalPages, pageSize, firstPage);
+
+            captured[label] = allMatches;
+            console.log(`  ✓ ${label}: ${allMatches.length} records`);
             resolve();
-          }
-        } catch(e) {}
+          } catch(e) { console.log('  Results parse error:', e.message); }
+        });
+
+        page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
+          .then(() => setTimeout(resolve, 5000))
+          .catch(() => resolve());
       });
 
-      page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
-        .then(() => setTimeout(resolve, 3000))
-        .catch(() => resolve());
-    });
+    } else {
+      await new Promise((resolve) => {
+        let done = false;
+        page.on('response', async (response) => {
+          if (done) return;
+          const u = response.url();
+          if (!u.includes(match)) return;
+          const ct = response.headers()['content-type'] || '';
+          if (!ct.includes('json')) return;
+          try {
+            const data = await response.json();
+            let arr = data.data || data;
+            if (label === 'standings' && Array.isArray(arr) && arr[0] && arr[0].teams) {
+              arr = arr[0].teams.map(t => t.team).filter(Boolean);
+            }
+            if (Array.isArray(arr) && arr.length > 0) {
+              if (!captured[label] || arr.length > captured[label].length) {
+                captured[label] = arr;
+              }
+              console.log(`  ✓ ${label}: ${arr.length} records`);
+              done = true;
+              resolve();
+            }
+          } catch(e) {}
+        });
+
+        page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
+          .then(() => setTimeout(resolve, 3000))
+          .catch(() => resolve());
+      });
+    }
   }
 
   await browser.close();
