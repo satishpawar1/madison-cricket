@@ -356,8 +356,21 @@ function renderStrength(team, opp) {
 
   var winRateScore = 0, nrrScore = 0;
   if (standing) {
-    var played = (standing.won || 0) + (standing.lost || 0);
-    var winRate = played > 0 ? standing.won / played : 0;
+    var wins   = standing.won  || 0;
+    var losses = standing.lost || 0;
+    var played = wins + losses;
+
+    // For 2026, blend with 2025 history (weight 0.5) to correct for small samples
+    if (currentSeason !== '2025') {
+      var standing2025 = (CRICCLUBS_STATS.standings2025 || []).filter(function(s) { return s.team === team; })[0];
+      if (standing2025) {
+        wins   += (standing2025.won  || 0) * 0.5;
+        losses += (standing2025.lost || 0) * 0.5;
+        played  = wins + losses;
+      }
+    }
+
+    var winRate = played > 0 ? wins / played : 0;
     winRateScore = Math.round(winRate * 5);
     nrrScore = (standing.nrr || 0) > 0 ? 1 : 0;
   }
