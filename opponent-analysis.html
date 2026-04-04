@@ -263,11 +263,7 @@ function switchSeason(season, btn) {
   renderStrength(team, opp);
   renderStats(opp);
   if (currentTab === 'results') {
-    if (season === '2025') {
-      document.getElementById('resultsList').innerHTML = '<div class="no-data-msg">2025 results not available</div>';
-    } else {
-      renderResults(team);
-    }
+    renderResults(team);
   } else {
     renderTab(currentTab, opp);
   }
@@ -427,11 +423,7 @@ function showTab(tab, btn) {
   if (selectedGame) {
     var team = cricclubsTeam(selectedGame);
     if (tab === 'results') {
-      if (currentSeason === '2025') {
-        document.getElementById('resultsList').innerHTML = '<div class="no-data-msg">2025 results not available</div>';
-      } else {
-        renderResults(team);
-      }
+      renderResults(team);
     } else {
       renderTab(tab, getOpponents()[team] || CRICCLUBS_STATS.opponents[team]);
     }
@@ -484,7 +476,8 @@ function renderTab(tab, opp) {
 
 function renderResults(team) {
   var container = document.getElementById('resultsList');
-  var results = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[team];
+  var src = currentSeason === '2025' ? CRICCLUBS_STATS.results2025 : CRICCLUBS_STATS.results;
+  var results = src && src[team];
   if (!results || !results.games || !results.games.length) {
     container.innerHTML = '<div class="no-data-msg">No match results yet</div>';
     return;
