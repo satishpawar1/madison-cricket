@@ -232,16 +232,30 @@ async function fetchStats() {
       if (!t1 || !t2) return;
       const date = m.matchDateTime ? m.matchDateTime.split('T')[0] : '';
 
+      const resultText = (ss.result || '').trim();
+      const isAbandoned = /abandoned/i.test(resultText);
+      const isForfeited = /forfeited/i.test(resultText);
+      const isDL        = /d\/l|duckworth/i.test(resultText);
+
       [t1, t2].forEach(team => {
         const isT1 = team === t1;
         const runsScored    = isT1 ? ss.teamOneScore1 : ss.teamTwoScore1;
         const wickets       = isT1 ? ss.teamOneWicketsLost1 : ss.teamTwoWicketsLost1;
         const balls         = isT1 ? ss.teamOneBallsPlayed1 : ss.teamTwoBallsPlayed1;
         const runsConceded  = isT1 ? ss.teamTwoScore1 : ss.teamOneScore1;
-        const won           = runsScored > runsConceded;
         const overs         = Math.floor(balls / 6) + (balls % 6 ? '.' + (balls % 6) : '');
+
+        let won = false, noResult = false;
+        if (isAbandoned) {
+          noResult = true;
+        } else if (isForfeited) {
+          won = resultText.toLowerCase().includes(team.toLowerCase());
+        } else {
+          won = runsScored > runsConceded || (isDL && resultText.toLowerCase().includes(team.toLowerCase()));
+        }
+
         if (!byTeam[team]) byTeam[team] = [];
-        byTeam[team].push({ opponent: isT1 ? t2 : t1, date, runsScored, wickets, overs, runsConceded, won });
+        byTeam[team].push({ opponent: isT1 ? t2 : t1, date, runsScored, wickets, overs, runsConceded, won, noResult });
       });
     });
 

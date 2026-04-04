@@ -148,6 +148,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-win  { background: #E2F5EE; color: #0F5C43; }
 .badge-loss { background: #FEE2E2; color: #991B1B; }
 .badge-tie  { background: #FEF3C7; color: #92400E; }
+.badge-nr   { background: #F3F4F6; color: #6B7280; }
 </style>
 </head>
 <body>
@@ -490,7 +491,8 @@ function renderResults(team) {
     var scoreStr = g.runsScored + '/' + (g.wickets || 0) + ' (' + g.overs + ' ov)';
     var vs = 'vs ' + g.opponent + ' — conceded ' + g.runsConceded;
     var resultCls, resultTxt;
-    if (g.runsScored > g.runsConceded) { resultCls = 'badge-win'; resultTxt = 'Won'; }
+    if (g.noResult) { resultCls = 'badge-nr'; resultTxt = 'No Result'; }
+    else if (g.won) { resultCls = 'badge-win'; resultTxt = 'Won'; }
     else if (g.runsScored < g.runsConceded) { resultCls = 'badge-loss'; resultTxt = 'Lost'; }
     else { resultCls = 'badge-tie'; resultTxt = 'Tied'; }
     return '<div class="result-row">'
