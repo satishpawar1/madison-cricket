@@ -347,27 +347,45 @@ function renderStrength(team, opp) {
     var avgBalls = oversToAverageBallsStr(p.overs, p.innings || 1);
     return avgBalls >= 12 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
   }).length;
-  var score = mainBatters + mainBowlers;
+
+  // Look up standings for win rate + NRR
+  var standings = currentSeason === '2025'
+    ? (CRICCLUBS_STATS.standings2025 || [])
+    : (CRICCLUBS_STATS.standings || []);
+  var standing = standings.filter(function(s) { return s.team === team; })[0];
+
+  var winRateScore = 0, nrrScore = 0;
+  if (standing) {
+    var played = (standing.won || 0) + (standing.lost || 0);
+    var winRate = played > 0 ? standing.won / played : 0;
+    winRateScore = Math.round(winRate * 5);
+    nrrScore = (standing.nrr || 0) > 0 ? 1 : 0;
+  }
+  var batScore  = Math.min(mainBatters, 2);
+  var bowlScore = Math.min(mainBowlers, 2);
+  var score = winRateScore + batScore + bowlScore + nrrScore;
 
   var banner = document.getElementById('strengthBanner');
   var icon, title, sub, cls;
   if (score >= 8) {
     icon = '⚠️'; cls = 'strength-banner str-tough';
     title = 'Tough opponent — prepare carefully';
-    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   } else if (score >= 6) {
     icon = '🔥'; cls = 'strength-banner str-competitive';
     title = 'Competitive opponent';
-    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
-  } else if (score >= 5) {
+  } else if (score >= 4) {
     icon = '⚡'; cls = 'strength-banner str-mid';
     title = 'Average opponent';
-    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   } else {
     icon = '✅'; cls = 'strength-banner str-weak';
     title = 'Easy opponent — stay focused';
-    sub = mainBatters + ' main batter' + (mainBatters!==1?'s':'') + ' · ' + mainBowlers + ' main bowler' + (mainBowlers!==1?'s':'');
   }
+
+  var winPct = standing && (standing.won + standing.lost) > 0
+    ? Math.round(standing.won / (standing.won + standing.lost) * 100) + '% win rate'
+    : 'no record';
+  sub = winPct + ' · ' + mainBatters + ' main batter' + (mainBatters !== 1 ? 's' : '')
+      + ' · ' + mainBowlers + ' main bowler' + (mainBowlers !== 1 ? 's' : '');
 
   banner.className = cls;
   document.getElementById('strIcon').textContent  = icon;
