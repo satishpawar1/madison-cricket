@@ -29,6 +29,11 @@ const PAGES = [
     match: 'getPointsTable',
   },
   {
+    label: 'standings2025',
+    url: 'https://cricclubs.com/NashvilleCricketLeague/points-table?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2025&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
+    match: 'getPointsTable',
+  },
+  {
     label: 'batting2025',
     url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/batting-records?filter=Most+Runs&year=2025&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
     match: 'getBattingStats'
@@ -117,7 +122,7 @@ async function fetchStats() {
           try {
             const data = await response.json();
             let arr = data.data || data;
-            if (label === 'standings' && Array.isArray(arr) && arr[0] && arr[0].teams) {
+            if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
               arr = arr[0].teams.map(t => t.team).filter(Boolean);
             }
             if (Array.isArray(arr) && arr.length > 0) {
@@ -316,6 +321,7 @@ async function fetchStats() {
     opponents,
     opponents2025,
     standings: cleanStandings(captured.standings || []),
+    standings2025: cleanStandings(captured.standings2025 || []),
     results: cleanResults(captured.results || []),
     results2025: cleanResults(captured.results2025 || []),
   };

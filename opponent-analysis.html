@@ -395,15 +395,9 @@ function renderStats(opp) {
   document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
 
   var team = cricclubsTeam(selectedGame);
-  if (currentSeason === '2025') {
-    document.getElementById('statWon').textContent  = '—';
-    document.getElementById('statLost').textContent = '—';
-    document.getElementById('statRank').textContent = '—';
-    document.getElementById('statPts').textContent  = '—';
-    document.getElementById('statNrr').textContent  = '—';
-    return;
-  }
-  var standings = CRICCLUBS_STATS.standings || [];
+  var standings = currentSeason === '2025'
+    ? (CRICCLUBS_STATS.standings2025 || [])
+    : (CRICCLUBS_STATS.standings || []);
   var standing = standings.filter(function(s) { return s.team === team; })[0];
   var rank = standing ? standings.indexOf(standing) + 1 : '—';
   document.getElementById('statWon').textContent  = standing ? standing.won    : '—';
