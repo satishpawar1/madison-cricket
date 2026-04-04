@@ -51,6 +51,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .chip-lions  { background: #E8F1FC; color: #1A56B0; }
 .chip-tigers { background: #FEF0E6; color: #C05000; }
+.chip-won    { background: #E2F5EE; color: #0F5C43; }
+.chip-lost   { background: #FEE2E2; color: #991B1B; }
 .chip-played { background: #E2F5EE; color: #0F5C43; }
 .chip-nodata { background: #F3F4F6; color: #9CA3AF; }
 
@@ -292,9 +294,17 @@ function buildGameList(games, containerId, teamClass) {
     var mon = gd.toLocaleDateString('en-US', {month:'short'});
     var stats = hasStats(g);
     var chipClass, chipText;
-    if (isPast) { chipClass = 'team-chip chip-played'; chipText = 'Played'; }
-    else if (!stats) { chipClass = 'team-chip chip-nodata'; chipText = 'No data yet'; }
-    else { chipClass = 'team-chip ' + teamClass; chipText = isPast ? 'Played' : 'Upcoming'; }
+    if (isPast) {
+      var mccName = g._team === 'lions' ? 'Madison Lions' : 'Madison Tigers';
+      var mccResults = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[mccName];
+      var oppName = cricclubsTeam(g);
+      var gameResult = mccResults && mccResults.games && mccResults.games.find(function(r) { return r.opponent === oppName; });
+      if (gameResult && gameResult.noResult) { chipClass = 'team-chip chip-nodata'; chipText = 'No Result'; }
+      else if (gameResult && gameResult.won)  { chipClass = 'team-chip chip-won';    chipText = 'Won'; }
+      else if (gameResult)                    { chipClass = 'team-chip chip-lost';   chipText = 'Lost'; }
+      else                                    { chipClass = 'team-chip chip-played'; chipText = 'Played'; }
+    } else if (!stats) { chipClass = 'team-chip chip-nodata'; chipText = 'No data yet'; }
+    else { chipClass = 'team-chip ' + teamClass; chipText = 'Upcoming'; }
 
     var disabled = !stats ? ' no-data' : '';
     var onclick = stats ? ' onclick="selectGame(\'' + g.name + '\')"' : '';
