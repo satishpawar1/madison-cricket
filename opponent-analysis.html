@@ -88,6 +88,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .tab-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 
+.season-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+.season-btn {
+  padding: 6px 16px; font-size: 12px; font-weight: 600; border-radius: 20px;
+  cursor: pointer; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280;
+}
+.season-btn.active { background: #1A56B0; color: #fff; border-color: #1A56B0; }
+
 .lb-card {
   background: #fff; border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1rem;
@@ -167,6 +174,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div><div class="str-title" id="strTitle"></div><div class="str-sub" id="strSub"></div></div>
     </div>
 
+    <div class="season-toggle">
+      <button class="season-btn active" onclick="switchSeason('2026', this)">2026 Season</button>
+      <button class="season-btn" id="btn2025" onclick="switchSeason('2025', this)">2025 Season</button>
+    </div>
+
     <div class="stat-grid">
       <div class="stat-card">
         <div class="num" id="statBatters" style="color:#1A56B0">—</div>
@@ -224,6 +236,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script>
 var selectedGame = null;
 var currentTab = 'batting';
+var currentSeason = '2026';
+
+function getOpponents() {
+  return currentSeason === '2025'
+    ? (CRICCLUBS_STATS.opponents2025 || {})
+    : (CRICCLUBS_STATS.opponents || {});
+}
+
+function switchSeason(season, btn) {
+  currentSeason = season;
+  document.querySelectorAll('.season-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  if (!selectedGame) return;
+  var team = cricclubsTeam(selectedGame);
+  var opp = getOpponents()[team];
+  if (!opp) {
+    document.getElementById('strengthBanner').className = 'strength-banner str-weak';
+    document.getElementById('strIcon').textContent = '—';
+    document.getElementById('strTitle').textContent = 'No ' + season + ' data available';
+    document.getElementById('strSub').textContent = '';
+    document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No ' + season + ' data for this opponent</div>';
+    document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No ' + season + ' data for this opponent</div>';
+    return;
+  }
+  renderStrength(team, opp);
+  renderStats(opp);
+  if (currentTab === 'results') {
+    if (season === '2025') {
+      document.getElementById('resultsList').innerHTML = '<div class="no-data-msg">2025 results not available</div>';
+    } else {
+      renderResults(team);
+    }
+  } else {
+    renderTab(currentTab, opp);
+  }
+}
 
 function cricclubsTeam(game) {
   return game.cricclubsTeam || game.opponent;
@@ -274,7 +322,7 @@ function selectGame(name) {
   if (!selectedGame) return;
 
   var team = cricclubsTeam(selectedGame);
-  var opp = CRICCLUBS_STATS.opponents[team];
+  var opp = getOpponents()[team] || CRICCLUBS_STATS.opponents[team];
   if (!opp) return;
 
   document.getElementById('analysis').style.display = 'block';
@@ -351,6 +399,14 @@ function renderStats(opp) {
   document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
 
   var team = cricclubsTeam(selectedGame);
+  if (currentSeason === '2025') {
+    document.getElementById('statWon').textContent  = '—';
+    document.getElementById('statLost').textContent = '—';
+    document.getElementById('statRank').textContent = '—';
+    document.getElementById('statPts').textContent  = '—';
+    document.getElementById('statNrr').textContent  = '—';
+    return;
+  }
   var standings = CRICCLUBS_STATS.standings || [];
   var standing = standings.filter(function(s) { return s.team === team; })[0];
   var rank = standing ? standings.indexOf(standing) + 1 : '—';
@@ -371,9 +427,13 @@ function showTab(tab, btn) {
   if (selectedGame) {
     var team = cricclubsTeam(selectedGame);
     if (tab === 'results') {
-      renderResults(team);
+      if (currentSeason === '2025') {
+        document.getElementById('resultsList').innerHTML = '<div class="no-data-msg">2025 results not available</div>';
+      } else {
+        renderResults(team);
+      }
     } else {
-      renderTab(tab, CRICCLUBS_STATS.opponents[team]);
+      renderTab(tab, getOpponents()[team] || CRICCLUBS_STATS.opponents[team]);
     }
   }
 }

@@ -28,6 +28,16 @@ const PAGES = [
     url: 'https://cricclubs.com/NashvilleCricketLeague/points-table?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2026&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
     match: 'getPointsTable',
   },
+  {
+    label: 'batting2025',
+    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/batting-records?filter=Most+Runs&year=2025&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
+    match: 'getBattingStats'
+  },
+  {
+    label: 'bowling2025',
+    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/bowling-records?filter=Most+Wickets&year=2025&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
+    match: 'getBowlingStats'
+  },
 ];
 
 async function fetchStats() {
@@ -224,6 +234,22 @@ async function fetchStats() {
     };
   });
 
+  // 2025 opponents
+  const allBattingByTeam2025 = groupByTeam(captured.batting2025);
+  const allBowlingByTeam2025 = groupByTeam(captured.bowling2025);
+  const allTeams2025 = [...new Set([
+    ...Object.keys(allBattingByTeam2025),
+    ...Object.keys(allBowlingByTeam2025),
+  ])].filter(t => !t.includes('Lions') && !t.includes('Tigers')).sort();
+
+  const opponents2025 = {};
+  allTeams2025.forEach(team => {
+    opponents2025[team] = {
+      batting: cleanBatting(allBattingByTeam2025[team] || []),
+      bowling: cleanBowling(allBowlingByTeam2025[team] || []),
+    };
+  });
+
   const output = {
     lastUpdated: new Date().toISOString(),
     lions: {
@@ -243,6 +269,7 @@ async function fetchStats() {
       ].sort((a, b) => (b.total||0) - (a.total||0))),
     },
     opponents,
+    opponents2025,
     standings: cleanStandings(captured.standings || []),
     results: cleanResults(captured.results || []),
   };
