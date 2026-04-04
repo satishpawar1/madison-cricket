@@ -123,7 +123,8 @@ async function fetchStats() {
             const data = await response.json();
             let arr = data.data || data;
             if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
-              arr = arr[0].teams.map(t => t.team).filter(Boolean);
+              // Flatten all groups into one list
+              arr = arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
             }
             if (Array.isArray(arr) && arr.length > 0) {
               if (!captured[label] || arr.length > captured[label].length) {
