@@ -59,11 +59,22 @@ async function fetchStats() {
   for (const { label, url, match } of PAGES) {
     const isResults = label === 'results' || label === 'results2025';
     console.log(`\nFetching ${label}...`);
+    page.removeAllListeners('request');
     page.removeAllListeners('response');
 
     if (isResults) {
-      // For results pages: intercept first response to get API URL + total count,
-      // then fetch all pages directly from the browser context.
+      // For results: intercept the outgoing API request and upgrade size=30 to size=200
+      // so we get all matches in a single response without pagination.
+      await page.setRequestInterception(true);
+      page.on('request', (req) => {
+        const u = req.url();
+        if (u.includes(match) && u.includes('size=')) {
+          req.continue({ url: u.replace(/size=\d+/, 'size=200') });
+        } else {
+          req.continue();
+        }
+      });
+
       await new Promise((resolve) => {
         let done = false;
         page.on('response', async (response) => {
@@ -75,28 +86,11 @@ async function fetchStats() {
           try {
             const data = await response.json();
             const inner = data.data || data;
-            const total = inner.totalMatchesCount || inner.allMatchesCount || 0;
-            const firstPage = inner.completed || [];
-            if (!firstPage.length) return;
+            const completed = inner.completed || [];
+            if (!completed.length) return;
             done = true;
-
-            // Build base API URL (strip page/size params), then re-fetch all at once
-            const baseApi = u.replace(/[?&]page=\d+/g, '').replace(/[?&]size=\d+/g, '');
-            const sep = baseApi.includes('?') ? '&' : '?';
-            console.log(`  Total matches: ${total}, fetching all at once (size=200)`);
-
-            // Fetch all matches in one request from within the browser (avoids CORS issues)
-            const allMatches = await page.evaluate(async (baseApi, sep) => {
-              try {
-                const r = await fetch(baseApi + sep + 'page=1&size=200');
-                const d = await r.json();
-                const inner = d.data || d;
-                return inner.completed || [];
-              } catch(e) { return []; }
-            }, baseApi, sep);
-
-            captured[label] = allMatches;
-            console.log(`  ✓ ${label}: ${allMatches.length} records`);
+            captured[label] = completed;
+            console.log(`  ✓ ${label}: ${completed.length} records`);
             resolve();
           } catch(e) { console.log('  Results parse error:', e.message); }
         });
@@ -105,6 +99,8 @@ async function fetchStats() {
           .then(() => setTimeout(resolve, 5000))
           .catch(() => resolve());
       });
+
+      await page.setRequestInterception(false);
 
     } else {
       await new Promise((resolve) => {
