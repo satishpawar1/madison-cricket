@@ -180,7 +180,7 @@ async function fetchStats() {
     const balls = p.balls || 0;
     const oversDisplay = Math.floor(balls / 6) + (balls % 6 ? '.' + (balls % 6) : '');
     const oversDecimal = balls / 6;
-    const runsGiven = p.runsGiven || 0;
+    const totalRuns = p.runs || 0;
     return {
       name: p.firstName + ' ' + p.lastName,
       team: p.teamName,
@@ -188,11 +188,11 @@ async function fetchStats() {
       innings: p.innings || 0,
       overs: oversDisplay,
       wickets: p.wickets,
-      runs: runsGiven,
+      runs: totalRuns,
       maidens: p.maidens || 0,
-      bestFigures: (p.maxWickets || 0) + '/-',
-      average: p.wickets > 0 ? +(runsGiven / p.wickets).toFixed(1) : null,
-      economy: oversDecimal > 0 ? +(runsGiven / oversDecimal).toFixed(2) : null,
+      bestFigures: (p.maxWickets || 0) + '/' + (p.runsGiven != null ? p.runsGiven : '-'),
+      average: p.wickets > 0 ? +(totalRuns / p.wickets).toFixed(1) : null,
+      economy: oversDecimal > 0 ? +(totalRuns / oversDecimal).toFixed(2) : null,
       strikeRate: p.wickets > 0 && balls > 0 ? +(balls / p.wickets).toFixed(1) : null,
     };
   }).sort((a, b) => b.wickets - a.wickets);
