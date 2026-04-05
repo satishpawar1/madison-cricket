@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="cricclubs-stats.js"></script>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>2026 Game Results — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.hero {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 2.5rem 1.5rem 4rem;
+  text-align: center;
+}
+.hero-back {
+  position: absolute; left: 1.2rem; top: 1.4rem;
+  color: rgba(255,255,255,0.8); font-size: 15px; text-decoration: none;
+  display: flex; align-items: center; gap: 5px;
+}
+.hero-badge { display: inline-flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); font-size: 26px; margin-bottom: 10px; }
+.hero h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+.hero p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+
+.content { padding: 0 1rem 2.5rem; max-width: 500px; margin: -2rem auto 0; position: relative; }
+
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin: 1.4rem 0 0.6rem;
+}
+
+/* ── Match card ── */
+.match-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.match-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid #F3F4F6;
+}
+.match-meta { font-size: 11px; color: #9CA3AF; }
+.match-meta strong { color: #6B7280; }
+
+.result-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 9px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0;
+}
+.badge-won    { background: #E2F5EE; color: #0F5C43; }
+.badge-lost   { background: #FEE2E2; color: #991B1B; }
+.badge-nr     { background: #F3F4F6; color: #6B7280; }
+
+/* ── Score rows ── */
+.score-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid #F9FAFB;
+}
+.score-row:last-child { border-bottom: none; }
+.score-row.winner { background: #F8FFFE; }
+
+.team-name-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.team-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-lions   { background: #1A56B0; }
+.dot-tigers  { background: #C05000; }
+.dot-opponent { background: #D1D5DB; }
+
+.score-num {
+  font-size: 15px; font-weight: 800; color: #111827;
+  white-space: nowrap; margin-left: 8px; flex-shrink: 0;
+}
+.score-overs {
+  font-size: 11px; color: #9CA3AF; margin-left: 5px; flex-shrink: 0;
+}
+.score-num.won-score { color: #0F5C43; }
+
+.no-games { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+
+<div class="hero" style="position:relative">
+  <a class="hero-back" href="index.html">‹ Home</a>
+  <div class="hero-badge">🏆</div>
+  <h1>2026 Game Results</h1>
+  <p>Tape T20 · Madison Lions &amp; Tigers</p>
+</div>
+
+<div class="content">
+  <div id="lionsSection"></div>
+  <div id="tigersSection"></div>
+</div>
+
+<script>
+function formatScore(runs, wickets, overs, isAllOut) {
+  var wkts = (wickets != null && wickets < 10) ? '/' + wickets : '';
+  var ov   = overs ? ' (' + overs + ' ov)' : '';
+  return { score: runs + wkts, overs: ov };
+}
+
+function getOpponentScorecard(oppCricclubsName, mccTeamName) {
+  if (!CRICCLUBS_STATS.results) return null;
+  var oppData = CRICCLUBS_STATS.results[oppCricclubsName];
+  if (!oppData || !oppData.games) return null;
+  return oppData.games.find(function(g) { return g.opponent === mccTeamName; }) || null;
+}
+
+function buildMatchCards(games, mccLabel, mccCricclubsName, dotClass, containerId) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var mccResults = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[mccCricclubsName];
+
+  var played = games.filter(function(g) {
+    var parts = g.gameDate.split('-');
+    var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    return today > gd;
+  });
+
+  var container = document.getElementById(containerId);
+
+  if (!played.length) {
+    container.innerHTML = '<div class="no-games">No completed games yet</div>';
+    return;
+  }
+
+  var html = '<div class="section-label">' + (dotClass === 'dot-lions' ? '🦁' : '🐯') + ' ' + mccLabel + '</div>';
+
+  played.forEach(function(g) {
+    var parts = g.gameDate.split('-');
+    var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    var dateStr = gd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    var oppName = g.cricclubsTeam || g.opponent;
+
+    // MCC game data
+    var mccGame = mccResults && mccResults.games && mccResults.games.find(function(r) {
+      return r.opponent === oppName;
+    });
+
+    // Opponent scorecard (their batting data)
+    var oppGame = getOpponentScorecard(oppName, mccCricclubsName);
+
+    var isNoResult = mccGame && mccGame.noResult;
+    var mccWon     = mccGame && mccGame.won && !isNoResult;
+
+    var badgeClass = isNoResult ? 'badge-nr' : (mccWon ? 'badge-won' : 'badge-lost');
+    var badgeText  = isNoResult ? 'No Result' : (mccWon ? 'Won' : 'Lost');
+
+    html += '<div class="match-card">';
+    html += '<div class="match-header">'
+          + '<div class="match-meta"><strong>vs ' + g.opponent + '</strong> &nbsp;·&nbsp; ' + dateStr + '</div>'
+          + '<span class="result-badge ' + badgeClass + '">' + badgeText + '</span>'
+          + '</div>';
+
+    // MCC score row
+    if (mccGame) {
+      var mccFmt = formatScore(mccGame.runsScored, mccGame.wickets, mccGame.overs);
+      html += '<div class="score-row' + (mccWon ? ' winner' : '') + '">'
+            + '<div class="team-name-row"><div class="team-dot ' + dotClass + '"></div>' + mccLabel + '</div>'
+            + '<span class="score-num' + (mccWon ? ' won-score' : '') + '">' + mccFmt.score + '</span>'
+            + '<span class="score-overs">' + mccFmt.overs + '</span>'
+            + '</div>';
+    }
+
+    // Opponent score row
+    var oppRuns, oppWickets, oppOvers;
+    if (oppGame) {
+      oppRuns    = oppGame.runsScored;
+      oppWickets = oppGame.wickets;
+      oppOvers   = oppGame.overs;
+    } else if (mccGame) {
+      // Fallback: use runsConceded from MCC's perspective (no wickets/overs)
+      oppRuns    = mccGame.runsConceded;
+      oppWickets = null;
+      oppOvers   = null;
+    }
+
+    if (oppRuns != null) {
+      var oppFmt = formatScore(oppRuns, oppWickets, oppOvers);
+      var oppWon = !mccWon && !isNoResult;
+      html += '<div class="score-row' + (oppWon ? ' winner' : '') + '">'
+            + '<div class="team-name-row"><div class="team-dot dot-opponent"></div>' + g.opponent + '</div>'
+            + '<span class="score-num' + (oppWon ? ' won-score' : '') + '">' + oppFmt.score + '</span>'
+            + '<span class="score-overs">' + oppFmt.overs + '</span>'
+            + '</div>';
+    }
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof CRICCLUBS_STATS === 'undefined' || typeof MCC_CONFIG === 'undefined') {
+    document.querySelector('.content').innerHTML = '<div class="no-games">Stats not loaded.</div>';
+    return;
+  }
+
+  buildMatchCards(MCC_CONFIG.lions.games,  'Madison Lions',  'Madison Lions',  'dot-lions',  'lionsSection');
+  buildMatchCards(MCC_CONFIG.tigers.games, 'Madison Tigers', 'Madison Tigers', 'dot-tigers', 'tigersSection');
+});
+</script>
+</body>
+</html>
