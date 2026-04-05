@@ -475,7 +475,7 @@ function renderTab(tab, opp) {
     var bat = opp.batting || [];
     if (!bat.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
     document.getElementById('battingList').innerHTML = bat.map(function(p, i) {
-      var isThreat = p.runs >= 30;
+      var isThreat = p.average >= 25 && p.strikeRate > 100;
       return '<div class="lb-row">'
         + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
         + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
@@ -493,7 +493,7 @@ function renderTab(tab, opp) {
     var bowl = opp.bowling || [];
     if (!bowl.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
     document.getElementById('bowlingList').innerHTML = bowl.map(function(p, i) {
-      var isThreat = p.wickets >= 3;
+      var isThreat = p.economy !== null && p.economy <= 7 && p.average !== null && p.average <= 12;
       return '<div class="lb-row">'
         + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
         + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
