@@ -99,28 +99,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .lb-card {
   background: #fff; border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 1rem;
 }
-.lb-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px; border-bottom: 1px solid #F9FAFB;
+
+/* ── Stats table ── */
+.stats-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.stats-table th {
+  background: #EEF2FF; color: #374151; font-weight: 700; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 8px 7px; text-align: center; white-space: nowrap;
+  border-bottom: 2px solid #E5E7EB;
 }
-.lb-row:last-child { border-bottom: none; }
-
-.lb-rank { font-size: 12px; font-weight: 800; color: #D1D5DB; width: 18px; text-align: center; flex-shrink: 0; }
-.lb-rank.r1 { color: #F59E0B; }
-.lb-rank.r2 { color: #9CA3AF; }
-.lb-rank.r3 { color: #CD7C2F; }
-
-.lb-info { flex: 1; min-width: 0; }
-.lb-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lb-pills { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
-.pill { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 20px; background: #F3F4F6; color: #6B7280; }
-.pill.threat { background: #FEE2E2; color: #991B1B; }
-
-.lb-primary { flex-shrink: 0; text-align: right; }
-.lb-primary-num { font-size: 18px; font-weight: 800; line-height: 1; }
-.lb-primary-lbl { font-size: 10px; color: #9CA3AF; font-weight: 500; text-transform: uppercase; margin-top: 1px; }
+.stats-table th.col-player { text-align: left; padding-left: 12px; }
+.stats-table td {
+  padding: 9px 7px; text-align: center; border-bottom: 1px solid #F3F4F6;
+  white-space: nowrap; color: #374151;
+}
+.stats-table td.col-player {
+  text-align: left; padding-left: 12px;
+  font-weight: 600; color: #111827; max-width: 140px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table .rank-num { font-size: 11px; font-weight: 700; color: #D1D5DB; }
+.stats-table .rank-num.r1 { color: #F59E0B; }
+.stats-table .rank-num.r2 { color: #9CA3AF; }
+.stats-table .rank-num.r3 { color: #CD7C2F; }
+.stats-table tr.threat-row td { background: #FFF8F8; }
+.threat-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #DC2626; margin-left: 5px; vertical-align: middle; flex-shrink: 0;
+}
 
 .no-data-msg { background: #fff; border-radius: 14px; padding: 2rem; text-align: center; font-size: 13px; color: #9CA3AF; }
 .lb-updated { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 0.5rem; }
@@ -474,39 +483,64 @@ function renderTab(tab, opp) {
   if (tab === 'batting') {
     var bat = opp.batting || [];
     if (!bat.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
-    document.getElementById('battingList').innerHTML = bat.map(function(p, i) {
+    var rows = bat.map(function(p, i) {
       var isThreat = p.average >= 25 && p.strikeRate > 100;
-      return '<div class="lb-row">'
-        + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
-        + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
-        + '<div class="lb-pills">'
-        + '<span class="pill">Inn ' + (p.innings||0) + '</span>'
-        + '<span class="pill">Avg ' + (p.average||'-') + '</span>'
-        + '<span class="pill">SR '  + (p.strikeRate||'-') + '</span>'
-        + '<span class="pill">HS '  + (p.highest||'-') + '</span>'
-        + (isThreat ? '<span class="pill threat">Threat</span>' : '')
-        + '</div></div>'
-        + '<div class="lb-primary"><div class="lb-primary-num" style="color:#1A56B0">' + p.runs + '</div><div class="lb-primary-lbl">Runs</div></div>'
-        + '</div>';
+      var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
+        + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
+        + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
+        + '<td>' + (p.matches||0) + '</td>'
+        + '<td>' + (p.innings||0) + '</td>'
+        + '<td>' + (p.notOuts||0) + '</td>'
+        + '<td style="color:#1A56B0;font-weight:700">' + (p.runs||0) + '</td>'
+        + '<td>' + (p.balls||0) + '</td>'
+        + '<td>' + (p.highest||'-') + '</td>'
+        + '<td>' + (p.fours||0) + '</td>'
+        + '<td>' + (p.sixes||0) + '</td>'
+        + '<td>' + (p.average||'-') + '</td>'
+        + '<td>' + (p.strikeRate||'-') + '</td>'
+        + '<td>' + (p.fifties||0) + '</td>'
+        + '<td>' + (p.hundreds||0) + '</td>'
+        + '</tr>';
     }).join('');
+    document.getElementById('battingList').innerHTML =
+      '<table class="stats-table"><thead><tr>'
+      + '<th>#</th><th class="col-player">Player</th>'
+      + '<th>Mat</th><th>Inns</th><th>NO</th><th>Runs</th><th>Balls</th>'
+      + '<th>HS</th><th>4s</th><th>6s</th><th>Avg</th><th>SR</th>'
+      + '<th>50s</th><th>100s</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
   } else {
     var bowl = opp.bowling || [];
     if (!bowl.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
-    document.getElementById('bowlingList').innerHTML = bowl.map(function(p, i) {
+    var rows = bowl.map(function(p, i) {
       var isThreat = p.economy !== null && p.economy <= 7 && p.average !== null && p.average <= 12;
-      return '<div class="lb-row">'
-        + '<div class="' + rankClass(i) + '">' + (i+1) + '</div>'
-        + '<div class="lb-info"><div class="lb-name">' + p.name + '</div>'
-        + '<div class="lb-pills">'
-        + '<span class="pill">Inn ' + (p.innings||0) + '</span>'
-        + '<span class="pill">Econ ' + (p.economy||'-') + '</span>'
-        + '<span class="pill">Avg '  + (p.average||'-') + '</span>'
-        + '<span class="pill">Best ' + (p.bestFigures||'-') + '</span>'
-        + (isThreat ? '<span class="pill threat">Threat</span>' : '')
-        + '</div></div>'
-        + '<div class="lb-primary"><div class="lb-primary-num" style="color:#1A8F6A">' + p.wickets + '</div><div class="lb-primary-lbl">Wickets</div></div>'
-        + '</div>';
+      var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
+        + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
+        + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
+        + '<td>' + (p.matches||0) + '</td>'
+        + '<td>' + (p.innings||0) + '</td>'
+        + '<td>' + (p.overs||0) + '</td>'
+        + '<td>' + (p.maidens||0) + '</td>'
+        + '<td>' + (p.runs||0) + '</td>'
+        + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
+        + '<td>' + (p.bestFigures||'-') + '</td>'
+        + '<td>' + (p.hattricks||0) + '</td>'
+        + '<td>' + (p.economy||'-') + '</td>'
+        + '<td>' + (p.average||'-') + '</td>'
+        + '<td>' + (p.strikeRate||'-') + '</td>'
+        + '<td>' + (p.fiveWickets||0) + '</td>'
+        + '<td>' + (p.fourWickets||0) + '</td>'
+        + '</tr>';
     }).join('');
+    document.getElementById('bowlingList').innerHTML =
+      '<table class="stats-table"><thead><tr>'
+      + '<th>#</th><th class="col-player">Player</th>'
+      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Mdns</th><th>Runs</th>'
+      + '<th>Wkts</th><th>BBF</th><th>Hat</th><th>Econ</th><th>Avg</th><th>SR</th>'
+      + '<th>5W</th><th>4W</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
 }
 
