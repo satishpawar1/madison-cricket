@@ -713,6 +713,12 @@ window.addEventListener('DOMContentLoaded', function() {
     setAutoSave('', '');
     if (!g) { renderAll(); return; }
 
+    // If we have preset data for this game, always use it (authoritative)
+    if (PRESETS[g]) {
+      loadPreset(g);
+      return;
+    }
+
     if (loadFromLocal(g)) {
       var hasLocalData = dismissed.length > 0 || slots[0].name || slots[1].name;
       if (hasLocalData) {
@@ -720,7 +726,6 @@ window.addEventListener('DOMContentLoaded', function() {
         setAutoSave('as-pending', '📱 Restored from device');
         return;
       }
-      // Empty local cache — fall through to Sheets / preset
     }
     // Load from Sheets
     fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(g))
@@ -745,15 +750,11 @@ window.addEventListener('DOMContentLoaded', function() {
           actionStack = [];
           setAutoSave('as-saved', 'Loaded from Sheets');
           renderAll();
-        } else if (PRESETS[g]) {
-          loadPreset(g);
         } else {
           renderAll();
         }
       })
-      .catch(function() {
-        if (PRESETS[g]) { loadPreset(g); } else { renderAll(); }
-      });
+      .catch(function() { renderAll(); });
   });
 
   renderAll();
