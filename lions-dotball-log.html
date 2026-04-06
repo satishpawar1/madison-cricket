@@ -20,23 +20,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .content { padding: 1.25rem; max-width: 540px; margin: 0 auto; }
 
-/* Game selector */
+/* Game card */
 .card {
   background: #fff; border-radius: 14px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   padding: 16px; margin-bottom: 1rem;
 }
-.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.gs { display: flex; gap: 10px; align-items: center; }
 .gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
 .gs select {
   font-size: 14px; padding: 10px 12px;
   border: 1.5px solid #E5E7EB; border-radius: 10px;
-  background: #fff; flex: 1; min-width: 200px; color: #111827;
+  background: #fff; flex: 1; color: #111827;
   -webkit-appearance: none; appearance: none;
 }
 .gs select:focus { outline: none; border-color: #1A56B0; }
 
-/* Auto-save status */
+/* Auto-save */
 .autosave-row { display: none; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F3F4F6; font-size: 12px; }
 .as-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .as-pending .as-dot { background: #F59E0B; }
@@ -69,9 +69,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   background: #fff; border-radius: 14px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   margin-bottom: 1rem; overflow: hidden;
-  transition: opacity 0.2s;
 }
-.batter-card.is-out { opacity: 0.5; }
 
 .card-hdr {
   display: flex; align-items: center; gap: 10px;
@@ -86,16 +84,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .batter-name { font-size: 14px; font-weight: 700; flex: 1; color: #111827; }
 .batter-name.placeholder { color: #9CA3AF; font-weight: 400; }
-.out-badge {
-  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
-  background: #FEE2E2; color: #991B1B; letter-spacing: 0.06em; flex-shrink: 0;
-}
-.x-btn {
-  background: none; border: none; color: #D1D5DB; font-size: 20px;
-  cursor: pointer; padding: 0 2px; line-height: 1; flex-shrink: 0;
-  transition: color 0.12s;
-}
-.x-btn:hover, .x-btn:active { color: #991B1B; }
 
 /* Stats row */
 .card-stats {
@@ -107,63 +95,99 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .stat-val.d { color: #DC2626; }
 .stat-val.b { color: #111827; }
 .stat-lbl { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
-
 .rate-wrap { flex: 1; }
 .rate-bar { height: 6px; background: #F3F4F6; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
 .rate-fill { height: 100%; background: linear-gradient(90deg, #DC2626, #F87171); border-radius: 3px; transition: width 0.25s; }
 .rate-lbl { font-size: 11px; color: #9CA3AF; }
 
 /* Action buttons */
-.card-btns-main {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  padding: 4px 14px 8px;
-}
-.card-btns-out { padding: 0 14px 14px; }
+.card-btns-main { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px 14px 8px; }
+.card-btns-out  { padding: 0 14px 14px; }
 
 .action-btn {
   font-size: 15px; font-weight: 700; letter-spacing: 0.08em;
   padding: 18px 10px; border: none; border-radius: 10px;
   cursor: pointer; touch-action: manipulation; user-select: none;
-  transition: filter 0.08s, transform 0.08s;
-  width: 100%;
+  transition: filter 0.08s, transform 0.08s; width: 100%;
 }
 .action-btn:active { filter: brightness(0.92); transform: scale(0.97); }
 .action-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
 .btn-dot { background: #FEE2E2; color: #991B1B; }
 .btn-run { background: #DCFCE7; color: #166534; }
 .btn-out {
-  background: #fff; color: #D97706;
-  border: 1.5px solid #FDE68A; font-size: 13px;
-  padding: 10px; border-radius: 10px; letter-spacing: 0.06em;
-  font-weight: 700;
+  background: #fff; color: #D97706; border: 1.5px solid #FDE68A;
+  font-size: 13px; padding: 10px; border-radius: 10px;
+  letter-spacing: 0.06em; font-weight: 700; width: 100%;
+  cursor: pointer; touch-action: manipulation;
+  transition: background 0.1s;
 }
 .btn-out:active { background: #FFFBEB; }
+.btn-out:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* Empty slot hint */
+.empty-hint {
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 14px; color: #9CA3AF; font-size: 13px;
+  gap: 8px; cursor: pointer;
+}
+.empty-hint:active { background: #F9FAFB; }
+.empty-hint-icon { font-size: 22px; }
 
 /* Bottom bar */
-.bottom-bar {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 0.25rem;
-}
+.bottom-bar { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 0.25rem; }
 .bar-btn {
   font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
   padding: 12px 4px; border-radius: 10px; cursor: pointer;
-  touch-action: manipulation; text-align: center; transition: background 0.12s;
+  touch-action: manipulation; text-align: center; border: none;
+  transition: filter 0.12s;
 }
+.bar-btn:active { filter: brightness(0.92); }
 .bar-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.bb-add   { background: #E2F5EE; color: #0F5C43; border: none; }
-.bb-undo  { background: #F3F4F6; color: #6B7280; border: none; }
-.bb-copy  { background: #EDE9FE; color: #5B21B6; border: none; }
-.bb-reset { background: #F3F4F6; color: #6B7280; border: none; }
-.bar-btn:active { filter: brightness(0.93); }
+.bb-undo  { background: #F3F4F6; color: #6B7280; }
+.bb-copy  { background: #EDE9FE; color: #5B21B6; }
+.bb-reset { background: #F3F4F6; color: #6B7280; }
 
-/* Batter selector overlay */
+/* Dismissed table */
+.section-lbl {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin: 1.25rem 0 0.6rem;
+}
+.dismissed-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden; margin-bottom: 1rem;
+}
+.dis-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dis-table th {
+  font-size: 10px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 9px 14px; text-align: right; background: #FAFAFA;
+  border-bottom: 1.5px solid #F3F4F6;
+}
+.dis-table th:first-child { text-align: left; }
+.dis-table td {
+  padding: 10px 14px; text-align: right;
+  border-bottom: 1px solid #F9FAFB; color: #111827;
+}
+.dis-table td:first-child { text-align: left; font-weight: 600; }
+.dis-table tr:last-child td { border-bottom: none; }
+.dis-table .out-tag {
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px;
+  background: #FEE2E2; color: #991B1B; margin-left: 5px; vertical-align: middle;
+}
+.dis-dots  { color: #DC2626; font-weight: 700; }
+.dis-pct   { color: #6B7280; }
+
+/* Selector overlay — bottom sheet */
 .overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
   display: none; align-items: flex-end; justify-content: center; z-index: 100;
 }
 .overlay.open { display: flex; }
 .sel-box {
   background: #fff; border-radius: 20px 20px 0 0;
-  padding: 20px 16px 32px; width: 100%; max-width: 540px;
+  padding: 20px 16px 36px; width: 100%; max-width: 540px;
   max-height: 75vh; overflow-y: auto;
 }
 .sel-title {
@@ -175,20 +199,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   display: block; width: 100%; font-size: 14px; font-weight: 600;
   text-align: left; background: #F9FAFB; border: 1.5px solid #F3F4F6;
   color: #111827; padding: 13px 16px; border-radius: 10px;
-  cursor: pointer; margin-bottom: 6px; transition: background 0.1s;
+  cursor: pointer; margin-bottom: 6px;
 }
 .p-opt:active { background: #E8F1FC; border-color: #1A56B0; }
 .p-opt:disabled { opacity: 0.3; cursor: not-allowed; }
 .sel-cancel {
   display: block; width: 100%; margin-top: 10px;
-  font-size: 13px; font-weight: 500;
-  background: #F3F4F6; border: none; color: #6B7280;
-  padding: 12px; border-radius: 10px; cursor: pointer; text-align: center;
+  font-size: 13px; font-weight: 500; background: #F3F4F6;
+  border: none; color: #6B7280; padding: 12px; border-radius: 10px;
+  cursor: pointer; text-align: center;
 }
 
 /* Confirm overlay */
 .confirm-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
   display: none; align-items: center; justify-content: center; z-index: 200;
 }
 .confirm-overlay.open { display: flex; }
@@ -199,14 +223,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .confirm-msg { font-size: 14px; color: #374151; margin-bottom: 20px; line-height: 1.6; }
 .confirm-btns { display: flex; gap: 10px; }
-.confirm-yes {
-  flex: 1; font-size: 14px; font-weight: 600; padding: 12px;
-  border-radius: 10px; border: none; background: #FEE2E2; color: #991B1B; cursor: pointer;
-}
-.confirm-no {
-  flex: 1; font-size: 14px; font-weight: 600; padding: 12px;
-  border-radius: 10px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer;
-}
+.confirm-yes { flex:1; font-size:14px; font-weight:600; padding:12px; border-radius:10px; border:none; background:#FEE2E2; color:#991B1B; cursor:pointer; }
+.confirm-no  { flex:1; font-size:14px; font-weight:600; padding:12px; border-radius:10px; border:1.5px solid #E5E7EB; background:#fff; color:#6B7280; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -240,18 +258,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="sum-item"><div class="sum-val pct" id="sumPct">0%</div><div class="sum-lbl">Dot %</div></div>
   </div>
 
-  <div id="batterCards"></div>
+  <!-- Always exactly 2 active batter cards -->
+  <div id="card0"></div>
+  <div id="card1"></div>
 
+  <!-- Bottom actions -->
   <div class="bottom-bar">
-    <button class="bar-btn bb-add"  onclick="addBatter()">+ Batter</button>
     <button class="bar-btn bb-undo" id="undoBtn" onclick="undoLast()" disabled>Undo</button>
     <button class="bar-btn bb-copy" onclick="copyStats()">Copy</button>
     <button class="bar-btn bb-reset" onclick="askReset()">Reset</button>
   </div>
 
+  <!-- Dismissed batters table -->
+  <div id="dismissedSection" style="display:none">
+    <div class="section-lbl">Dismissed batters</div>
+    <div class="dismissed-card">
+      <table class="dis-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Balls</th>
+            <th>Dots</th>
+            <th>Dot %</th>
+          </tr>
+        </thead>
+        <tbody id="dismissedTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
-<!-- Batter selector -->
+<!-- Batter selector bottom sheet -->
 <div class="overlay" id="selOverlay">
   <div class="sel-box">
     <div class="sel-title">Select Batter</div>
@@ -277,20 +315,18 @@ var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var PL = CFG.players;
 
 // ── State ─────────────────────────────────────────────────────────
+// Exactly 2 active slots (index 0 and 1)
 var slots = [
-  { id: 0, name: null, history: [], isOut: false },
-  { id: 1, name: null, history: [], isOut: false }
+  { name: null, history: [] },
+  { name: null, history: [] }
 ];
-var nextId = 2;
-var actionStack = []; // [{slotId, type:'D'|'R'}]
+// Dismissed: [{name, dots, balls, pct}] — append-only
+var dismissed = [];
+var actionStack = []; // [{slotIdx: 0|1, type:'D'|'R'}]
 var autoSaveTimer = null;
-var LOCAL_KEY_PREFIX = 'dottrack_lions_';
+var LOCAL_KEY_PREFIX = 'dottrack2_lions_';
 
-// ── Helpers ───────────────────────────────────────────────────────
-function findSlot(id) {
-  for (var i = 0; i < slots.length; i++) { if (slots[i].id === id) return slots[i]; }
-  return null;
-}
+// ── Stats ─────────────────────────────────────────────────────────
 function slotStats(slot) {
   var dots = 0;
   for (var i = 0; i < slot.history.length; i++) { if (slot.history[i] === 'D') dots++; }
@@ -300,129 +336,124 @@ function slotStats(slot) {
 
 // ── Render ────────────────────────────────────────────────────────
 function renderAll() {
-  var container = document.getElementById('batterCards');
-  container.innerHTML = '';
-  for (var i = 0; i < slots.length; i++) {
-    container.appendChild(buildCard(slots[i], i));
-  }
+  renderCard(0);
+  renderCard(1);
+  renderDismissed();
   updateSummary();
 }
 
-function buildCard(slot, idx) {
-  var st = slotStats(slot);
+function renderCard(idx) {
+  var slot = slots[idx];
+  var container = document.getElementById('card' + idx);
   var hasName = slot.name !== null;
-  var isOut = slot.isOut;
+  var st = slotStats(slot);
 
   var card = document.createElement('div');
-  card.className = 'batter-card' + (isOut ? ' is-out' : '');
+  card.className = 'batter-card';
 
-  // ── Header ──
-  var hdr = document.createElement('div');
-  hdr.className = 'card-hdr' + (!hasName && !isOut ? ' selectable' : '');
-  if (!hasName && !isOut) hdr.onclick = function() { openSelector(slot.id); };
+  if (!hasName) {
+    // Empty slot — tap anywhere to select
+    var hdr = document.createElement('div');
+    hdr.className = 'card-hdr selectable';
+    hdr.onclick = function() { openSelector(idx); };
+    var badge = document.createElement('span');
+    badge.className = 'slot-badge';
+    badge.textContent = '#' + (idx + 1);
+    var nameEl = document.createElement('span');
+    nameEl.className = 'batter-name placeholder';
+    nameEl.textContent = 'Tap to select batter';
+    hdr.appendChild(badge);
+    hdr.appendChild(nameEl);
+    card.appendChild(hdr);
 
-  var badge = document.createElement('span');
-  badge.className = 'slot-badge';
-  badge.textContent = '#' + (idx + 1);
+    var hint = document.createElement('div');
+    hint.className = 'empty-hint';
+    hint.onclick = function() { openSelector(idx); };
+    hint.innerHTML = '<span class="empty-hint-icon">+</span><span>Select incoming batter</span>';
+    card.appendChild(hint);
+  } else {
+    // Active batter
+    var hdr = document.createElement('div');
+    hdr.className = 'card-hdr';
+    var badge = document.createElement('span');
+    badge.className = 'slot-badge';
+    badge.textContent = '#' + (idx + 1);
+    var nameEl = document.createElement('span');
+    nameEl.className = 'batter-name';
+    nameEl.textContent = slot.name;
+    hdr.appendChild(badge);
+    hdr.appendChild(nameEl);
+    card.appendChild(hdr);
 
-  var nameEl = document.createElement('span');
-  nameEl.className = 'batter-name' + (!hasName ? ' placeholder' : '');
-  nameEl.textContent = hasName ? slot.name : 'Tap to select batter';
-  if (hasName && !isOut) {
-    nameEl.style.cursor = 'pointer';
-    (function(sid) { nameEl.onclick = function(e) { e.stopPropagation(); openSelector(sid); }; })(slot.id);
+    // Stats
+    var statsRow = document.createElement('div');
+    statsRow.className = 'card-stats';
+    statsRow.innerHTML =
+      '<div class="stat-blk"><div class="stat-val d">' + st.dots + '</div><div class="stat-lbl">Dots</div></div>'
+      + '<div class="stat-blk"><div class="stat-val b">' + st.balls + '</div><div class="stat-lbl">Balls</div></div>'
+      + '<div class="rate-wrap"><div class="rate-bar"><div class="rate-fill" style="width:' + st.pct + '%"></div></div>'
+      + '<div class="rate-lbl">' + st.pct + '% dot rate</div></div>';
+    card.appendChild(statsRow);
+
+    // DOT / RUN
+    var mainBtns = document.createElement('div');
+    mainBtns.className = 'card-btns-main';
+    var dotBtn = document.createElement('button');
+    dotBtn.className = 'action-btn btn-dot';
+    dotBtn.textContent = 'DOT';
+    var runBtn = document.createElement('button');
+    runBtn.className = 'action-btn btn-run';
+    runBtn.textContent = 'RUN';
+    (function(i) {
+      dotBtn.onclick = function() { logAction(i, 'D'); };
+      runBtn.onclick = function() { logAction(i, 'R'); };
+    })(idx);
+    mainBtns.appendChild(dotBtn);
+    mainBtns.appendChild(runBtn);
+    card.appendChild(mainBtns);
+
+    // OUT
+    var outRow = document.createElement('div');
+    outRow.className = 'card-btns-out';
+    var outBtn = document.createElement('button');
+    outBtn.className = 'btn-out';
+    outBtn.textContent = '🟡  Mark as Out';
+    (function(i, s, stats) {
+      outBtn.onclick = function() { markOut(i, s, stats); };
+    })(idx, slot, st);
+    outRow.appendChild(outBtn);
+    card.appendChild(outRow);
   }
 
-  hdr.appendChild(badge);
-  hdr.appendChild(nameEl);
+  container.innerHTML = '';
+  container.appendChild(card);
+}
 
-  if (isOut) {
-    var outBadge = document.createElement('span');
-    outBadge.className = 'out-badge';
-    outBadge.textContent = 'OUT';
-    hdr.appendChild(outBadge);
-  }
-
-  var xBtn = document.createElement('button');
-  xBtn.className = 'x-btn';
-  xBtn.innerHTML = '&times;';
-  xBtn.title = isOut ? 'Remove card' : (hasName ? 'Remove batter' : 'Remove slot');
-  (function(s) {
-    xBtn.onclick = function(e) {
-      e.stopPropagation();
-      if (s.isOut) {
-        slots = slots.filter(function(x) { return x.id !== s.id; });
-        actionStack = actionStack.filter(function(a) { return a.slotId !== s.id; });
-      } else if (s.name) {
-        // Clear this batter from slot, reset to empty
-        s.name = null; s.history = []; s.isOut = false;
-        actionStack = actionStack.filter(function(a) { return a.slotId !== s.id; });
-      } else if (slots.length > 2) {
-        slots = slots.filter(function(x) { return x.id !== s.id; });
-      }
-      renderAll(); saveToLocal();
-    };
-  })(slot);
-  hdr.appendChild(xBtn);
-
-  // ── Stats ──
-  var statsRow = document.createElement('div');
-  statsRow.className = 'card-stats';
-
-  statsRow.innerHTML =
-    '<div class="stat-blk"><div class="stat-val d">' + st.dots + '</div><div class="stat-lbl">Dots</div></div>'
-    + '<div class="stat-blk"><div class="stat-val b">' + st.balls + '</div><div class="stat-lbl">Balls</div></div>'
-    + '<div class="rate-wrap"><div class="rate-bar"><div class="rate-fill" style="width:' + st.pct + '%"></div></div>'
-    + '<div class="rate-lbl">' + st.pct + '% dot rate</div></div>';
-
-  // ── DOT / RUN buttons ──
-  var mainBtns = document.createElement('div');
-  mainBtns.className = 'card-btns-main';
-
-  var dotBtn = document.createElement('button');
-  dotBtn.className = 'action-btn btn-dot';
-  dotBtn.textContent = 'DOT';
-  dotBtn.disabled = !hasName || isOut;
-  (function(sid) { dotBtn.onclick = function() { logAction(sid, 'D'); }; })(slot.id);
-
-  var runBtn = document.createElement('button');
-  runBtn.className = 'action-btn btn-run';
-  runBtn.textContent = 'RUN';
-  runBtn.disabled = !hasName || isOut;
-  (function(sid) { runBtn.onclick = function() { logAction(sid, 'R'); }; })(slot.id);
-
-  mainBtns.appendChild(dotBtn);
-  mainBtns.appendChild(runBtn);
-
-  // ── OUT button ──
-  var outRow = document.createElement('div');
-  outRow.className = 'card-btns-out';
-
-  var outBtn = document.createElement('button');
-  outBtn.className = 'action-btn btn-out';
-  outBtn.textContent = '🟡  Mark as Out';
-  outBtn.disabled = !hasName || isOut;
-  (function(s) {
-    outBtn.onclick = function() {
-      s.isOut = true;
-      renderAll(); saveToLocal(); scheduleAutoSave();
-    };
-  })(slot);
-
-  outRow.appendChild(outBtn);
-
-  card.appendChild(hdr);
-  card.appendChild(statsRow);
-  card.appendChild(mainBtns);
-  card.appendChild(outRow);
-  return card;
+function renderDismissed() {
+  var section = document.getElementById('dismissedSection');
+  var tbody = document.getElementById('dismissedTbody');
+  if (!dismissed.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  tbody.innerHTML = dismissed.map(function(p) {
+    return '<tr>'
+      + '<td>' + p.name + ' <span class="out-tag">OUT</span></td>'
+      + '<td>' + p.balls + '</td>'
+      + '<td class="dis-dots">' + p.dots + '</td>'
+      + '<td class="dis-pct">' + p.pct + '%</td>'
+      + '</tr>';
+  }).join('');
 }
 
 function updateSummary() {
   var totalDots = 0, totalBalls = 0;
-  for (var i = 0; i < slots.length; i++) {
+  // Active batters
+  for (var i = 0; i < 2; i++) {
     var st = slotStats(slots[i]);
     totalDots += st.dots; totalBalls += st.balls;
+  }
+  // Dismissed batters
+  for (var j = 0; j < dismissed.length; j++) {
+    totalDots += dismissed[j].dots; totalBalls += dismissed[j].balls;
   }
   var pct = totalBalls > 0 ? Math.round(totalDots / totalBalls * 100) : 0;
   document.getElementById('sumDots').textContent = totalDots;
@@ -432,37 +463,43 @@ function updateSummary() {
 }
 
 // ── Actions ───────────────────────────────────────────────────────
-function logAction(slotId, type) {
-  var slot = findSlot(slotId);
-  if (!slot || slot.isOut) return;
-  slot.history.push(type);
-  actionStack.push({ slotId: slotId, type: type });
-  renderAll(); saveToLocal(); scheduleAutoSave();
+function logAction(idx, type) {
+  slots[idx].history.push(type);
+  actionStack.push({ slotIdx: idx, type: type });
+  renderCard(idx);
+  updateSummary();
+  saveToLocal(); scheduleAutoSave();
 }
 
 function undoLast() {
   if (!actionStack.length) return;
   var last = actionStack.pop();
-  var slot = findSlot(last.slotId);
-  if (slot && slot.history.length > 0) slot.history.pop();
-  renderAll(); saveToLocal(); scheduleAutoSave();
+  if (slots[last.slotIdx].history.length > 0) slots[last.slotIdx].history.pop();
+  renderCard(last.slotIdx);
+  updateSummary();
+  saveToLocal(); scheduleAutoSave();
 }
 
-function addBatter() {
-  for (var i = 0; i < slots.length; i++) {
-    if (!slots[i].name && !slots[i].isOut) { openSelector(slots[i].id); return; }
-  }
-  var newSlot = { id: nextId++, name: null, history: [], isOut: false };
-  slots.push(newSlot);
+function markOut(idx, slot, stats) {
+  // Move to dismissed list
+  dismissed.push({ name: slot.name, dots: stats.dots, balls: stats.balls, pct: stats.pct });
+  // Clear undo actions for this slot
+  actionStack = actionStack.filter(function(a) { return a.slotIdx !== idx; });
+  // Reset slot to empty
+  slots[idx] = { name: null, history: [] };
   renderAll();
-  openSelector(newSlot.id);
+  saveToLocal(); scheduleAutoSave();
 }
 
 // ── Selector ──────────────────────────────────────────────────────
-function openSelector(slotId) {
-  var activeNames = [];
-  for (var i = 0; i < slots.length; i++) {
-    if (slots[i].name && !slots[i].isOut && slots[i].id !== slotId) activeNames.push(slots[i].name);
+var pendingIdx = null;
+
+function openSelector(idx) {
+  pendingIdx = idx;
+  // Names already active in the other slot or dismissed (can't pick same active batter)
+  var blocked = [];
+  for (var i = 0; i < 2; i++) {
+    if (i !== idx && slots[i].name) blocked.push(slots[i].name);
   }
   var list = document.getElementById('playerList');
   list.innerHTML = '';
@@ -471,25 +508,26 @@ function openSelector(slotId) {
       var btn = document.createElement('button');
       btn.className = 'p-opt';
       btn.textContent = name;
-      btn.disabled = activeNames.indexOf(name) >= 0;
-      btn.onclick = function() { selectBatter(slotId, name); };
+      btn.disabled = blocked.indexOf(name) >= 0;
+      btn.onclick = function() { selectBatter(pendingIdx, name); };
       list.appendChild(btn);
     })(PL[j]);
   }
   document.getElementById('selOverlay').classList.add('open');
 }
 
-function selectBatter(slotId, name) {
-  var slot = findSlot(slotId);
-  if (slot) {
-    slot.name = name; slot.history = []; slot.isOut = false;
-    actionStack = actionStack.filter(function(a) { return a.slotId !== slotId; });
-  }
-  closeSelector(); renderAll(); saveToLocal();
+function selectBatter(idx, name) {
+  slots[idx] = { name: name, history: [] };
+  actionStack = actionStack.filter(function(a) { return a.slotIdx !== idx; });
+  closeSelector();
+  renderCard(idx);
+  updateSummary();
+  saveToLocal();
 }
 
 function closeSelector() {
   document.getElementById('selOverlay').classList.remove('open');
+  pendingIdx = null;
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
@@ -497,16 +535,12 @@ function askReset() { document.getElementById('confirmOverlay').classList.add('o
 function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
 function doReset() {
   closeConfirm();
-  slots = [
-    { id: 0, name: null, history: [], isOut: false },
-    { id: 1, name: null, history: [], isOut: false }
-  ];
-  nextId = 2; actionStack = [];
+  slots = [{ name: null, history: [] }, { name: null, history: [] }];
+  dismissed = []; actionStack = [];
+  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
   var g = document.getElementById('gameSelect').value;
   if (g) clearLocal(g);
-  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
-  renderAll();
-  setAutoSave('', '');
+  renderAll(); setAutoSave('', '');
 }
 
 // ── Copy ──────────────────────────────────────────────────────────
@@ -514,18 +548,21 @@ function copyStats() {
   var g = document.getElementById('gameSelect').value || 'Game';
   var lines = ['🦁 Lions — Dot Ball Tracker', 'Game: ' + g, ''];
   var td = 0, tb = 0;
-  for (var i = 0; i < slots.length; i++) {
-    var s = slots[i];
-    if (!s.name) continue;
-    var st = slotStats(s);
+  for (var i = 0; i < 2; i++) {
+    if (!slots[i].name) continue;
+    var st = slotStats(slots[i]);
     td += st.dots; tb += st.balls;
-    lines.push(s.name + (s.isOut ? ' [OUT]' : '') + ': ' + st.dots + ' dots / ' + st.balls + ' balls (' + st.pct + '%)');
+    lines.push(slots[i].name + ': ' + st.dots + ' dots / ' + st.balls + ' balls (' + st.pct + '%)');
   }
-  if (tb > 0) { lines.push(''); lines.push('TOTAL: ' + td + '/' + tb + ' balls — ' + Math.round(td/tb*100) + '% dot rate'); }
+  for (var j = 0; j < dismissed.length; j++) {
+    var d = dismissed[j];
+    td += d.dots; tb += d.balls;
+    lines.push(d.name + ' [OUT]: ' + d.dots + ' dots / ' + d.balls + ' balls (' + d.pct + '%)');
+  }
+  if (tb > 0) { lines.push(''); lines.push('TOTAL: ' + td + '/' + tb + ' — ' + Math.round(td/tb*100) + '% dot rate'); }
   var text = lines.join('\n');
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function() { setAutoSave('as-saved', '✓ Copied to clipboard'); })
-    .catch(function() { fallbackCopy(text); });
+    navigator.clipboard.writeText(text).then(function() { setAutoSave('as-saved', '✓ Copied to clipboard'); }).catch(function() { fallbackCopy(text); });
   } else { fallbackCopy(text); }
 }
 function fallbackCopy(text) {
@@ -543,7 +580,9 @@ function lsKey(g) { return LOCAL_KEY_PREFIX + g; }
 function saveToLocal() {
   var g = document.getElementById('gameSelect').value;
   if (!g) return;
-  try { localStorage.setItem(lsKey(g), JSON.stringify({ ts: Date.now(), slots: slots, nextId: nextId, actionStack: actionStack })); } catch(e) {}
+  try {
+    localStorage.setItem(lsKey(g), JSON.stringify({ ts: Date.now(), slots: slots, dismissed: dismissed, actionStack: actionStack }));
+  } catch(e) {}
 }
 
 function loadFromLocal(g) {
@@ -551,7 +590,9 @@ function loadFromLocal(g) {
     var raw = localStorage.getItem(lsKey(g));
     if (!raw) return false;
     var d = JSON.parse(raw);
-    slots = d.slots || slots; nextId = d.nextId || nextId; actionStack = d.actionStack || [];
+    slots = d.slots || [{ name:null,history:[] },{ name:null,history:[] }];
+    dismissed = d.dismissed || [];
+    actionStack = d.actionStack || [];
     return true;
   } catch(e) { return false; }
 }
@@ -578,11 +619,16 @@ function submitToSheets(silent) {
   var g = document.getElementById('gameSelect').value;
   if (!g) return;
   var dotballs = [];
-  for (var i = 0; i < slots.length; i++) {
-    var s = slots[i];
-    if (!s.name) continue;
-    var st = slotStats(s);
-    dotballs.push({ name: s.name, dots: st.dots, runs: st.balls - st.dots, balls: st.balls, isOut: s.isOut });
+  // Active
+  for (var i = 0; i < 2; i++) {
+    if (!slots[i].name) continue;
+    var st = slotStats(slots[i]);
+    dotballs.push({ name: slots[i].name, dots: st.dots, runs: st.balls - st.dots, balls: st.balls, isOut: false });
+  }
+  // Dismissed
+  for (var j = 0; j < dismissed.length; j++) {
+    var d = dismissed[j];
+    dotballs.push({ name: d.name, dots: d.dots, runs: d.balls - d.dots, balls: d.balls, isOut: true });
   }
   if (silent) setAutoSave('as-saving', 'Saving...');
   fetch(SCRIPT_URL, {
@@ -596,12 +642,10 @@ function submitToSheets(silent) {
       var t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       setAutoSave('as-saved', '✓ Saved at ' + t);
     } else {
-      setAutoSave('as-error', 'Save failed: ' + (d.message || 'unknown error'));
+      setAutoSave('as-error', 'Save failed: ' + (d.message || 'check App Script'));
     }
   })
-  .catch(function(err) {
-    setAutoSave('as-error', 'No connection — data safe on device');
-  });
+  .catch(function() { setAutoSave('as-error', 'No connection — data safe on device'); });
 }
 
 // ── Init ──────────────────────────────────────────────────────────
@@ -613,39 +657,45 @@ window.addEventListener('DOMContentLoaded', function() {
     opt.value = g.name;
     var parts = g.gameDate.split('-');
     var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric' })
                     + (today > d ? ' (played)' : '');
     sel.appendChild(opt);
   });
 
   sel.addEventListener('change', function() {
     var g = this.value;
-    slots = [{ id:0,name:null,history:[],isOut:false },{ id:1,name:null,history:[],isOut:false }];
-    nextId = 2; actionStack = [];
+    slots = [{ name:null,history:[] },{ name:null,history:[] }];
+    dismissed = []; actionStack = [];
     if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
     setAutoSave('', '');
-
     if (!g) { renderAll(); return; }
 
     if (loadFromLocal(g)) {
       renderAll();
-      setAutoSave('as-pending', '📱 Restored from device — tap an action to continue');
+      setAutoSave('as-pending', '📱 Restored from device');
       return;
     }
+    // Load from Sheets
     fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(g))
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.status === 'ok' && data.data && data.data.length) {
-          slots = [];
+          var active = [], dis = [];
           for (var i = 0; i < data.data.length; i++) {
             var p = data.data[i];
             var history = [];
             for (var dd = 0; dd < (p.dots||0); dd++) history.push('D');
             for (var rr = 0; rr < (p.runs||0); rr++) history.push('R');
-            slots.push({ id: i, name: p.name, history: history, isOut: p.isOut || false });
+            if (p.isOut) {
+              dis.push({ name: p.name, dots: p.dots||0, balls: p.balls||0, pct: (p.balls||0) > 0 ? Math.round((p.dots||0)/(p.balls||0)*100) : 0 });
+            } else {
+              active.push({ name: p.name, history: history });
+            }
           }
-          while (slots.length < 2) slots.push({ id: nextId++, name: null, history: [], isOut: false });
-          nextId = Math.max(nextId, slots.length); actionStack = [];
+          dismissed = dis;
+          slots[0] = active[0] || { name:null, history:[] };
+          slots[1] = active[1] || { name:null, history:[] };
+          actionStack = [];
           setAutoSave('as-saved', 'Loaded from Sheets');
         }
         renderAll();
