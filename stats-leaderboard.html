@@ -214,7 +214,7 @@ function _batRows(data) {
   return data.map(function(p, i) {
     return '<tr>'
       + '<td><span class="rank-num ' + _rc(i) + '">' + (i+1) + '</span></td>'
-      + '<td class="col-player">' + p.name + _teamBadge(p) + '</td>'
+      + '<td class="col-player">' + p.name + '</td>'
       + (_showTeam() ? '<td class="col-player" style="font-size:11px;color:#6B7280;font-weight:400">' + (p.team||'') + '</td>' : '')
       + '<td>' + (p.matches||0) + '</td>'
       + '<td>' + (p.innings||0) + '</td>'
@@ -254,7 +254,7 @@ function _bowlRows(data) {
       ? (_ovrsToDecimal(p.overs) / p.innings / 6).toFixed(1) : '-';
     return '<tr>'
       + '<td><span class="rank-num ' + _rc(i) + '">' + (i+1) + '</span></td>'
-      + '<td class="col-player">' + p.name + _teamBadge(p) + '</td>'
+      + '<td class="col-player">' + p.name + '</td>'
       + (_showTeam() ? '<td class="col-player" style="font-size:11px;color:#6B7280;font-weight:400">' + (p.team||'') + '</td>' : '')
       + '<td>' + (p.matches||0) + '</td>'
       + '<td>' + (p.innings||0) + '</td>'
@@ -289,7 +289,7 @@ function _ptsRows(data) {
   return data.map(function(p, i) {
     return '<tr>'
       + '<td><span class="rank-num ' + _rc(i) + '">' + (i+1) + '</span></td>'
-      + '<td class="col-player">' + p.name + _teamBadge(p) + '</td>'
+      + '<td class="col-player">' + p.name + '</td>'
       + (_showTeam() ? '<td class="col-player" style="font-size:11px;color:#6B7280;font-weight:400">' + (p.team||'') + '</td>' : '')
       + '<td>' + (p.matches||0) + '</td>'
       + '<td>' + (p.mom||0) + '</td>'
