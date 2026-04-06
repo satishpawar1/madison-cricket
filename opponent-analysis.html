@@ -526,8 +526,6 @@ function renderTab(tab, opp) {
         + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
         + '<td>' + (p.economy||'-') + '</td>'
         + '<td>' + (p.average||'-') + '</td>'
-        + '<td>' + (p.fiveWickets||0) + '</td>'
-        + '<td>' + (p.fourWickets||0) + '</td>'
         + '</tr>';
     }).join('');
     document.getElementById('bowlingList').innerHTML =
@@ -535,7 +533,6 @@ function renderTab(tab, opp) {
       + '<th>#</th><th class="col-player">Player</th>'
       + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Runs</th>'
       + '<th>Wkts</th><th>Econ</th><th>Avg</th>'
-      + '<th>5W</th><th>4W</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
 }
