@@ -130,6 +130,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .stats-table .rank-num.r2 { color: #9CA3AF; }
 .stats-table .rank-num.r3 { color: #CD7C2F; }
 .stats-table tr.threat-row td { background: #FFF8F8; }
+.threat-legend {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #6B7280; margin-bottom: 6px; padding: 0 2px;
+}
 .threat-dot {
   display: inline-block; width: 6px; height: 6px; border-radius: 50%;
   background: #DC2626; margin-left: 5px; vertical-align: middle; flex-shrink: 0;
@@ -609,15 +613,17 @@ function renderTab(tab, opp) {
     _batData = opp.batting || [];
     if (!_batData.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
     var sorted = _sortData(_batData, _batSort.key, _batSort.dir);
-    document.getElementById('battingList').innerHTML =
-      '<table class="stats-table"><thead><tr>' + _batHeaders(_batSort.key, _batSort.dir) + '</tr></thead>'
+    var batLegend = '<div class="threat-legend"><span class="threat-dot"></span> Avg ≥ 25 &amp; SR &gt; 100</div>';
+    document.getElementById('battingList').innerHTML = batLegend
+      + '<table class="stats-table"><thead><tr>' + _batHeaders(_batSort.key, _batSort.dir) + '</tr></thead>'
       + '<tbody>' + _renderBatRows(sorted) + '</tbody></table>';
   } else {
     _bowlData = opp.bowling || [];
     if (!_bowlData.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
     var sorted = _sortData(_bowlData, _bowlSort.key, _bowlSort.dir);
-    document.getElementById('bowlingList').innerHTML =
-      '<table class="stats-table"><thead><tr>' + _bowlHeaders(_bowlSort.key, _bowlSort.dir) + '</tr></thead>'
+    var bowlLegend = '<div class="threat-legend"><span class="threat-dot"></span> Econ ≤ 7 &amp; Avg ≤ 12</div>';
+    document.getElementById('bowlingList').innerHTML = bowlLegend
+      + '<table class="stats-table"><thead><tr>' + _bowlHeaders(_bowlSort.key, _bowlSort.dir) + '</tr></thead>'
       + '<tbody>' + _renderBowlRows(sorted) + '</tbody></table>';
   }
 }
