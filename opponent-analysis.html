@@ -522,14 +522,10 @@ function renderTab(tab, opp) {
         + '<td>' + (p.matches||0) + '</td>'
         + '<td>' + (p.innings||0) + '</td>'
         + '<td>' + (p.overs||0) + '</td>'
-        + '<td>' + (p.maidens||0) + '</td>'
         + '<td>' + (p.runs||0) + '</td>'
         + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
-        + '<td>' + (p.bestFigures||'-') + '</td>'
-        + '<td>' + (p.hattricks||0) + '</td>'
         + '<td>' + (p.economy||'-') + '</td>'
         + '<td>' + (p.average||'-') + '</td>'
-        + '<td>' + (p.strikeRate||'-') + '</td>'
         + '<td>' + (p.fiveWickets||0) + '</td>'
         + '<td>' + (p.fourWickets||0) + '</td>'
         + '</tr>';
@@ -537,8 +533,8 @@ function renderTab(tab, opp) {
     document.getElementById('bowlingList').innerHTML =
       '<table class="stats-table"><thead><tr>'
       + '<th>#</th><th class="col-player">Player</th>'
-      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Mdns</th><th>Runs</th>'
-      + '<th>Wkts</th><th>BBF</th><th>Hat</th><th>Econ</th><th>Avg</th><th>SR</th>'
+      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Runs</th>'
+      + '<th>Wkts</th><th>Econ</th><th>Avg</th>'
       + '<th>5W</th><th>4W</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
