@@ -108,6 +108,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .game-card-title { font-size: 13px; font-weight: 700; }
 .game-card-meta { font-size: 11px; color: #9CA3AF; }
+.game-summary-strip {
+  display: flex; gap: 16px; padding: 7px 14px;
+  background: #F8FAFF; border-bottom: 1px solid #F3F4F6;
+  font-size: 12px;
+}
+.gss-item { display: flex; flex-direction: column; align-items: center; }
+.gss-val { font-weight: 700; color: #1A56B0; font-size: 15px; line-height: 1; }
+.gss-val.red { color: #DC2626; }
+.gss-val.green { color: #16A34A; }
+.gss-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.gss-div { width: 1px; background: #E5E7EB; align-self: stretch; margin: 2px 0; }
 .game-dot-rows { padding: 6px 0; }
 .gdr {
   display: flex; align-items: center; justify-content: space-between;
@@ -353,10 +364,21 @@ function renderTeam(team) {
         }).join('')
       : '<div class="no-data" style="padding:0.75rem 1rem">No data recorded for this game.</div>';
 
+    var totalBalls = (g.players || []).reduce(function(sum, p) { return sum + (p.balls || 0); }, 0);
+    var dotPct = totalBalls > 0 ? Math.round(total / totalBalls * 100) : 0;
+    var dotPctClass = dotPct >= 40 ? 'red' : (dotPct <= 25 ? 'green' : '');
+
     return '<div class="game-card">'
       + '<div class="game-card-header">'
       + '<span class="game-card-title">' + (g.game || 'Game') + '</span>'
       + '<span class="game-card-meta">' + total + ' total dots</span>'
+      + '</div>'
+      + '<div class="game-summary-strip">'
+      + '<div class="gss-item"><span class="gss-val">' + totalBalls + '</span><span class="gss-lbl">Balls</span></div>'
+      + '<div class="gss-div"></div>'
+      + '<div class="gss-item"><span class="gss-val">' + total + '</span><span class="gss-lbl">Dots</span></div>'
+      + '<div class="gss-div"></div>'
+      + '<div class="gss-item"><span class="gss-val ' + dotPctClass + '">' + dotPct + '%</span><span class="gss-lbl">Dot %</span></div>'
       + '</div>'
       + '<div class="game-dot-rows">' + playersHtml + '</div>'
       + '</div>';
