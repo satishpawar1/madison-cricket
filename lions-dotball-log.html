@@ -36,6 +36,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .gs select:focus { outline: none; border-color: #1A56B0; }
 
+/* ── Auto-save status bar ── */
+.autosave-bar {
+  display: none; align-items: center; gap: 6px;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid #F3F4F6;
+  font-size: 12px;
+}
+.autosave-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.as-saved   .autosave-dot { background: #1A8F6A; }
+.as-pending .autosave-dot { background: #F59E0B; }
+.as-saving  .autosave-dot { background: #9CA3AF; animation: pulse 1s infinite; }
+.as-error   .autosave-dot { background: #EF4444; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.autosave-text { color: #6B7280; }
+.as-saved   .autosave-text { color: #1A8F6A; }
+.as-pending .autosave-text { color: #92400E; }
+.as-error   .autosave-text { color: #991B1B; }
+
 .banner { border-radius: 10px; padding: 11px 14px; font-size: 13px; margin-bottom: 1rem; display: none; line-height: 1.5; font-weight: 500; }
 .b-lock { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
 .b-pre  { background: #E8F1FC; color: #1A56B0; border-left: 3px solid #1A56B0; }
@@ -59,8 +79,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .counter-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .cnt-btn {
-  width: 36px; height: 36px; border-radius: 10px; border: none;
-  font-size: 20px; font-weight: 700; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 10px; border: none;
+  font-size: 22px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   touch-action: manipulation; user-select: none;
   transition: opacity 0.1s;
@@ -72,8 +92,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .cnt-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .cnt-val {
-  font-size: 20px; font-weight: 800; color: #111827;
-  min-width: 34px; text-align: center;
+  font-size: 22px; font-weight: 800; color: #111827;
+  min-width: 36px; text-align: center;
 }
 .cnt-val.has-dots { color: #1A56B0; }
 
@@ -119,6 +139,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <label>Game</label>
       <select id="gs"><option value="">— pick a game —</option></select>
     </div>
+    <!-- auto-save status sits inside the game card -->
+    <div class="autosave-bar" id="autosaveBar">
+      <div class="autosave-dot"></div>
+      <span class="autosave-text" id="autosaveText"></span>
+    </div>
   </div>
 
   <div class="banner" id="banner"></div>
@@ -130,7 +155,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="summary" id="summary"></div>
       <hr class="sep">
       <div class="acts">
-        <button class="btn btn-primary" id="saveBtn" onclick="submitDots()">Save to Sheets</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="submitDots(false)">Save to Sheets</button>
         <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
       </div>
       <div class="msg" id="msg"></div>
@@ -143,7 +168,64 @@ var CFG = MCC_CONFIG.lions;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var PL = CFG.players;
 var isLocked = false;
+var autoSaveTimer = null;
+var LOCAL_KEY_PREFIX = 'dotballs_lions_';
 
+// ── localStorage helpers ──────────────────────────────────────────
+function saveToLocal(game) {
+  if (!game || isLocked) return;
+  var state = {};
+  PL.forEach(function(p) {
+    var el = document.getElementById('dots-' + p);
+    state[p] = el ? (parseInt(el.textContent) || 0) : 0;
+  });
+  try {
+    localStorage.setItem(LOCAL_KEY_PREFIX + game, JSON.stringify({ ts: Date.now(), state: state }));
+  } catch(e) {}
+}
+
+function loadFromLocal(game) {
+  try {
+    var raw = localStorage.getItem(LOCAL_KEY_PREFIX + game);
+    if (!raw) return null;
+    var parsed = JSON.parse(raw);
+    // Convert to same format as Sheets response: [{name, dots}]
+    return Object.keys(parsed.state).map(function(name) {
+      return { name: name, dots: parsed.state[name] };
+    });
+  } catch(e) { return null; }
+}
+
+function clearLocal(game) {
+  try { localStorage.removeItem(LOCAL_KEY_PREFIX + game); } catch(e) {}
+}
+
+// ── Auto-save status indicator ────────────────────────────────────
+function setAutoSaveStatus(state, text) {
+  var bar = document.getElementById('autosaveBar');
+  bar.style.display = 'flex';
+  bar.className = 'autosave-bar ' + state;
+  document.getElementById('autosaveText').textContent = text;
+}
+
+// ── Schedule auto-save to Sheets ─────────────────────────────────
+function scheduleAutoSave(game) {
+  if (isLocked) return;
+  setAutoSaveStatus('as-pending', 'Unsaved changes — saving in a moment...');
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(function() {
+    submitDots(true, game);
+  }, 8000); // 8 seconds after last tap
+}
+
+// ── On every counter change ───────────────────────────────────────
+function onCounterChange(game) {
+  saveToLocal(game);      // instant — survives browser close
+  scheduleAutoSave(game); // deferred — syncs to Sheets
+  updateSummary();
+}
+
+// ── Page init ─────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
   var sel = document.getElementById('gs');
   var today = new Date(); today.setHours(0,0,0,0);
@@ -162,11 +244,18 @@ window.addEventListener('DOMContentLoaded', function() {
 function onGameChange() {
   var game = this.value;
   var section = document.getElementById('playerSection');
-  if (!game) { section.style.display='none'; hideBanner(); return; }
+  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+
+  if (!game) {
+    section.style.display = 'none';
+    hideBanner();
+    document.getElementById('autosaveBar').style.display = 'none';
+    return;
+  }
 
   var today = new Date(); today.setHours(0,0,0,0);
   var gCfg = null;
-  for (var i=0; i<CFG.games.length; i++) {
+  for (var i = 0; i < CFG.games.length; i++) {
     if (CFG.games[i].name === game) { gCfg = CFG.games[i]; break; }
   }
   var gdParts = gCfg.gameDate.split('-');
@@ -176,32 +265,48 @@ function onGameChange() {
   var isPast = today > gameDate;
   isLocked = isPast && daysSince > 5;
 
-  showBanner('b-load', 'Loading dot ball data from Google Sheets...');
-  section.style.display = 'block';
-  document.getElementById('saveBtn').disabled = true;
+  // Check localStorage first — most recent local edits take priority
+  var localData = isLocked ? null : loadFromLocal(game);
 
-  fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(game))
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
-      buildRows(game, isPast, daysSince, liveData);
-    })
-    .catch(function() {
-      buildRows(game, isPast, daysSince, null);
-    });
+  if (localData && localData.some(function(p) { return p.dots > 0; })) {
+    // Have local data — use it immediately, no spinner needed
+    buildRows(game, isPast, daysSince, localData, true);
+    setAutoSaveStatus('as-pending', 'Local data restored — tap + to continue, or save to Sheets.');
+    // Also fetch from Sheets in background but don't overwrite local
+  } else {
+    // No local data — fetch from Sheets
+    showBanner('b-load', 'Loading dot ball data from Google Sheets...');
+    section.style.display = 'block';
+    document.getElementById('saveBtn').disabled = true;
+
+    fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(game))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var sheetsData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
+        buildRows(game, isPast, daysSince, sheetsData, false);
+        if (!isLocked && sheetsData && sheetsData.some(function(p){return p.dots>0;})) {
+          setAutoSaveStatus('as-saved', 'Loaded from Sheets. Tap + to start logging.');
+        }
+      })
+      .catch(function() {
+        buildRows(game, isPast, daysSince, null, false);
+      });
+  }
 }
 
-function buildRows(game, isPast, daysSince, data) {
+function buildRows(game, isPast, daysSince, data, fromLocal) {
   var hasPrefill = data && data.some(function(p) { return p.dots > 0; });
 
   if (isLocked) {
     showBanner('b-lock', '🔒 This game was played ' + daysSince + ' days ago — dot ball data is locked.');
+  } else if (fromLocal) {
+    showBanner('b-pre', '📱 Restored from this device. Tap + to continue logging.');
   } else if (hasPrefill) {
-    showBanner('b-pre', 'Pre-filled with recorded data. Edit and save to update.');
+    showBanner('b-pre', 'Pre-filled with recorded data. Edit to update.');
   } else if (isPast) {
     showBanner('b-past', 'Past game — enter dot ball data below.');
   } else {
-    showBanner('b-new', 'Live logging mode — tap + to add dot balls per player as the game progresses.');
+    showBanner('b-new', 'Live logging mode — tap + per player. Auto-saves as you go.');
   }
 
   var rows = document.getElementById('prows');
@@ -210,7 +315,7 @@ function buildRows(game, isPast, daysSince, data) {
   PL.forEach(function(p) {
     var pre = null;
     if (data) {
-      for (var i=0; i<data.length; i++) {
+      for (var i = 0; i < data.length; i++) {
         if (data[i].name === p) { pre = data[i]; break; }
       }
     }
@@ -248,14 +353,14 @@ function buildRows(game, isPast, daysSince, data) {
         v++;
         valSpan.textContent = v;
         valSpan.className = 'cnt-val has-dots';
-        updateSummary();
+        onCounterChange(game);
       });
       minusBtn.addEventListener('click', function() {
         var v = parseInt(valSpan.textContent) || 0;
         if (v > 0) v--;
         valSpan.textContent = v;
         valSpan.className = 'cnt-val' + (v > 0 ? ' has-dots' : '');
-        updateSummary();
+        onCounterChange(game);
       });
     })(p, valEl);
 
@@ -268,13 +373,13 @@ function buildRows(game, isPast, daysSince, data) {
     rows.appendChild(row);
   });
 
+  document.getElementById('playerSection').style.display = 'block';
   document.getElementById('saveBtn').disabled = isLocked;
   updateSummary();
 }
 
 function updateSummary() {
-  var total = 0;
-  var withDots = 0;
+  var total = 0, withDots = 0;
   PL.forEach(function(p) {
     var v = parseInt(document.getElementById('dots-' + p).textContent) || 0;
     total += v;
@@ -289,34 +394,61 @@ function updateSummary() {
 
 function clearAll() {
   if (isLocked) { show('This game is locked.', 'err'); return; }
+  var game = document.getElementById('gs').value;
   PL.forEach(function(p) {
     var el = document.getElementById('dots-' + p);
     el.textContent = 0;
     el.className = 'cnt-val';
   });
+  clearLocal(game);
+  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+  document.getElementById('autosaveBar').style.display = 'none';
   updateSummary();
 }
 
-function submitDots() {
-  if (isLocked) { show('This game is locked.', 'err'); return; }
-  var game = document.getElementById('gs').value;
-  if (!game) { show('Pick a game first!', 'err'); return; }
+// silent=true: called by auto-save timer (no big message)
+// silent=false: called by manual Save button (shows message)
+function submitDots(silent, gameOverride) {
+  if (isLocked) { if (!silent) show('This game is locked.', 'err'); return; }
+  var game = gameOverride || document.getElementById('gs').value;
+  if (!game) { if (!silent) show('Pick a game first!', 'err'); return; }
+
   var dotballs = [];
   PL.forEach(function(p) {
     var dots = parseInt(document.getElementById('dots-' + p).textContent) || 0;
     dotballs.push({ name: p, dots: dots });
   });
-  show('Saving...', 'info');
+
+  if (silent) {
+    setAutoSaveStatus('as-saving', 'Saving to Sheets...');
+  } else {
+    show('Saving...', 'info');
+  }
+
   fetch(SCRIPT_URL, {
     method: 'POST',
     body: JSON.stringify({ type: 'dotballs', team: 'Lions', game: game, dotballs: dotballs })
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {
-    if (d.status === 'ok') show('Saved! Google Sheet updated.', 'ok');
-    else show('Error: ' + d.message, 'err');
+    if (d.status === 'ok') {
+      clearLocal(game); // Sheets is now authoritative, clear local copy
+      var t = new Date().toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+      if (silent) {
+        setAutoSaveStatus('as-saved', '✓ Auto-saved to Sheets at ' + t);
+      } else {
+        show('Saved! Google Sheet updated.', 'ok');
+        setAutoSaveStatus('as-saved', '✓ Saved to Sheets at ' + t);
+      }
+    } else {
+      if (silent) setAutoSaveStatus('as-error', 'Auto-save failed — data safe on this device');
+      else show('Error: ' + d.message, 'err');
+    }
   })
-  .catch(function() { show('Network error. Try again.', 'err'); });
+  .catch(function() {
+    if (silent) setAutoSaveStatus('as-error', 'No connection — data safe on this device, will retry next tap');
+    else show('Network error. Try again.', 'err');
+  });
 }
 
 function showBanner(cls, txt) {
