@@ -714,9 +714,13 @@ window.addEventListener('DOMContentLoaded', function() {
     if (!g) { renderAll(); return; }
 
     if (loadFromLocal(g)) {
-      renderAll();
-      setAutoSave('as-pending', '📱 Restored from device');
-      return;
+      var hasLocalData = dismissed.length > 0 || slots[0].name || slots[1].name;
+      if (hasLocalData) {
+        renderAll();
+        setAutoSave('as-pending', '📱 Restored from device');
+        return;
+      }
+      // Empty local cache — fall through to Sheets / preset
     }
     // Load from Sheets
     fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(g))
