@@ -208,7 +208,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="stat-card">
         <div class="num" id="statBowlers" style="color:#1A8F6A">—</div>
         <div class="lbl">Main bowlers</div>
-        <div class="lbl" style="margin-top:3px;font-size:9px;color:#9CA3AF">Econ ≤ 7 &amp; Avg ≤ 12 &amp; 2+ ovrs/inn</div>
+        <div class="lbl" style="margin-top:3px;font-size:9px;color:#9CA3AF">Econ ≤ 7 &amp; Avg ≤ 12 &amp; 3+ ovrs/inn</div>
       </div>
       <div class="stat-card">
         <div class="num" id="statTopRuns" style="color:#1A56B0">—</div>
@@ -374,7 +374,7 @@ function renderStrength(team, opp) {
   }
   var mainBowlers = bowl.filter(function(p) {
     var avgBalls = oversToAverageBallsStr(p.overs, p.innings || 1);
-    return avgBalls >= 12 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
+    return avgBalls >= 18 && ((p.economy !== null && p.economy <= 7) || (p.average !== null && p.average < 10));
   }).length;
 
   // Look up standings for win rate + NRR
