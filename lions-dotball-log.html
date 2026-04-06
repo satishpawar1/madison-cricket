@@ -677,7 +677,7 @@ function loadPreset(g) {
       if (slotIdx < 2) {
         var hist = [];
         for (var d = 0; d < p.dots; d++) hist.push('D');
-        for (var r = 0; r < p.runs; r++) hist.push('R');
+        for (var r = 0; r < (p.balls - p.dots); r++) hist.push('R');
         slots[slotIdx] = { name: p.name, history: hist };
         slotIdx++;
       }
