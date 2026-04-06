@@ -7,244 +7,251 @@
 <title>Madison Tigers — Dot Ball Tracker</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  font-family: 'Courier New', Courier, monospace;
-  background: #0d1117;
-  color: #c9d1d9;
-  min-height: 100vh;
-  padding: 1.5rem 1rem 3rem;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
 
-.hdr-team {
-  text-align: center; font-size: 11px; letter-spacing: 0.28em;
-  color: #8bc34a; text-transform: uppercase; margin-bottom: 8px;
+.page-header {
+  background: linear-gradient(150deg, #C05000 0%, #7A2D00 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
 }
-.hdr-title {
-  text-align: center; font-size: 26px; font-weight: 900;
-  color: #e8e8e8; letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 1.25rem;
-}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p  { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 540px; margin: 0 auto; }
 
 /* Game selector */
-.game-bar {
-  display: flex; align-items: center; gap: 10px;
-  justify-content: center; margin-bottom: 1.25rem; flex-wrap: wrap;
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
 }
-.game-bar label { font-size: 10px; letter-spacing: 0.15em; color: #4b5563; text-transform: uppercase; }
-.game-bar select {
-  font-family: 'Courier New', monospace; font-size: 12px;
-  padding: 7px 12px; border: 1px solid #2d3748; border-radius: 6px;
-  background: #161c27; color: #e8e8e8; flex: 1; max-width: 300px;
+.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
+.gs select {
+  font-size: 14px; padding: 10px 12px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; flex: 1; min-width: 200px; color: #111827;
   -webkit-appearance: none; appearance: none;
 }
-.game-bar select:focus { outline: none; border-color: #4ade80; }
+.gs select:focus { outline: none; border-color: #C05000; }
 
-/* Summary box */
-.summary-box {
-  border: 1px solid #2d3748; border-radius: 10px;
-  padding: 14px 24px; margin: 0 auto 1.5rem;
-  max-width: 440px; display: flex;
-  align-items: center; justify-content: center; gap: 12px;
-  background: #161c27;
+/* Auto-save status */
+.autosave-row { display: none; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F3F4F6; font-size: 12px; }
+.as-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.as-pending .as-dot { background: #F59E0B; }
+.as-saving  .as-dot { background: #9CA3AF; animation: blink 1s infinite; }
+.as-saved   .as-dot { background: #16A34A; }
+.as-error   .as-dot { background: #DC2626; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.as-pending .as-text { color: #92400E; }
+.as-saving  .as-text { color: #6B7280; }
+.as-saved   .as-text { color: #16A34A; }
+.as-error   .as-text { color: #DC2626; }
+
+/* Summary */
+.summary-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 14px 20px; margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: space-around;
 }
-.sum-grp { display: flex; align-items: baseline; gap: 8px; }
 .sum-item { text-align: center; }
-.sum-label { font-size: 9px; letter-spacing: 0.18em; color: #4b5563; text-transform: uppercase; margin-bottom: 3px; }
-.sum-val { font-size: 30px; font-weight: 800; line-height: 1; }
-.sum-val.dots  { color: #e05252; }
-.sum-val.balls { color: #e8e8e8; }
-.sum-val.pct   { color: #4ade80; }
-.sum-sep { font-size: 28px; color: #2d3748; align-self: center; padding-top: 6px; }
-.sum-divider { width: 1px; height: 40px; background: #2d3748; }
+.sum-val { font-size: 28px; font-weight: 800; line-height: 1; }
+.sum-val.dots  { color: #DC2626; }
+.sum-val.balls { color: #111827; }
+.sum-val.pct   { color: #16A34A; }
+.sum-lbl { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+.sum-divider { width: 1px; height: 36px; background: #F3F4F6; }
 
-/* Batter cards */
-.batter-cards { max-width: 500px; margin: 0 auto; }
+/* Batter card */
 .batter-card {
-  background: #161c27; border: 1px solid #2d3748;
-  border-radius: 12px; margin-bottom: 1rem; overflow: hidden;
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1rem; overflow: hidden;
   transition: opacity 0.2s;
 }
-.batter-card.is-out { opacity: 0.45; }
+.batter-card.is-out { opacity: 0.5; }
 
-.card-header {
+.card-hdr {
   display: flex; align-items: center; gap: 10px;
-  padding: 11px 14px 10px;
-  border-bottom: 1px dashed #2d3748;
+  padding: 12px 14px 10px; border-bottom: 1px solid #F3F4F6;
 }
-.card-header.selectable { cursor: pointer; }
-.card-header.selectable:active { background: #1c2535; }
+.card-hdr.selectable { cursor: pointer; }
+.card-hdr.selectable:active { background: #F9FAFB; }
 
 .slot-badge {
-  font-size: 10px; font-weight: 700;
-  background: #1a2d0e; color: #8bc34a;
-  padding: 2px 7px; border-radius: 4px;
-  letter-spacing: 0.06em; flex-shrink: 0;
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  background: #FEF0E6; color: #C05000; flex-shrink: 0;
 }
-.batter-name {
-  font-size: 14px; font-weight: 700;
-  letter-spacing: 0.05em; flex: 1; color: #e8e8e8;
-}
-.batter-name.placeholder { color: #3d4756; font-weight: 400; font-size: 13px; }
+.batter-name { font-size: 14px; font-weight: 700; flex: 1; color: #111827; }
+.batter-name.placeholder { color: #9CA3AF; font-weight: 400; }
 .out-badge {
-  font-size: 10px; font-weight: 700;
-  background: #2d0e0e; color: #e05252;
-  padding: 2px 7px; border-radius: 4px;
-  letter-spacing: 0.1em;
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  background: #FEE2E2; color: #991B1B; letter-spacing: 0.06em; flex-shrink: 0;
 }
 .x-btn {
-  background: none; border: none; color: #3d4756;
-  font-size: 18px; cursor: pointer; padding: 0 2px;
-  line-height: 1; flex-shrink: 0; font-family: inherit;
+  background: none; border: none; color: #D1D5DB; font-size: 20px;
+  cursor: pointer; padding: 0 2px; line-height: 1; flex-shrink: 0;
   transition: color 0.12s;
 }
-.x-btn:hover, .x-btn:active { color: #e05252; }
+.x-btn:hover, .x-btn:active { color: #991B1B; }
 
+/* Stats row */
 .card-stats {
   display: flex; align-items: center; gap: 14px;
-  padding: 11px 14px 8px;
+  padding: 12px 14px 8px;
 }
-.stat-block { min-width: 44px; }
+.stat-blk { min-width: 44px; }
 .stat-val { font-size: 28px; font-weight: 800; line-height: 1; }
-.stat-val.dots  { color: #e05252; }
-.stat-val.balls { color: #e8e8e8; }
-.stat-lbl { font-size: 9px; letter-spacing: 0.14em; color: #3d4756; text-transform: uppercase; margin-top: 3px; }
+.stat-val.d { color: #DC2626; }
+.stat-val.b { color: #111827; }
+.stat-lbl { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
 
 .rate-wrap { flex: 1; }
-.rate-bar { height: 5px; background: #1a2535; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
-.rate-fill { height: 100%; background: #8bc34a; border-radius: 3px; transition: width 0.25s; }
-.rate-lbl { font-size: 11px; color: #4b5563; letter-spacing: 0.04em; }
+.rate-bar { height: 6px; background: #F3F4F6; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+.rate-fill { height: 100%; background: linear-gradient(90deg, #DC2626, #F87171); border-radius: 3px; transition: width 0.25s; }
+.rate-lbl { font-size: 11px; color: #9CA3AF; }
 
-.card-btns {
+/* Action buttons */
+.card-btns-main {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  padding: 8px 14px 14px;
+  padding: 4px 14px 8px;
 }
+.card-btns-out { padding: 0 14px 14px; }
+
 .action-btn {
-  font-family: 'Courier New', monospace;
-  font-size: 15px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  padding: 18px 10px; border: none; border-radius: 8px;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 18px 10px; border: none; border-radius: 10px;
   cursor: pointer; touch-action: manipulation; user-select: none;
   transition: filter 0.08s, transform 0.08s;
+  width: 100%;
 }
-.action-btn:active { filter: brightness(1.25); transform: scale(0.97); }
-.action-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
-.btn-dot { background: #5c1a1a; color: #e05252; }
-.btn-run { background: #1a4d1a; color: #4ade80; }
+.action-btn:active { filter: brightness(0.92); transform: scale(0.97); }
+.action-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+.btn-dot { background: #FEE2E2; color: #991B1B; }
+.btn-run { background: #DCFCE7; color: #166534; }
+.btn-out {
+  background: #fff; color: #D97706;
+  border: 1.5px solid #FDE68A; font-size: 13px;
+  padding: 10px; border-radius: 10px; letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.btn-out:active { background: #FFFBEB; }
 
-/* Bottom action bar */
+/* Bottom bar */
 .bottom-bar {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;
-  max-width: 500px; margin: 0.5rem auto 0;
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 0.25rem;
 }
 .bar-btn {
-  font-family: 'Courier New', monospace;
-  font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
-  padding: 13px 4px; border-radius: 8px; cursor: pointer;
-  background: transparent; text-align: center;
-  touch-action: manipulation; transition: filter 0.12s;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 12px 4px; border-radius: 10px; cursor: pointer;
+  touch-action: manipulation; text-align: center; transition: background 0.12s;
 }
-.bar-btn:active { filter: brightness(1.35); }
-.bar-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-.bb-add   { border: 1px dashed #4ade80; color: #4ade80; }
-.bb-undo  { border: 1px dashed #4b5563; color: #6b7280; }
-.bb-copy  { border: 1px dashed #818cf8; color: #818cf8; }
-.bb-reset { border: 1px dashed #4b5563; color: #6b7280; }
+.bar-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.bb-add   { background: #E2F5EE; color: #0F5C43; border: none; }
+.bb-undo  { background: #F3F4F6; color: #6B7280; border: none; }
+.bb-copy  { background: #EDE9FE; color: #5B21B6; border: none; }
+.bb-reset { background: #F3F4F6; color: #6B7280; border: none; }
+.bar-btn:active { filter: brightness(0.93); }
 
-/* Auto-save bar */
-.autosave-bar {
-  text-align: center; font-size: 10px; letter-spacing: 0.08em;
-  margin-top: 1rem; display: none; max-width: 500px; margin-left: auto; margin-right: auto;
-}
-.autosave-bar.as-pending { color: #92400E; display: block; }
-.autosave-bar.as-saving  { color: #4b5563; display: block; }
-.autosave-bar.as-saved   { color: #4ade80; display: block; }
-.autosave-bar.as-error   { color: #e05252; display: block; }
-
-/* Selector overlay */
+/* Batter selector overlay */
 .overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-  display: none; align-items: center; justify-content: center; z-index: 100;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: flex-end; justify-content: center; z-index: 100;
 }
 .overlay.open { display: flex; }
 .sel-box {
-  background: #161c27; border: 1px solid #2d3748; border-radius: 14px;
-  padding: 20px; width: calc(100% - 2rem); max-width: 340px;
-  max-height: 80vh; overflow-y: auto;
+  background: #fff; border-radius: 20px 20px 0 0;
+  padding: 20px 16px 32px; width: 100%; max-width: 540px;
+  max-height: 75vh; overflow-y: auto;
 }
 .sel-title {
-  font-size: 10px; letter-spacing: 0.2em; color: #8bc34a;
-  text-transform: uppercase; margin-bottom: 14px; text-align: center;
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 14px; text-align: center;
 }
 .p-opt {
-  display: block; width: 100%;
-  font-family: 'Courier New', monospace; font-size: 14px; font-weight: 600;
-  text-align: left; background: #1c2535; border: 1px solid #2d3748;
-  color: #e8e8e8; padding: 12px 16px; border-radius: 8px;
+  display: block; width: 100%; font-size: 14px; font-weight: 600;
+  text-align: left; background: #F9FAFB; border: 1.5px solid #F3F4F6;
+  color: #111827; padding: 13px 16px; border-radius: 10px;
   cursor: pointer; margin-bottom: 6px; transition: background 0.1s;
 }
-.p-opt:active { background: #243040; }
-.p-opt:disabled { opacity: 0.25; cursor: not-allowed; }
+.p-opt:active { background: #FEF0E6; border-color: #C05000; }
+.p-opt:disabled { opacity: 0.3; cursor: not-allowed; }
 .sel-cancel {
   display: block; width: 100%; margin-top: 10px;
-  font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 0.1em;
-  background: none; border: 1px dashed #2d3748; color: #4b5563;
-  padding: 10px; border-radius: 8px; cursor: pointer; text-align: center;
+  font-size: 13px; font-weight: 500;
+  background: #F3F4F6; border: none; color: #6B7280;
+  padding: 12px; border-radius: 10px; cursor: pointer; text-align: center;
 }
 
-/* Confirm dialog */
+/* Confirm overlay */
 .confirm-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   display: none; align-items: center; justify-content: center; z-index: 200;
 }
 .confirm-overlay.open { display: flex; }
 .confirm-box {
-  background: #161c27; border: 1px solid #2d3748; border-radius: 14px;
-  padding: 24px 20px; width: calc(100% - 2rem); max-width: 320px; text-align: center;
+  background: #fff; border-radius: 16px; padding: 24px 20px;
+  width: calc(100% - 2rem); max-width: 320px; text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
-.confirm-msg { font-size: 14px; color: #e8e8e8; margin-bottom: 20px; line-height: 1.6; letter-spacing: 0.03em; }
+.confirm-msg { font-size: 14px; color: #374151; margin-bottom: 20px; line-height: 1.6; }
 .confirm-btns { display: flex; gap: 10px; }
 .confirm-yes {
-  flex: 1; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700;
-  letter-spacing: 0.1em; padding: 12px; border-radius: 8px;
-  border: none; background: #5c1a1a; color: #e05252; cursor: pointer;
+  flex: 1; font-size: 14px; font-weight: 600; padding: 12px;
+  border-radius: 10px; border: none; background: #FEE2E2; color: #991B1B; cursor: pointer;
 }
 .confirm-no {
-  flex: 1; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700;
-  letter-spacing: 0.1em; padding: 12px; border-radius: 8px;
-  border: 1px solid #2d3748; background: transparent; color: #6b7280; cursor: pointer;
+  flex: 1; font-size: 14px; font-weight: 600; padding: 12px;
+  border-radius: 10px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer;
 }
 </style>
 </head>
 <body>
 
-<div class="hdr-team">Madison Tigers</div>
-<div class="hdr-title">Dot Ball Tracker</div>
-
-<div class="game-bar">
-  <label>Game</label>
-  <select id="gameSelect"><option value="">— select game —</option></select>
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🐯 Tigers — Dot Ball Tracker</h2>
+    <p>Log dot balls &amp; runs per batter</p>
+  </div>
 </div>
 
-<div class="summary-box">
-  <div class="sum-item"><div class="sum-label">Dots</div><div class="sum-val dots" id="sumDots">0</div></div>
-  <div class="sum-sep">/</div>
-  <div class="sum-item"><div class="sum-label">Balls</div><div class="sum-val balls" id="sumBalls">0</div></div>
-  <div class="sum-divider"></div>
-  <div class="sum-item"><div class="sum-label">Dot%</div><div class="sum-val pct" id="sumPct">0%</div></div>
+<div class="content">
+
+  <div class="card">
+    <div class="gs">
+      <label>Game</label>
+      <select id="gameSelect"><option value="">— select game —</option></select>
+    </div>
+    <div class="autosave-row" id="autosaveRow">
+      <div class="as-dot"></div>
+      <span class="as-text" id="autosaveText"></span>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <div class="sum-item"><div class="sum-val dots" id="sumDots">0</div><div class="sum-lbl">Dots</div></div>
+    <div class="sum-divider"></div>
+    <div class="sum-item"><div class="sum-val balls" id="sumBalls">0</div><div class="sum-lbl">Balls</div></div>
+    <div class="sum-divider"></div>
+    <div class="sum-item"><div class="sum-val pct" id="sumPct">0%</div><div class="sum-lbl">Dot %</div></div>
+  </div>
+
+  <div id="batterCards"></div>
+
+  <div class="bottom-bar">
+    <button class="bar-btn bb-add"  onclick="addBatter()">+ Batter</button>
+    <button class="bar-btn bb-undo" id="undoBtn" onclick="undoLast()" disabled>Undo</button>
+    <button class="bar-btn bb-copy" onclick="copyStats()">Copy</button>
+    <button class="bar-btn bb-reset" onclick="askReset()">Reset</button>
+  </div>
+
 </div>
 
-<div class="batter-cards" id="batterCards"></div>
-
-<div class="bottom-bar">
-  <button class="bar-btn bb-add"  onclick="addBatter()">+ Batter</button>
-  <button class="bar-btn bb-undo" id="undoBtn" onclick="undoLast()" disabled>Undo</button>
-  <button class="bar-btn bb-copy" onclick="copyStats()">Copy</button>
-  <button class="bar-btn bb-reset" onclick="askReset()">Reset</button>
-</div>
-
-<div class="autosave-bar" id="autosaveBar"></div>
-
-<!-- Batter selector overlay -->
+<!-- Batter selector -->
 <div class="overlay" id="selOverlay">
   <div class="sel-box">
     <div class="sel-title">Select Batter</div>
@@ -253,7 +260,7 @@ body {
   </div>
 </div>
 
-<!-- Reset confirm overlay -->
+<!-- Reset confirm -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-msg">Reset all data for this game?<br>This cannot be undone.</div>
@@ -275,9 +282,8 @@ var slots = [
   { id: 1, name: null, history: [], isOut: false }
 ];
 var nextId = 2;
-var actionStack = []; // [{slotId, type:'D'|'R'}] — global undo stack
+var actionStack = []; // [{slotId, type:'D'|'R'}]
 var autoSaveTimer = null;
-var pendingSlotId = null;
 var LOCAL_KEY_PREFIX = 'dottrack_tigers_';
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -312,7 +318,7 @@ function buildCard(slot, idx) {
 
   // ── Header ──
   var hdr = document.createElement('div');
-  hdr.className = 'card-header' + (!hasName && !isOut ? ' selectable' : '');
+  hdr.className = 'card-hdr' + (!hasName && !isOut ? ' selectable' : '');
   if (!hasName && !isOut) hdr.onclick = function() { openSelector(slot.id); };
 
   var badge = document.createElement('span');
@@ -321,12 +327,10 @@ function buildCard(slot, idx) {
 
   var nameEl = document.createElement('span');
   nameEl.className = 'batter-name' + (!hasName ? ' placeholder' : '');
-  nameEl.textContent = hasName ? slot.name.toUpperCase() : 'tap to select batter';
+  nameEl.textContent = hasName ? slot.name : 'Tap to select batter';
   if (hasName && !isOut) {
     nameEl.style.cursor = 'pointer';
-    (function(sid) {
-      nameEl.onclick = function(e) { e.stopPropagation(); openSelector(sid); };
-    })(slot.id);
+    (function(sid) { nameEl.onclick = function(e) { e.stopPropagation(); openSelector(sid); }; })(slot.id);
   }
 
   hdr.appendChild(badge);
@@ -341,78 +345,76 @@ function buildCard(slot, idx) {
 
   var xBtn = document.createElement('button');
   xBtn.className = 'x-btn';
-  xBtn.textContent = '×';
-  xBtn.title = isOut ? 'Remove' : (hasName ? 'Mark Out' : 'Remove slot');
+  xBtn.innerHTML = '&times;';
+  xBtn.title = isOut ? 'Remove card' : (hasName ? 'Remove batter' : 'Remove slot');
   (function(s) {
     xBtn.onclick = function(e) {
       e.stopPropagation();
       if (s.isOut) {
-        // Remove frozen card
         slots = slots.filter(function(x) { return x.id !== s.id; });
         actionStack = actionStack.filter(function(a) { return a.slotId !== s.id; });
-        renderAll(); saveToLocal();
       } else if (s.name) {
-        // Mark as out — freeze
-        s.isOut = true;
-        renderAll(); saveToLocal(); scheduleAutoSave();
-      } else {
-        // Remove empty slot (only if more than 2)
-        if (slots.length > 2) {
-          slots = slots.filter(function(x) { return x.id !== s.id; });
-          renderAll();
-        }
+        // Clear this batter from slot, reset to empty
+        s.name = null; s.history = []; s.isOut = false;
+        actionStack = actionStack.filter(function(a) { return a.slotId !== s.id; });
+      } else if (slots.length > 2) {
+        slots = slots.filter(function(x) { return x.id !== s.id; });
       }
+      renderAll(); saveToLocal();
     };
   })(slot);
   hdr.appendChild(xBtn);
 
-  // ── Stats row ──
+  // ── Stats ──
   var statsRow = document.createElement('div');
   statsRow.className = 'card-stats';
 
-  var dotsBlk = document.createElement('div');
-  dotsBlk.className = 'stat-block';
-  dotsBlk.innerHTML = '<div class="stat-val dots">' + st.dots + '</div><div class="stat-lbl">Dots</div>';
+  statsRow.innerHTML =
+    '<div class="stat-blk"><div class="stat-val d">' + st.dots + '</div><div class="stat-lbl">Dots</div></div>'
+    + '<div class="stat-blk"><div class="stat-val b">' + st.balls + '</div><div class="stat-lbl">Balls</div></div>'
+    + '<div class="rate-wrap"><div class="rate-bar"><div class="rate-fill" style="width:' + st.pct + '%"></div></div>'
+    + '<div class="rate-lbl">' + st.pct + '% dot rate</div></div>';
 
-  var ballsBlk = document.createElement('div');
-  ballsBlk.className = 'stat-block';
-  ballsBlk.innerHTML = '<div class="stat-val balls">' + st.balls + '</div><div class="stat-lbl">Balls</div>';
-
-  var rateWrap = document.createElement('div');
-  rateWrap.className = 'rate-wrap';
-  rateWrap.innerHTML = '<div class="rate-bar"><div class="rate-fill" style="width:' + st.pct + '%"></div></div>'
-    + '<div class="rate-lbl">' + st.pct + '% dot rate</div>';
-
-  statsRow.appendChild(dotsBlk);
-  statsRow.appendChild(ballsBlk);
-  statsRow.appendChild(rateWrap);
-
-  // ── Action buttons ──
-  var btnRow = document.createElement('div');
-  btnRow.className = 'card-btns';
+  // ── DOT / RUN buttons ──
+  var mainBtns = document.createElement('div');
+  mainBtns.className = 'card-btns-main';
 
   var dotBtn = document.createElement('button');
   dotBtn.className = 'action-btn btn-dot';
   dotBtn.textContent = 'DOT';
   dotBtn.disabled = !hasName || isOut;
-  (function(sid) {
-    dotBtn.onclick = function() { logAction(sid, 'D'); };
-  })(slot.id);
+  (function(sid) { dotBtn.onclick = function() { logAction(sid, 'D'); }; })(slot.id);
 
   var runBtn = document.createElement('button');
   runBtn.className = 'action-btn btn-run';
   runBtn.textContent = 'RUN';
   runBtn.disabled = !hasName || isOut;
-  (function(sid) {
-    runBtn.onclick = function() { logAction(sid, 'R'); };
-  })(slot.id);
+  (function(sid) { runBtn.onclick = function() { logAction(sid, 'R'); }; })(slot.id);
 
-  btnRow.appendChild(dotBtn);
-  btnRow.appendChild(runBtn);
+  mainBtns.appendChild(dotBtn);
+  mainBtns.appendChild(runBtn);
+
+  // ── OUT button ──
+  var outRow = document.createElement('div');
+  outRow.className = 'card-btns-out';
+
+  var outBtn = document.createElement('button');
+  outBtn.className = 'action-btn btn-out';
+  outBtn.textContent = '🟡  Mark as Out';
+  outBtn.disabled = !hasName || isOut;
+  (function(s) {
+    outBtn.onclick = function() {
+      s.isOut = true;
+      renderAll(); saveToLocal(); scheduleAutoSave();
+    };
+  })(slot);
+
+  outRow.appendChild(outBtn);
 
   card.appendChild(hdr);
   card.appendChild(statsRow);
-  card.appendChild(btnRow);
+  card.appendChild(mainBtns);
+  card.appendChild(outRow);
   return card;
 }
 
@@ -435,9 +437,7 @@ function logAction(slotId, type) {
   if (!slot || slot.isOut) return;
   slot.history.push(type);
   actionStack.push({ slotId: slotId, type: type });
-  renderAll();
-  saveToLocal();
-  scheduleAutoSave();
+  renderAll(); saveToLocal(); scheduleAutoSave();
 }
 
 function undoLast() {
@@ -445,29 +445,24 @@ function undoLast() {
   var last = actionStack.pop();
   var slot = findSlot(last.slotId);
   if (slot && slot.history.length > 0) slot.history.pop();
-  renderAll();
-  saveToLocal();
-  scheduleAutoSave();
+  renderAll(); saveToLocal(); scheduleAutoSave();
 }
 
 function addBatter() {
-  // Find first truly empty slot
   for (var i = 0; i < slots.length; i++) {
     if (!slots[i].name && !slots[i].isOut) { openSelector(slots[i].id); return; }
   }
-  // All slots have names — add a new slot
   var newSlot = { id: nextId++, name: null, history: [], isOut: false };
   slots.push(newSlot);
   renderAll();
   openSelector(newSlot.id);
 }
 
-// ── Batter selector ───────────────────────────────────────────────
+// ── Selector ──────────────────────────────────────────────────────
 function openSelector(slotId) {
-  pendingSlotId = slotId;
-  var activeName = [];
+  var activeNames = [];
   for (var i = 0; i < slots.length; i++) {
-    if (slots[i].name && !slots[i].isOut && slots[i].id !== slotId) activeName.push(slots[i].name);
+    if (slots[i].name && !slots[i].isOut && slots[i].id !== slotId) activeNames.push(slots[i].name);
   }
   var list = document.getElementById('playerList');
   list.innerHTML = '';
@@ -476,7 +471,7 @@ function openSelector(slotId) {
       var btn = document.createElement('button');
       btn.className = 'p-opt';
       btn.textContent = name;
-      btn.disabled = activeName.indexOf(name) >= 0;
+      btn.disabled = activeNames.indexOf(name) >= 0;
       btn.onclick = function() { selectBatter(slotId, name); };
       list.appendChild(btn);
     })(PL[j]);
@@ -487,29 +482,19 @@ function openSelector(slotId) {
 function selectBatter(slotId, name) {
   var slot = findSlot(slotId);
   if (slot) {
-    slot.name = name;
-    slot.history = [];
-    slot.isOut = false;
-    // Clear undo actions for this slot since it's a fresh batter
+    slot.name = name; slot.history = []; slot.isOut = false;
     actionStack = actionStack.filter(function(a) { return a.slotId !== slotId; });
   }
-  closeSelector();
-  renderAll();
-  saveToLocal();
+  closeSelector(); renderAll(); saveToLocal();
 }
 
 function closeSelector() {
   document.getElementById('selOverlay').classList.remove('open');
-  pendingSlotId = null;
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
-function askReset() {
-  document.getElementById('confirmOverlay').classList.add('open');
-}
-function closeConfirm() {
-  document.getElementById('confirmOverlay').classList.remove('open');
-}
+function askReset() { document.getElementById('confirmOverlay').classList.add('open'); }
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
 function doReset() {
   closeConfirm();
   slots = [
@@ -521,40 +506,34 @@ function doReset() {
   if (g) clearLocal(g);
   if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
   renderAll();
-  document.getElementById('autosaveBar').style.display = 'none';
+  setAutoSave('', '');
 }
 
-// ── Copy to clipboard ─────────────────────────────────────────────
+// ── Copy ──────────────────────────────────────────────────────────
 function copyStats() {
   var g = document.getElementById('gameSelect').value || 'Game';
-  var lines = ['Tigers — Dot Ball Tracker', 'Game: ' + g, ''];
-  var totalDots = 0, totalBalls = 0;
+  var lines = ['🐯 Tigers — Dot Ball Tracker', 'Game: ' + g, ''];
+  var td = 0, tb = 0;
   for (var i = 0; i < slots.length; i++) {
     var s = slots[i];
     if (!s.name) continue;
     var st = slotStats(s);
-    totalDots += st.dots; totalBalls += st.balls;
-    lines.push(s.name + (s.isOut ? ' [OUT]' : '') + ': '
-      + st.dots + ' dots / ' + st.balls + ' balls (' + st.pct + '% dot rate)');
+    td += st.dots; tb += st.balls;
+    lines.push(s.name + (s.isOut ? ' [OUT]' : '') + ': ' + st.dots + ' dots / ' + st.balls + ' balls (' + st.pct + '%)');
   }
-  if (totalBalls > 0) {
-    lines.push('');
-    lines.push('TOTAL: ' + totalDots + '/' + totalBalls + ' balls — '
-      + Math.round(totalDots / totalBalls * 100) + '% dot rate');
-  }
+  if (tb > 0) { lines.push(''); lines.push('TOTAL: ' + td + '/' + tb + ' balls — ' + Math.round(td/tb*100) + '% dot rate'); }
   var text = lines.join('\n');
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function() {
-      setAutoSave('as-saved', '✓ Copied to clipboard');
-    }).catch(function() { fallbackCopy(text); });
+    navigator.clipboard.writeText(text).then(function() { setAutoSave('as-saved', '✓ Copied to clipboard'); })
+    .catch(function() { fallbackCopy(text); });
   } else { fallbackCopy(text); }
 }
 function fallbackCopy(text) {
   var ta = document.createElement('textarea');
-  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
   document.body.appendChild(ta); ta.select();
   try { document.execCommand('copy'); setAutoSave('as-saved', '✓ Copied to clipboard'); }
-  catch(e) { setAutoSave('as-error', 'Copy failed — share manually'); }
+  catch(e) { setAutoSave('as-error', 'Copy failed'); }
   document.body.removeChild(ta);
 }
 
@@ -564,11 +543,7 @@ function lsKey(g) { return LOCAL_KEY_PREFIX + g; }
 function saveToLocal() {
   var g = document.getElementById('gameSelect').value;
   if (!g) return;
-  try {
-    localStorage.setItem(lsKey(g), JSON.stringify({
-      ts: Date.now(), slots: slots, nextId: nextId, actionStack: actionStack
-    }));
-  } catch(e) {}
+  try { localStorage.setItem(lsKey(g), JSON.stringify({ ts: Date.now(), slots: slots, nextId: nextId, actionStack: actionStack })); } catch(e) {}
 }
 
 function loadFromLocal(g) {
@@ -576,16 +551,12 @@ function loadFromLocal(g) {
     var raw = localStorage.getItem(lsKey(g));
     if (!raw) return false;
     var d = JSON.parse(raw);
-    slots = d.slots || slots;
-    nextId = d.nextId || nextId;
-    actionStack = d.actionStack || [];
+    slots = d.slots || slots; nextId = d.nextId || nextId; actionStack = d.actionStack || [];
     return true;
   } catch(e) { return false; }
 }
 
-function clearLocal(g) {
-  try { localStorage.removeItem(lsKey(g)); } catch(e) {}
-}
+function clearLocal(g) { try { localStorage.removeItem(lsKey(g)); } catch(e) {} }
 
 function scheduleAutoSave() {
   var g = document.getElementById('gameSelect').value;
@@ -596,9 +567,11 @@ function scheduleAutoSave() {
 }
 
 function setAutoSave(cls, text) {
-  var bar = document.getElementById('autosaveBar');
-  bar.className = 'autosave-bar ' + cls;
-  bar.textContent = text;
+  var row = document.getElementById('autosaveRow');
+  if (!cls) { row.style.display = 'none'; return; }
+  row.style.display = 'flex';
+  row.className = 'autosave-row ' + cls;
+  document.getElementById('autosaveText').textContent = text;
 }
 
 function submitToSheets(silent) {
@@ -623,10 +596,10 @@ function submitToSheets(silent) {
       var t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       setAutoSave('as-saved', '✓ Saved at ' + t);
     } else {
-      setAutoSave('as-error', 'Save failed — data safe on device');
+      setAutoSave('as-error', 'Save failed: ' + (d.message || 'unknown error'));
     }
   })
-  .catch(function() {
+  .catch(function(err) {
     setAutoSave('as-error', 'No connection — data safe on device');
   });
 }
@@ -647,22 +620,18 @@ window.addEventListener('DOMContentLoaded', function() {
 
   sel.addEventListener('change', function() {
     var g = this.value;
-    slots = [
-      { id: 0, name: null, history: [], isOut: false },
-      { id: 1, name: null, history: [], isOut: false }
-    ];
+    slots = [{ id:0,name:null,history:[],isOut:false },{ id:1,name:null,history:[],isOut:false }];
     nextId = 2; actionStack = [];
     if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+    setAutoSave('', '');
 
-    if (!g) { renderAll(); document.getElementById('autosaveBar').style.display = 'none'; return; }
+    if (!g) { renderAll(); return; }
 
-    // Try localStorage first
     if (loadFromLocal(g)) {
       renderAll();
       setAutoSave('as-pending', '📱 Restored from device — tap an action to continue');
       return;
     }
-    // Fetch from Sheets
     fetch(SCRIPT_URL + '?type=dotballs&team=Tigers&game=' + encodeURIComponent(g))
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -671,15 +640,12 @@ window.addEventListener('DOMContentLoaded', function() {
           for (var i = 0; i < data.data.length; i++) {
             var p = data.data[i];
             var history = [];
-            for (var d = 0; d < (p.dots || 0); d++) history.push('D');
-            for (var r = 0; r < (p.runs || 0); r++) history.push('R');
+            for (var dd = 0; dd < (p.dots||0); dd++) history.push('D');
+            for (var rr = 0; rr < (p.runs||0); rr++) history.push('R');
             slots.push({ id: i, name: p.name, history: history, isOut: p.isOut || false });
           }
-          if (slots.length < 2) {
-            while (slots.length < 2) slots.push({ id: nextId++, name: null, history: [], isOut: false });
-          }
-          nextId = Math.max(nextId, slots.length);
-          actionStack = [];
+          while (slots.length < 2) slots.push({ id: nextId++, name: null, history: [], isOut: false });
+          nextId = Math.max(nextId, slots.length); actionStack = [];
           setAutoSave('as-saved', 'Loaded from Sheets');
         }
         renderAll();
