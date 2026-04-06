@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Dot Ball Dashboard — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+/* ── Team tabs ── */
+.tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.tab {
+  flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: all 0.15s;
+}
+.tab.lions  { color: #1A56B0; }
+.tab.tigers { color: #C05000; }
+.tab.active.lions  { background: #E8F1FC; border-color: #1A56B0; }
+.tab.active.tigers { background: #FEF0E6; border-color: #C05000; }
+
+/* ── Summary tiles ── */
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc {
+  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sn { font-size: 26px; font-weight: 700; color: #1A56B0; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Table card ── */
+.lb-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem; overflow-x: auto;
+}
+.lb-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 12px; border-bottom: 1.5px solid #F3F4F6;
+  flex-wrap: wrap; gap: 8px;
+}
+.lb-title { font-size: 13px; font-weight: 700; color: #111827; }
+
+.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 360px; }
+.stats-table th {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 10px; text-align: right;
+  border-bottom: 1.5px solid #F3F4F6;
+  white-space: nowrap; cursor: pointer; user-select: none;
+  background: #FAFAFA;
+}
+.stats-table th:first-child  { text-align: left; padding-left: 16px; }
+.stats-table th:nth-child(2) { text-align: left; }
+.stats-table th.sort-asc::after  { content: ' ↑'; color: #1A56B0; }
+.stats-table th.sort-desc::after { content: ' ↓'; color: #1A56B0; }
+.stats-table td {
+  padding: 9px 10px; text-align: right;
+  border-bottom: 1px solid #F9FAFB;
+  color: #111827; white-space: nowrap;
+}
+.stats-table td:first-child  { text-align: left; padding-left: 16px; color: #9CA3AF; font-size: 12px; }
+.stats-table td:nth-child(2) { text-align: left; font-weight: 600; }
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: #F9FAFB; }
+
+.team-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 20px; margin-left: 5px;
+}
+.tag-lions  { background: #E8F1FC; color: #1A56B0; }
+.tag-tigers { background: #FEF0E6; color: #C05000; }
+
+.highlight-val { color: #1A56B0; font-weight: 700; }
+
+/* ── Per-game breakdown card ── */
+.game-section { margin-bottom: 1.25rem; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.game-cards { display: flex; flex-direction: column; gap: 8px; }
+.game-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.game-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #FAFAFA;
+  border-bottom: 1px solid #F3F4F6;
+}
+.game-card-title { font-size: 13px; font-weight: 700; }
+.game-card-meta { font-size: 11px; color: #9CA3AF; }
+.game-dot-rows { padding: 6px 0; }
+.gdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 14px;
+}
+.gdr-name { font-size: 13px; color: #374151; }
+.gdr-bar-wrap { flex: 1; margin: 0 10px; }
+.gdr-bar-track { background: #F3F4F6; border-radius: 4px; height: 6px; overflow: hidden; }
+.gdr-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3B82F6, #1A56B0); }
+.gdr-val { font-size: 13px; font-weight: 700; color: #1A56B0; min-width: 28px; text-align: right; }
+.gdr-val.zero { color: #D1D5DB; font-weight: 400; }
+
+.loading { text-align: center; color: #9CA3AF; font-size: 14px; padding: 3rem; }
+.no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>⚫ Dot Ball Dashboard</h2>
+    <p>Dots faced per player — Lions &amp; Tigers</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="tabs">
+    <div class="tab lions active" onclick="switchTab('lions')">🦁 Madison Lions</div>
+    <div class="tab tigers" onclick="switchTab('tigers')">🐯 Madison Tigers</div>
+  </div>
+
+  <div id="loadingMsg" class="loading">Loading&hellip;</div>
+
+  <div id="lionsView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="l-totalDots" style="color:#1A56B0">—</div><div class="sl">Total dots</div></div>
+      <div class="sc"><div class="sn" id="l-avgPerGame" style="color:#1A56B0">—</div><div class="sl">Avg dots/game</div></div>
+      <div class="sc"><div class="sn" id="l-mostDots" style="color:#1A56B0">—</div><div class="sl">Most dots (player)</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🦁 Lions — Dot Ball Totals</div>
+      </div>
+      <table class="stats-table" id="lionsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('lions','name')">Player</th>
+            <th onclick="sortTable('lions','games')">Games</th>
+            <th onclick="sortTable('lions','total')">Total Dots</th>
+            <th onclick="sortTable('lions','avg')">Avg/Game</th>
+            <th onclick="sortTable('lions','max')">Best Game</th>
+          </tr>
+        </thead>
+        <tbody id="lionsTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="lionsGames"></div>
+    </div>
+  </div>
+
+  <div id="tigersView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="t-totalDots" style="color:#C05000">—</div><div class="sl">Total dots</div></div>
+      <div class="sc"><div class="sn" id="t-avgPerGame" style="color:#C05000">—</div><div class="sl">Avg dots/game</div></div>
+      <div class="sc"><div class="sn" id="t-mostDots" style="color:#C05000">—</div><div class="sl">Most dots (player)</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🐯 Tigers — Dot Ball Totals</div>
+      </div>
+      <table class="stats-table" id="tigersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('tigers','name')">Player</th>
+            <th onclick="sortTable('tigers','games')">Games</th>
+            <th onclick="sortTable('tigers','total')">Total Dots</th>
+            <th onclick="sortTable('tigers','avg')">Avg/Game</th>
+            <th onclick="sortTable('tigers','max')">Best Game</th>
+          </tr>
+        </thead>
+        <tbody id="tigersTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="tigersGames"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var activeTab = 'lions';
+
+// Sort state per team
+var _sort = {
+  lions:  { key: 'total', dir: -1 },
+  tigers: { key: 'total', dir: -1 }
+};
+
+// Raw data keyed by team: { games: [{game, players:[{name,dots}]}] }
+var _data = { lions: null, tigers: null };
+
+var _pending = 2;
+
+function onLoaded() {
+  _pending--;
+  if (_pending === 0) {
+    document.getElementById('loadingMsg').style.display = 'none';
+    renderTeam('lions');
+    renderTeam('tigers');
+    showTab(activeTab);
+  }
+}
+
+function fetchTeam(team, label) {
+  fetch(SCRIPT_URL + '?type=dotballs&team=' + label)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.status === 'ok' && d.games) {
+        _data[team] = d.games;
+      } else {
+        _data[team] = [];
+      }
+      onLoaded();
+    })
+    .catch(function() {
+      _data[team] = [];
+      onLoaded();
+    });
+}
+
+function buildPlayerSummary(games) {
+  // Returns array: { name, total, games, max }
+  var map = {};
+  (games || []).forEach(function(g) {
+    (g.players || []).forEach(function(p) {
+      if (!map[p.name]) map[p.name] = { name: p.name, total: 0, games: 0, max: 0 };
+      map[p.name].total += (p.dots || 0);
+      if (p.dots > 0) map[p.name].games++;
+      if ((p.dots || 0) > map[p.name].max) map[p.name].max = p.dots;
+    });
+  });
+  return Object.values(map);
+}
+
+function sortTable(team, key) {
+  var s = _sort[team];
+  if (s.key === key) s.dir *= -1; else { s.key = key; s.dir = key === 'name' ? 1 : -1; }
+  renderTeam(team);
+}
+
+function renderTeam(team) {
+  var games = _data[team] || [];
+  var players = buildPlayerSummary(games);
+  var s = _sort[team];
+
+  // Update sort header indicators
+  var tableId = team + 'Table';
+  var table = document.getElementById(tableId);
+  table.querySelectorAll('th').forEach(function(th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    var col = th.getAttribute('onclick') || '';
+    var m = col.match(/'([^']+)'\)$/);
+    if (m && m[1] === s.key) {
+      th.classList.add(s.dir === 1 ? 'sort-asc' : 'sort-desc');
+    }
+  });
+
+  // Sort players
+  players.sort(function(a, b) {
+    var va = a[s.key], vb = b[s.key];
+    if (s.key === 'avg') {
+      va = a.games ? a.total / a.games : 0;
+      vb = b.games ? b.total / b.games : 0;
+    }
+    if (typeof va === 'string') return s.dir * va.localeCompare(vb);
+    return s.dir * ((vb || 0) - (va || 0));
+  });
+
+  // Summary tiles
+  var totalDots = players.reduce(function(sum, p) { return sum + p.total; }, 0);
+  var gamesPlayed = games.length;
+  var avgPerGame = gamesPlayed ? (totalDots / gamesPlayed).toFixed(1) : '—';
+  var topPlayer = players.length ? players.slice().sort(function(a,b){return b.total-a.total;})[0] : null;
+
+  var prefix = team === 'lions' ? 'l' : 't';
+  document.getElementById(prefix + '-totalDots').textContent = totalDots || '—';
+  document.getElementById(prefix + '-avgPerGame').textContent = avgPerGame;
+  document.getElementById(prefix + '-mostDots').textContent = topPlayer ? topPlayer.total : '—';
+
+  // Table
+  var tbodyId = team + 'Tbody';
+  var tbody = document.getElementById(tbodyId);
+  if (!players.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:2rem">No dot ball data recorded yet.</td></tr>';
+  } else {
+    tbody.innerHTML = players.map(function(p, i) {
+      var avg = p.games ? (p.total / p.games).toFixed(1) : '—';
+      return '<tr>'
+        + '<td>' + (i+1) + '</td>'
+        + '<td>' + p.name + '</td>'
+        + '<td>' + p.games + '</td>'
+        + '<td class="highlight-val">' + p.total + '</td>'
+        + '<td>' + avg + '</td>'
+        + '<td>' + (p.max || '—') + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  // Game-by-game breakdown
+  var gamesContainerId = team + 'Games';
+  var gamesContainer = document.getElementById(gamesContainerId);
+  if (!games.length) {
+    gamesContainer.innerHTML = '<div class="no-data">No games recorded yet.</div>';
+    return;
+  }
+
+  // Find max dots in any single player-game for bar scaling
+  var maxVal = 0;
+  games.forEach(function(g) {
+    (g.players || []).forEach(function(p) {
+      if ((p.dots || 0) > maxVal) maxVal = p.dots;
+    });
+  });
+
+  gamesContainer.innerHTML = games.map(function(g) {
+    var gamePlayers = (g.players || []).filter(function(p) { return (p.dots || 0) > 0; });
+    var total = gamePlayers.reduce(function(sum, p) { return sum + p.dots; }, 0);
+    var playersHtml = gamePlayers.length
+      ? gamePlayers.sort(function(a,b){return b.dots-a.dots;}).map(function(p) {
+          var pct = maxVal ? Math.round((p.dots / maxVal) * 100) : 0;
+          return '<div class="gdr">'
+            + '<span class="gdr-name">' + p.name + '</span>'
+            + '<div class="gdr-bar-wrap"><div class="gdr-bar-track"><div class="gdr-bar-fill" style="width:' + pct + '%"></div></div></div>'
+            + '<span class="gdr-val">' + p.dots + '</span>'
+            + '</div>';
+        }).join('')
+      : '<div class="no-data" style="padding:0.75rem 1rem">No data recorded for this game.</div>';
+
+    return '<div class="game-card">'
+      + '<div class="game-card-header">'
+      + '<span class="game-card-title">' + (g.game || 'Game') + '</span>'
+      + '<span class="game-card-meta">' + total + ' total dots</span>'
+      + '</div>'
+      + '<div class="game-dot-rows">' + playersHtml + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function switchTab(team) {
+  activeTab = team;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.tab.' + team).classList.add('active');
+  showTab(team);
+}
+
+function showTab(team) {
+  document.getElementById('lionsView').style.display  = team === 'lions'  ? 'block' : 'none';
+  document.getElementById('tigersView').style.display = team === 'tigers' ? 'block' : 'none';
+}
+
+// Fetch both teams
+fetchTeam('lions', 'Lions');
+fetchTeam('tigers', 'Tigers');
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Madison Lions — Log Dot Balls</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
+}
+
+.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
+.gs select {
+  font-size: 14px; padding: 10px 12px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; flex: 1; min-width: 200px; color: #111827;
+  -webkit-appearance: none; appearance: none;
+}
+.gs select:focus { outline: none; border-color: #1A56B0; }
+
+.banner { border-radius: 10px; padding: 11px 14px; font-size: 13px; margin-bottom: 1rem; display: none; line-height: 1.5; font-weight: 500; }
+.b-lock { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
+.b-pre  { background: #E8F1FC; color: #1A56B0; border-left: 3px solid #1A56B0; }
+.b-past { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
+.b-new  { background: #E2F5EE; color: #0F5C43; border-left: 3px solid #1A8F6A; }
+.b-load { background: #F3F4F6; color: #9CA3AF; border-left: 3px solid #D1D5DB; }
+
+.slbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+
+.prows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+
+.pr {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1.5px solid #F3F4F6;
+  border-radius: 12px; padding: 10px 14px;
+}
+.pr.pre { border-color: #1A56B0; background: #F0F6FF; }
+.pr.locked { opacity: 0.55; }
+
+.prname { font-size: 14px; font-weight: 600; flex: 1; min-width: 0; }
+
+.counter-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.cnt-btn {
+  width: 36px; height: 36px; border-radius: 10px; border: none;
+  font-size: 20px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  touch-action: manipulation; user-select: none;
+  transition: opacity 0.1s;
+  line-height: 1;
+}
+.cnt-btn:active { opacity: 0.7; }
+.btn-minus { background: #FEE2E2; color: #991B1B; }
+.btn-plus  { background: #E2F5EE; color: #0F5C43; }
+.cnt-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.cnt-val {
+  font-size: 20px; font-weight: 800; color: #111827;
+  min-width: 34px; text-align: center;
+}
+.cnt-val.has-dots { color: #1A56B0; }
+
+.summary {
+  background: #F8FAFF; border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; color: #6B7280; margin-bottom: 1.25rem; line-height: 1.7;
+  border: 1px solid #E8F1FC;
+}
+.summary strong { color: #111827; font-weight: 700; }
+
+.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.25rem 0; }
+
+.acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  font-size: 14px; padding: 11px 20px; border-radius: 10px;
+  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: #1A56B0; color: #fff; }
+.btn-primary:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
+.btn-clear { background: #F3F4F6; color: #6B7280; }
+
+.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
+.msg.ok   { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err  { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.info { background: #E8F1FC; color: #1A56B0; display: block; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🦁 Lions — Log Dot Balls</h2>
+    <p>Record dot balls faced per player per game</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="card">
+    <div class="gs">
+      <label>Game</label>
+      <select id="gs"><option value="">— pick a game —</option></select>
+    </div>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div id="playerSection" style="display:none">
+    <div class="card" style="padding:12px 16px">
+      <div class="slbl">Dot balls per player</div>
+      <div class="prows" id="prows"></div>
+      <div class="summary" id="summary"></div>
+      <hr class="sep">
+      <div class="acts">
+        <button class="btn btn-primary" id="saveBtn" onclick="submitDots()">Save to Sheets</button>
+        <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var CFG = MCC_CONFIG.lions;
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var PL = CFG.players;
+var isLocked = false;
+
+window.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('gs');
+  var today = new Date(); today.setHours(0,0,0,0);
+  CFG.games.forEach(function(g) {
+    var opt = document.createElement('option');
+    opt.value = g.name;
+    var parts = g.gameDate.split('-');
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    opt.textContent = g.name + ' - ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'})
+                    + (today > d ? ' (played)' : '');
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', onGameChange);
+});
+
+function onGameChange() {
+  var game = this.value;
+  var section = document.getElementById('playerSection');
+  if (!game) { section.style.display='none'; hideBanner(); return; }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var gCfg = null;
+  for (var i=0; i<CFG.games.length; i++) {
+    if (CFG.games[i].name === game) { gCfg = CFG.games[i]; break; }
+  }
+  var gdParts = gCfg.gameDate.split('-');
+  var gameDate = new Date(parseInt(gdParts[0]), parseInt(gdParts[1])-1, parseInt(gdParts[2]));
+  gameDate.setHours(0,0,0,0);
+  var daysSince = Math.floor((today - gameDate) / (1000*60*60*24));
+  var isPast = today > gameDate;
+  isLocked = isPast && daysSince > 5;
+
+  showBanner('b-load', 'Loading dot ball data from Google Sheets...');
+  section.style.display = 'block';
+  document.getElementById('saveBtn').disabled = true;
+
+  fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(game))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
+      buildRows(game, isPast, daysSince, liveData);
+    })
+    .catch(function() {
+      buildRows(game, isPast, daysSince, null);
+    });
+}
+
+function buildRows(game, isPast, daysSince, data) {
+  var hasPrefill = data && data.some(function(p) { return p.dots > 0; });
+
+  if (isLocked) {
+    showBanner('b-lock', '🔒 This game was played ' + daysSince + ' days ago — dot ball data is locked.');
+  } else if (hasPrefill) {
+    showBanner('b-pre', 'Pre-filled with recorded data. Edit and save to update.');
+  } else if (isPast) {
+    showBanner('b-past', 'Past game — enter dot ball data below.');
+  } else {
+    showBanner('b-new', 'Live logging mode — tap + to add dot balls per player as the game progresses.');
+  }
+
+  var rows = document.getElementById('prows');
+  rows.innerHTML = '';
+
+  PL.forEach(function(p) {
+    var pre = null;
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        if (data[i].name === p) { pre = data[i]; break; }
+      }
+    }
+    var dots = pre ? (pre.dots || 0) : 0;
+    var cls = isLocked ? 'pr locked' : (pre && pre.dots > 0 ? 'pr pre' : 'pr');
+
+    var row = document.createElement('div');
+    row.className = cls;
+
+    var nameEl = document.createElement('span');
+    nameEl.className = 'prname';
+    nameEl.textContent = p;
+
+    var grp = document.createElement('div');
+    grp.className = 'counter-group';
+
+    var minusBtn = document.createElement('button');
+    minusBtn.className = 'cnt-btn btn-minus';
+    minusBtn.textContent = '−';
+    minusBtn.disabled = isLocked;
+
+    var valEl = document.createElement('span');
+    valEl.className = 'cnt-val' + (dots > 0 ? ' has-dots' : '');
+    valEl.id = 'dots-' + p;
+    valEl.textContent = dots;
+
+    var plusBtn = document.createElement('button');
+    plusBtn.className = 'cnt-btn btn-plus';
+    plusBtn.textContent = '+';
+    plusBtn.disabled = isLocked;
+
+    (function(player, valSpan) {
+      plusBtn.addEventListener('click', function() {
+        var v = parseInt(valSpan.textContent) || 0;
+        v++;
+        valSpan.textContent = v;
+        valSpan.className = 'cnt-val has-dots';
+        updateSummary();
+      });
+      minusBtn.addEventListener('click', function() {
+        var v = parseInt(valSpan.textContent) || 0;
+        if (v > 0) v--;
+        valSpan.textContent = v;
+        valSpan.className = 'cnt-val' + (v > 0 ? ' has-dots' : '');
+        updateSummary();
+      });
+    })(p, valEl);
+
+    grp.appendChild(minusBtn);
+    grp.appendChild(valEl);
+    grp.appendChild(plusBtn);
+
+    row.appendChild(nameEl);
+    row.appendChild(grp);
+    rows.appendChild(row);
+  });
+
+  document.getElementById('saveBtn').disabled = isLocked;
+  updateSummary();
+}
+
+function updateSummary() {
+  var total = 0;
+  var withDots = 0;
+  PL.forEach(function(p) {
+    var v = parseInt(document.getElementById('dots-' + p).textContent) || 0;
+    total += v;
+    if (v > 0) withDots++;
+  });
+  var avg = withDots ? (total / withDots).toFixed(1) : '0';
+  document.getElementById('summary').innerHTML =
+    '<strong>' + total + '</strong> total dot balls &nbsp;·&nbsp; '
+    + '<strong>' + withDots + '</strong> players with dots &nbsp;·&nbsp; '
+    + '<strong>' + avg + '</strong> avg per player';
+}
+
+function clearAll() {
+  if (isLocked) { show('This game is locked.', 'err'); return; }
+  PL.forEach(function(p) {
+    var el = document.getElementById('dots-' + p);
+    el.textContent = 0;
+    el.className = 'cnt-val';
+  });
+  updateSummary();
+}
+
+function submitDots() {
+  if (isLocked) { show('This game is locked.', 'err'); return; }
+  var game = document.getElementById('gs').value;
+  if (!game) { show('Pick a game first!', 'err'); return; }
+  var dotballs = [];
+  PL.forEach(function(p) {
+    var dots = parseInt(document.getElementById('dots-' + p).textContent) || 0;
+    dotballs.push({ name: p, dots: dots });
+  });
+  show('Saving...', 'info');
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ type: 'dotballs', team: 'Lions', game: game, dotballs: dotballs })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.status === 'ok') show('Saved! Google Sheet updated.', 'ok');
+    else show('Error: ' + d.message, 'err');
+  })
+  .catch(function() { show('Network error. Try again.', 'err'); });
+}
+
+function showBanner(cls, txt) {
+  var b = document.getElementById('banner');
+  b.className = 'banner ' + cls; b.textContent = txt; b.style.display = 'block';
+}
+function hideBanner() {
+  var b = document.getElementById('banner');
+  b.style.display = 'none'; b.className = 'banner';
+}
+function show(t, type) {
+  var e = document.getElementById('msg');
+  e.textContent = t; e.className = 'msg ' + type;
+  setTimeout(function() { e.className = 'msg'; }, 4000);
+}
+</script>
+</body>
+</html>
