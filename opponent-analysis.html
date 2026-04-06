@@ -214,10 +214,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="num" id="statTopRuns" style="color:#1A56B0">—</div>
         <div class="lbl">Highest individual score</div>
       </div>
-      <div class="stat-card">
-        <div class="num" id="statTopWkts" style="color:#1A8F6A">—</div>
-        <div class="lbl">Top wickets</div>
-      </div>
+
       <div class="stat-card">
         <div class="num" id="statWon" style="color:#0F5C43">—</div>
         <div class="lbl">Wins</div>
@@ -453,7 +450,6 @@ function renderStats(opp) {
   document.getElementById('statBowlers').textContent  = mainBowlers;
   var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
   document.getElementById('statTopRuns').textContent  = highestScore;
-  document.getElementById('statTopWkts').textContent  = bowl.length ? bowl[0].wickets : '—';
 
   var team = cricclubsTeam(selectedGame);
   var standings = currentSeason === '2025'
