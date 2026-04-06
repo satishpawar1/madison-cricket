@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="config.js"></script>
+<title>Load Rockvale Risers Dot Balls</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; padding: 1.5rem; }
+h2 { font-size: 18px; margin-bottom: 4px; }
+p  { font-size: 13px; color: #6B7280; margin-bottom: 1.5rem; }
+table { width: 100%; max-width: 560px; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+th { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; background: #FAFAFA; border-bottom: 1.5px solid #F3F4F6; }
+td { padding: 10px 14px; font-size: 14px; border-bottom: 1px solid #F9FAFB; }
+tr:last-child td { border-bottom: none; }
+.dots { color: #DC2626; font-weight: 700; }
+.out { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; background: #FEE2E2; color: #991B1B; }
+.ro  { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; background: #FEF3C7; color: #92400E; }
+button {
+  font-size: 15px; font-weight: 600; padding: 13px 28px;
+  background: #1A56B0; color: #fff; border: none; border-radius: 10px;
+  cursor: pointer; display: block; margin-bottom: 1rem;
+}
+button:disabled { background: #D1D5DB; cursor: not-allowed; }
+.msg { font-size: 13px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; margin-top: 8px; }
+.msg.ok  { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.inf { background: #E8F1FC; color: #1A56B0; display: block; }
+</style>
+</head>
+<body>
+
+<h2>🦁 Lions vs Rockvale Risers — Dot Ball Data</h2>
+<p>Calculated from CricClubs ball-by-ball (April 5, 2026 · Madison Lions innings). Click Submit to save to Google Sheets.</p>
+
+<table>
+  <thead>
+    <tr><th>Player</th><th>Balls</th><th>Dots</th><th>Runs</th><th>Dot %</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Chinmay</td><td>6</td><td class="dots">2</td><td>15</td><td>33%</td><td><span class="out">OUT</span></td></tr>
+    <tr><td>Hardik</td><td>39</td><td class="dots">13</td><td>72</td><td>33%</td><td><span class="out">OUT</span></td></tr>
+    <tr><td>Sunny(W) ©</td><td>5</td><td class="dots">2</td><td>6</td><td>40%</td><td><span class="out">OUT</span></td></tr>
+    <tr><td>Mahesh</td><td>14</td><td class="dots">2</td><td>29</td><td>14%</td><td><span class="out">OUT</span></td></tr>
+    <tr><td>Manish</td><td>26</td><td class="dots">5</td><td>54</td><td>19%</td><td><span class="ro">RET OUT</span></td></tr>
+    <tr><td>Satish</td><td>16</td><td class="dots">3</td><td>21</td><td>19%</td><td><span class="ro">RET OUT</span></td></tr>
+    <tr><td>Mayur R</td><td>11</td><td class="dots">4</td><td>16</td><td>36%</td><td>Not out</td></tr>
+    <tr><td>Kirtan</td><td>6</td><td class="dots">2</td><td>9</td><td>33%</td><td>Not out</td></tr>
+  </tbody>
+</table>
+
+<button id="submitBtn" onclick="submitData()">Submit to Google Sheets</button>
+<div class="msg" id="msg"></div>
+
+<script>
+var GAME = 'Rockvale Risers';
+var DATA = [
+  { name: 'Chinmay',    dots: 2,  runs: 15, balls: 6,  isOut: true  },
+  { name: 'Hardik',     dots: 13, runs: 72, balls: 39, isOut: true  },
+  { name: 'Sunny(W) \u00a9', dots: 2, runs: 6, balls: 5, isOut: true },
+  { name: 'Mahesh',     dots: 2,  runs: 29, balls: 14, isOut: true  },
+  { name: 'Manish',     dots: 5,  runs: 54, balls: 26, isOut: true  },
+  { name: 'Satish',     dots: 3,  runs: 21, balls: 16, isOut: true  },
+  { name: 'Mayur R',    dots: 4,  runs: 16, balls: 11, isOut: false },
+  { name: 'Kirtan',     dots: 2,  runs: 9,  balls: 6,  isOut: false }
+];
+
+function submitData() {
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  show('Submitting to Google Sheets...', 'inf');
+
+  fetch(MCC_CONFIG.SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ type: 'dotballs', team: 'Lions', game: GAME, dotballs: DATA })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.status === 'ok') {
+      show('✓ Saved! Rockvale Risers dot ball data is now in Google Sheets. You can close this page.', 'ok');
+      btn.textContent = 'Already submitted';
+    } else {
+      show('Error: ' + (d.message || 'Unknown error from App Script'), 'err');
+      btn.disabled = false;
+    }
+  })
+  .catch(function(e) {
+    show('Network error — make sure you are connected and try again. (' + e + ')', 'err');
+    btn.disabled = false;
+  });
+}
+
+function show(text, type) {
+  var el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+</script>
+</body>
+</html>
