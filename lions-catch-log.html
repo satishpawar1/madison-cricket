@@ -183,10 +183,12 @@ function onGameChange() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
+      if (!liveData) liveData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
       buildRows(game, isPast, daysSince, liveData);
     })
     .catch(function() {
-      buildRows(game, isPast, daysSince, null);
+      var preData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
+      buildRows(game, isPast, daysSince, preData);
     });
 }
 
