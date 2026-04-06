@@ -326,6 +326,20 @@ var actionStack = []; // [{slotIdx: 0|1, type:'D'|'R'}]
 var autoSaveTimer = null;
 var LOCAL_KEY_PREFIX = 'dottrack2_lions_';
 
+// Pre-calculated historical game data (loaded when Sheets has no data yet)
+var PRESETS = {
+  'Rockvale Risers': [
+    { name: 'Chinmay',     dots: 2,  runs: 15, balls: 6,  isOut: true  },
+    { name: 'Hardik',      dots: 13, runs: 72, balls: 39, isOut: true  },
+    { name: 'Sunny(W) \u00a9', dots: 2,  runs: 6,  balls: 5,  isOut: true  },
+    { name: 'Mahesh',      dots: 2,  runs: 29, balls: 14, isOut: true  },
+    { name: 'Manish',      dots: 5,  runs: 54, balls: 26, isOut: true  },
+    { name: 'Satish',      dots: 3,  runs: 21, balls: 16, isOut: true  },
+    { name: 'Mayur R',     dots: 4,  runs: 16, balls: 11, isOut: false },
+    { name: 'Kirtan',      dots: 2,  runs: 9,  balls: 6,  isOut: false }
+  ]
+};
+
 // ── Stats ─────────────────────────────────────────────────────────
 function slotStats(slot) {
   var dots = 0;
@@ -648,6 +662,35 @@ function submitToSheets(silent) {
   .catch(function() { setAutoSave('as-error', 'No connection — data safe on device'); });
 }
 
+// ── Preset loader ─────────────────────────────────────────────────
+function loadPreset(g) {
+  var preset = PRESETS[g];
+  dismissed = [];
+  slots = [{ name: null, history: [] }, { name: null, history: [] }];
+  var slotIdx = 0;
+  for (var i = 0; i < preset.length; i++) {
+    var p = preset[i];
+    var pct = p.balls > 0 ? Math.round(p.dots / p.balls * 100) : 0;
+    if (p.isOut) {
+      dismissed.push({ name: p.name, dots: p.dots, balls: p.balls, pct: pct });
+    } else {
+      if (slotIdx < 2) {
+        var hist = [];
+        for (var d = 0; d < p.dots; d++) hist.push('D');
+        for (var r = 0; r < p.runs; r++) hist.push('R');
+        slots[slotIdx] = { name: p.name, history: hist };
+        slotIdx++;
+      }
+    }
+  }
+  actionStack = [];
+  renderAll();
+  saveToLocal();
+  setAutoSave('as-pending', 'Game data loaded — saving to Sheets...');
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(function() { submitToSheets(true); }, 2000);
+}
+
 // ── Init ──────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
   var sel = document.getElementById('gameSelect');
@@ -697,10 +740,16 @@ window.addEventListener('DOMContentLoaded', function() {
           slots[1] = active[1] || { name:null, history:[] };
           actionStack = [];
           setAutoSave('as-saved', 'Loaded from Sheets');
+          renderAll();
+        } else if (PRESETS[g]) {
+          loadPreset(g);
+        } else {
+          renderAll();
         }
-        renderAll();
       })
-      .catch(function() { renderAll(); });
+      .catch(function() {
+        if (PRESETS[g]) { loadPreset(g); } else { renderAll(); }
+      });
   });
 
   renderAll();
