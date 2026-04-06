@@ -183,14 +183,10 @@ function onGameChange() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
-      if (!liveData || !liveData.some(function(p){return p.att>0;})) {
-        liveData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
-      }
       buildRows(game, isPast, daysSince, liveData);
     })
     .catch(function() {
-      var preData = (CFG.catchByGame && CFG.catchByGame[game]) || null;
-      buildRows(game, isPast, daysSince, preData);
+      buildRows(game, isPast, daysSince, null);
     });
 }
 
@@ -217,8 +213,8 @@ function buildRows(game, isPast, daysSince, data) {
         if (data[i].name === p) { pre = data[i]; break; }
       }
     }
-    var att  = pre ? (pre.att  || 0) : 0;
-    var tak  = pre ? (pre.tak  || 0) : 0;
+    var att  = pre ? (pre.att  || pre.attempted || pre.caught  || 0) : 0;
+    var tak  = pre ? (pre.tak  || pre.taken    || pre.caught  || 0) : 0;
     var drop = att - tak;
     var cls  = isLocked ? 'pr locked' : (pre && pre.att > 0 ? 'pr pre' : 'pr');
 
