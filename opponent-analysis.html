@@ -515,7 +515,7 @@ function _sortData(data, key, dir) {
 function _batHeaders(sortKey, sortDir) {
   var cols = [
     ['#',''],['Player','name'],['Mat','matches'],['Inns','innings'],
-    ['NO','notOuts'],['Runs','runs'],['Balls','balls'],['HS','highest'],
+    ['Runs','runs'],['HS','highest'],
     ['4s','fours'],['6s','sixes'],['Avg','average'],['SR','strikeRate'],
     ['50s','fifties'],['100s','hundreds']
   ];
@@ -556,9 +556,7 @@ function _renderBatRows(data) {
       + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
       + '<td>' + (p.matches||0) + '</td>'
       + '<td>' + (p.innings||0) + '</td>'
-      + '<td>' + (p.notOuts||0) + '</td>'
       + '<td style="color:#1A56B0;font-weight:700">' + (p.runs||0) + '</td>'
-      + '<td>' + (p.balls||0) + '</td>'
       + '<td>' + (p.highest||'-') + '</td>'
       + '<td>' + (p.fours||0) + '</td>'
       + '<td>' + (p.sixes||0) + '</td>'
