@@ -516,13 +516,17 @@ function renderTab(tab, opp) {
     var rows = bowl.map(function(p, i) {
       var isThreat = p.economy !== null && p.economy <= 7 && p.average !== null && p.average <= 12;
       var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      var ovrsParts = String(p.overs||'0').split('.');
+      var totalBalls = parseInt(ovrsParts[0]) * 6 + (ovrsParts[1] ? parseInt(ovrsParts[1]) : 0);
+      var inns = p.innings || 1;
+      var ovrsPerInn = inns > 0 ? (totalBalls / inns / 6).toFixed(1) : '-';
       return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
         + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
         + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
         + '<td>' + (p.matches||0) + '</td>'
         + '<td>' + (p.innings||0) + '</td>'
         + '<td>' + (p.overs||0) + '</td>'
-        + '<td>' + (p.runs||0) + '</td>'
+        + '<td>' + ovrsPerInn + '</td>'
         + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
         + '<td>' + (p.economy||'-') + '</td>'
         + '<td>' + (p.average||'-') + '</td>'
@@ -531,7 +535,7 @@ function renderTab(tab, opp) {
     document.getElementById('bowlingList').innerHTML =
       '<table class="stats-table"><thead><tr>'
       + '<th>#</th><th class="col-player">Player</th>'
-      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Runs</th>'
+      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Ovrs/Inn</th>'
       + '<th>Wkts</th><th>Econ</th><th>Avg</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
