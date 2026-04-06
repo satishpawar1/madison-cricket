@@ -4,161 +4,262 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <script src="config.js"></script>
-<title>Madison Lions — Log Dot Balls</title>
+<title>Madison Lions — Dot Ball Tracker</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
-
-.page-header {
-  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
-  padding: 1.25rem 1.25rem 1.5rem;
-  display: flex; align-items: center; gap: 12px;
-}
-.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
-.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
-.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
-
-.content { padding: 1.25rem; max-width: 640px; margin: 0 auto; }
-
-.card {
-  background: #fff; border-radius: 14px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  padding: 16px; margin-bottom: 1rem;
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background: #0d1117;
+  color: #c9d1d9;
+  min-height: 100vh;
+  padding: 1.5rem 1rem 3rem;
 }
 
-.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
-.gs select {
-  font-size: 14px; padding: 10px 12px;
-  border: 1.5px solid #E5E7EB; border-radius: 10px;
-  background: #fff; flex: 1; min-width: 200px; color: #111827;
+.hdr-team {
+  text-align: center; font-size: 11px; letter-spacing: 0.28em;
+  color: #8bc34a; text-transform: uppercase; margin-bottom: 8px;
+}
+.hdr-title {
+  text-align: center; font-size: 26px; font-weight: 900;
+  color: #e8e8e8; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+/* Game selector */
+.game-bar {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: center; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.game-bar label { font-size: 10px; letter-spacing: 0.15em; color: #4b5563; text-transform: uppercase; }
+.game-bar select {
+  font-family: 'Courier New', monospace; font-size: 12px;
+  padding: 7px 12px; border: 1px solid #2d3748; border-radius: 6px;
+  background: #161c27; color: #e8e8e8; flex: 1; max-width: 300px;
   -webkit-appearance: none; appearance: none;
 }
-.gs select:focus { outline: none; border-color: #1A56B0; }
+.game-bar select:focus { outline: none; border-color: #4ade80; }
 
-/* ── Auto-save status bar ── */
-.autosave-bar {
-  display: none; align-items: center; gap: 6px;
-  margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid #F3F4F6;
-  font-size: 12px;
+/* Summary box */
+.summary-box {
+  border: 1px solid #2d3748; border-radius: 10px;
+  padding: 14px 24px; margin: 0 auto 1.5rem;
+  max-width: 440px; display: flex;
+  align-items: center; justify-content: center; gap: 12px;
+  background: #161c27;
 }
-.autosave-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+.sum-grp { display: flex; align-items: baseline; gap: 8px; }
+.sum-item { text-align: center; }
+.sum-label { font-size: 9px; letter-spacing: 0.18em; color: #4b5563; text-transform: uppercase; margin-bottom: 3px; }
+.sum-val { font-size: 30px; font-weight: 800; line-height: 1; }
+.sum-val.dots  { color: #e05252; }
+.sum-val.balls { color: #e8e8e8; }
+.sum-val.pct   { color: #4ade80; }
+.sum-sep { font-size: 28px; color: #2d3748; align-self: center; padding-top: 6px; }
+.sum-divider { width: 1px; height: 40px; background: #2d3748; }
+
+/* Batter cards */
+.batter-cards { max-width: 500px; margin: 0 auto; }
+.batter-card {
+  background: #161c27; border: 1px solid #2d3748;
+  border-radius: 12px; margin-bottom: 1rem; overflow: hidden;
+  transition: opacity 0.2s;
 }
-.as-saved   .autosave-dot { background: #1A8F6A; }
-.as-pending .autosave-dot { background: #F59E0B; }
-.as-saving  .autosave-dot { background: #9CA3AF; animation: pulse 1s infinite; }
-.as-error   .autosave-dot { background: #EF4444; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.autosave-text { color: #6B7280; }
-.as-saved   .autosave-text { color: #1A8F6A; }
-.as-pending .autosave-text { color: #92400E; }
-.as-error   .autosave-text { color: #991B1B; }
+.batter-card.is-out { opacity: 0.45; }
 
-.banner { border-radius: 10px; padding: 11px 14px; font-size: 13px; margin-bottom: 1rem; display: none; line-height: 1.5; font-weight: 500; }
-.b-lock { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
-.b-pre  { background: #E8F1FC; color: #1A56B0; border-left: 3px solid #1A56B0; }
-.b-past { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
-.b-new  { background: #E2F5EE; color: #0F5C43; border-left: 3px solid #1A8F6A; }
-.b-load { background: #F3F4F6; color: #9CA3AF; border-left: 3px solid #D1D5DB; }
-
-.slbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
-
-.prows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-
-.pr {
+.card-header {
   display: flex; align-items: center; gap: 10px;
-  background: #fff; border: 1.5px solid #F3F4F6;
-  border-radius: 12px; padding: 10px 14px;
+  padding: 11px 14px 10px;
+  border-bottom: 1px dashed #2d3748;
 }
-.pr.pre { border-color: #1A56B0; background: #F0F6FF; }
-.pr.locked { opacity: 0.55; }
+.card-header.selectable { cursor: pointer; }
+.card-header.selectable:active { background: #1c2535; }
 
-.prname { font-size: 14px; font-weight: 600; flex: 1; min-width: 0; }
-
-.counter-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.cnt-btn {
-  width: 40px; height: 40px; border-radius: 10px; border: none;
-  font-size: 22px; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  touch-action: manipulation; user-select: none;
-  transition: opacity 0.1s;
-  line-height: 1;
+.slot-badge {
+  font-size: 10px; font-weight: 700;
+  background: #1a2d0e; color: #8bc34a;
+  padding: 2px 7px; border-radius: 4px;
+  letter-spacing: 0.06em; flex-shrink: 0;
 }
-.cnt-btn:active { opacity: 0.7; }
-.btn-minus { background: #FEE2E2; color: #991B1B; }
-.btn-plus  { background: #E2F5EE; color: #0F5C43; }
-.cnt-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.cnt-val {
-  font-size: 22px; font-weight: 800; color: #111827;
-  min-width: 36px; text-align: center;
+.batter-name {
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.05em; flex: 1; color: #e8e8e8;
 }
-.cnt-val.has-dots { color: #1A56B0; }
-
-.summary {
-  background: #F8FAFF; border-radius: 10px; padding: 12px 16px;
-  font-size: 13px; color: #6B7280; margin-bottom: 1.25rem; line-height: 1.7;
-  border: 1px solid #E8F1FC;
+.batter-name.placeholder { color: #3d4756; font-weight: 400; font-size: 13px; }
+.out-badge {
+  font-size: 10px; font-weight: 700;
+  background: #2d0e0e; color: #e05252;
+  padding: 2px 7px; border-radius: 4px;
+  letter-spacing: 0.1em;
 }
-.summary strong { color: #111827; font-weight: 700; }
-
-.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.25rem 0; }
-
-.acts { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn {
-  font-size: 14px; padding: 11px 20px; border-radius: 10px;
-  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
-  transition: opacity 0.15s;
+.x-btn {
+  background: none; border: none; color: #3d4756;
+  font-size: 18px; cursor: pointer; padding: 0 2px;
+  line-height: 1; flex-shrink: 0; font-family: inherit;
+  transition: color 0.12s;
 }
-.btn:active { opacity: 0.8; }
-.btn-primary { background: #1A56B0; color: #fff; }
-.btn-primary:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
-.btn-clear { background: #F3F4F6; color: #6B7280; }
+.x-btn:hover, .x-btn:active { color: #e05252; }
 
-.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
-.msg.ok   { background: #E2F5EE; color: #0F5C43; display: block; }
-.msg.err  { background: #FEE2E2; color: #991B1B; display: block; }
-.msg.info { background: #E8F1FC; color: #1A56B0; display: block; }
+.card-stats {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 14px 8px;
+}
+.stat-block { min-width: 44px; }
+.stat-val { font-size: 28px; font-weight: 800; line-height: 1; }
+.stat-val.dots  { color: #e05252; }
+.stat-val.balls { color: #e8e8e8; }
+.stat-lbl { font-size: 9px; letter-spacing: 0.14em; color: #3d4756; text-transform: uppercase; margin-top: 3px; }
+
+.rate-wrap { flex: 1; }
+.rate-bar { height: 5px; background: #1a2535; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+.rate-fill { height: 100%; background: #8bc34a; border-radius: 3px; transition: width 0.25s; }
+.rate-lbl { font-size: 11px; color: #4b5563; letter-spacing: 0.04em; }
+
+.card-btns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 8px 14px 14px;
+}
+.action-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 18px 10px; border: none; border-radius: 8px;
+  cursor: pointer; touch-action: manipulation; user-select: none;
+  transition: filter 0.08s, transform 0.08s;
+}
+.action-btn:active { filter: brightness(1.25); transform: scale(0.97); }
+.action-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
+.btn-dot { background: #5c1a1a; color: #e05252; }
+.btn-run { background: #1a4d1a; color: #4ade80; }
+
+/* Bottom action bar */
+.bottom-bar {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;
+  max-width: 500px; margin: 0.5rem auto 0;
+}
+.bar-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 13px 4px; border-radius: 8px; cursor: pointer;
+  background: transparent; text-align: center;
+  touch-action: manipulation; transition: filter 0.12s;
+}
+.bar-btn:active { filter: brightness(1.35); }
+.bar-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+.bb-add   { border: 1px dashed #4ade80; color: #4ade80; }
+.bb-undo  { border: 1px dashed #4b5563; color: #6b7280; }
+.bb-copy  { border: 1px dashed #818cf8; color: #818cf8; }
+.bb-reset { border: 1px dashed #4b5563; color: #6b7280; }
+
+/* Auto-save bar */
+.autosave-bar {
+  text-align: center; font-size: 10px; letter-spacing: 0.08em;
+  margin-top: 1rem; display: none; max-width: 500px; margin-left: auto; margin-right: auto;
+}
+.autosave-bar.as-pending { color: #92400E; display: block; }
+.autosave-bar.as-saving  { color: #4b5563; display: block; }
+.autosave-bar.as-saved   { color: #4ade80; display: block; }
+.autosave-bar.as-error   { color: #e05252; display: block; }
+
+/* Selector overlay */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  display: none; align-items: center; justify-content: center; z-index: 100;
+}
+.overlay.open { display: flex; }
+.sel-box {
+  background: #161c27; border: 1px solid #2d3748; border-radius: 14px;
+  padding: 20px; width: calc(100% - 2rem); max-width: 340px;
+  max-height: 80vh; overflow-y: auto;
+}
+.sel-title {
+  font-size: 10px; letter-spacing: 0.2em; color: #8bc34a;
+  text-transform: uppercase; margin-bottom: 14px; text-align: center;
+}
+.p-opt {
+  display: block; width: 100%;
+  font-family: 'Courier New', monospace; font-size: 14px; font-weight: 600;
+  text-align: left; background: #1c2535; border: 1px solid #2d3748;
+  color: #e8e8e8; padding: 12px 16px; border-radius: 8px;
+  cursor: pointer; margin-bottom: 6px; transition: background 0.1s;
+}
+.p-opt:active { background: #243040; }
+.p-opt:disabled { opacity: 0.25; cursor: not-allowed; }
+.sel-cancel {
+  display: block; width: 100%; margin-top: 10px;
+  font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 0.1em;
+  background: none; border: 1px dashed #2d3748; color: #4b5563;
+  padding: 10px; border-radius: 8px; cursor: pointer; text-align: center;
+}
+
+/* Confirm dialog */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  display: none; align-items: center; justify-content: center; z-index: 200;
+}
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: #161c27; border: 1px solid #2d3748; border-radius: 14px;
+  padding: 24px 20px; width: calc(100% - 2rem); max-width: 320px; text-align: center;
+}
+.confirm-msg { font-size: 14px; color: #e8e8e8; margin-bottom: 20px; line-height: 1.6; letter-spacing: 0.03em; }
+.confirm-btns { display: flex; gap: 10px; }
+.confirm-yes {
+  flex: 1; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.1em; padding: 12px; border-radius: 8px;
+  border: none; background: #5c1a1a; color: #e05252; cursor: pointer;
+}
+.confirm-no {
+  flex: 1; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.1em; padding: 12px; border-radius: 8px;
+  border: 1px solid #2d3748; background: transparent; color: #6b7280; cursor: pointer;
+}
 </style>
 </head>
 <body>
 
-<div class="page-header">
-  <a href="index.html">&#8249;</a>
-  <div class="hdr-text">
-    <h2>🦁 Lions — Log Dot Balls</h2>
-    <p>Record dot balls faced per player per game</p>
+<div class="hdr-team">Madison Lions</div>
+<div class="hdr-title">Dot Ball Tracker</div>
+
+<div class="game-bar">
+  <label>Game</label>
+  <select id="gameSelect"><option value="">— select game —</option></select>
+</div>
+
+<div class="summary-box">
+  <div class="sum-item"><div class="sum-label">Dots</div><div class="sum-val dots" id="sumDots">0</div></div>
+  <div class="sum-sep">/</div>
+  <div class="sum-item"><div class="sum-label">Balls</div><div class="sum-val balls" id="sumBalls">0</div></div>
+  <div class="sum-divider"></div>
+  <div class="sum-item"><div class="sum-label">Dot%</div><div class="sum-val pct" id="sumPct">0%</div></div>
+</div>
+
+<div class="batter-cards" id="batterCards"></div>
+
+<div class="bottom-bar">
+  <button class="bar-btn bb-add"  onclick="addBatter()">+ Batter</button>
+  <button class="bar-btn bb-undo" id="undoBtn" onclick="undoLast()" disabled>Undo</button>
+  <button class="bar-btn bb-copy" onclick="copyStats()">Copy</button>
+  <button class="bar-btn bb-reset" onclick="askReset()">Reset</button>
+</div>
+
+<div class="autosave-bar" id="autosaveBar"></div>
+
+<!-- Batter selector overlay -->
+<div class="overlay" id="selOverlay">
+  <div class="sel-box">
+    <div class="sel-title">Select Batter</div>
+    <div id="playerList"></div>
+    <button class="sel-cancel" onclick="closeSelector()">Cancel</button>
   </div>
 </div>
 
-<div class="content">
-  <div class="card">
-    <div class="gs">
-      <label>Game</label>
-      <select id="gs"><option value="">— pick a game —</option></select>
-    </div>
-    <!-- auto-save status sits inside the game card -->
-    <div class="autosave-bar" id="autosaveBar">
-      <div class="autosave-dot"></div>
-      <span class="autosave-text" id="autosaveText"></span>
-    </div>
-  </div>
-
-  <div class="banner" id="banner"></div>
-
-  <div id="playerSection" style="display:none">
-    <div class="card" style="padding:12px 16px">
-      <div class="slbl">Dot balls per player</div>
-      <div class="prows" id="prows"></div>
-      <div class="summary" id="summary"></div>
-      <hr class="sep">
-      <div class="acts">
-        <button class="btn btn-primary" id="saveBtn" onclick="submitDots(false)">Save to Sheets</button>
-        <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
-      </div>
-      <div class="msg" id="msg"></div>
+<!-- Reset confirm overlay -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-msg">Reset all data for this game?<br>This cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="confirm-yes" onclick="doReset()">Reset</button>
+      <button class="confirm-no"  onclick="closeConfirm()">Cancel</button>
     </div>
   </div>
 </div>
@@ -167,303 +268,427 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 var CFG = MCC_CONFIG.lions;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var PL = CFG.players;
-var isLocked = false;
+
+// ── State ─────────────────────────────────────────────────────────
+var slots = [
+  { id: 0, name: null, history: [], isOut: false },
+  { id: 1, name: null, history: [], isOut: false }
+];
+var nextId = 2;
+var actionStack = []; // [{slotId, type:'D'|'R'}] — global undo stack
 var autoSaveTimer = null;
-var LOCAL_KEY_PREFIX = 'dotballs_lions_';
+var pendingSlotId = null;
+var LOCAL_KEY_PREFIX = 'dottrack_lions_';
 
-// ── localStorage helpers ──────────────────────────────────────────
-function saveToLocal(game) {
-  if (!game || isLocked) return;
-  var state = {};
-  PL.forEach(function(p) {
-    var el = document.getElementById('dots-' + p);
-    state[p] = el ? (parseInt(el.textContent) || 0) : 0;
-  });
-  try {
-    localStorage.setItem(LOCAL_KEY_PREFIX + game, JSON.stringify({ ts: Date.now(), state: state }));
-  } catch(e) {}
+// ── Helpers ───────────────────────────────────────────────────────
+function findSlot(id) {
+  for (var i = 0; i < slots.length; i++) { if (slots[i].id === id) return slots[i]; }
+  return null;
+}
+function slotStats(slot) {
+  var dots = 0;
+  for (var i = 0; i < slot.history.length; i++) { if (slot.history[i] === 'D') dots++; }
+  var balls = slot.history.length;
+  return { dots: dots, balls: balls, pct: balls > 0 ? Math.round(dots / balls * 100) : 0 };
 }
 
-function loadFromLocal(game) {
-  try {
-    var raw = localStorage.getItem(LOCAL_KEY_PREFIX + game);
-    if (!raw) return null;
-    var parsed = JSON.parse(raw);
-    // Convert to same format as Sheets response: [{name, dots}]
-    return Object.keys(parsed.state).map(function(name) {
-      return { name: name, dots: parsed.state[name] };
-    });
-  } catch(e) { return null; }
-}
-
-function clearLocal(game) {
-  try { localStorage.removeItem(LOCAL_KEY_PREFIX + game); } catch(e) {}
-}
-
-// ── Auto-save status indicator ────────────────────────────────────
-function setAutoSaveStatus(state, text) {
-  var bar = document.getElementById('autosaveBar');
-  bar.style.display = 'flex';
-  bar.className = 'autosave-bar ' + state;
-  document.getElementById('autosaveText').textContent = text;
-}
-
-// ── Schedule auto-save to Sheets ─────────────────────────────────
-function scheduleAutoSave(game) {
-  if (isLocked) return;
-  setAutoSaveStatus('as-pending', 'Unsaved changes — saving in a moment...');
-  if (autoSaveTimer) clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(function() {
-    submitDots(true, game);
-  }, 8000); // 8 seconds after last tap
-}
-
-// ── On every counter change ───────────────────────────────────────
-function onCounterChange(game) {
-  saveToLocal(game);      // instant — survives browser close
-  scheduleAutoSave(game); // deferred — syncs to Sheets
+// ── Render ────────────────────────────────────────────────────────
+function renderAll() {
+  var container = document.getElementById('batterCards');
+  container.innerHTML = '';
+  for (var i = 0; i < slots.length; i++) {
+    container.appendChild(buildCard(slots[i], i));
+  }
   updateSummary();
 }
 
-// ── Page init ─────────────────────────────────────────────────────
+function buildCard(slot, idx) {
+  var st = slotStats(slot);
+  var hasName = slot.name !== null;
+  var isOut = slot.isOut;
+
+  var card = document.createElement('div');
+  card.className = 'batter-card' + (isOut ? ' is-out' : '');
+
+  // ── Header ──
+  var hdr = document.createElement('div');
+  hdr.className = 'card-header' + (!hasName && !isOut ? ' selectable' : '');
+  if (!hasName && !isOut) hdr.onclick = function() { openSelector(slot.id); };
+
+  var badge = document.createElement('span');
+  badge.className = 'slot-badge';
+  badge.textContent = '#' + (idx + 1);
+
+  var nameEl = document.createElement('span');
+  nameEl.className = 'batter-name' + (!hasName ? ' placeholder' : '');
+  nameEl.textContent = hasName ? slot.name.toUpperCase() : 'tap to select batter';
+  if (hasName && !isOut) {
+    nameEl.style.cursor = 'pointer';
+    (function(sid) {
+      nameEl.onclick = function(e) { e.stopPropagation(); openSelector(sid); };
+    })(slot.id);
+  }
+
+  hdr.appendChild(badge);
+  hdr.appendChild(nameEl);
+
+  if (isOut) {
+    var outBadge = document.createElement('span');
+    outBadge.className = 'out-badge';
+    outBadge.textContent = 'OUT';
+    hdr.appendChild(outBadge);
+  }
+
+  var xBtn = document.createElement('button');
+  xBtn.className = 'x-btn';
+  xBtn.textContent = '×';
+  xBtn.title = isOut ? 'Remove' : (hasName ? 'Mark Out' : 'Remove slot');
+  (function(s) {
+    xBtn.onclick = function(e) {
+      e.stopPropagation();
+      if (s.isOut) {
+        // Remove frozen card
+        slots = slots.filter(function(x) { return x.id !== s.id; });
+        actionStack = actionStack.filter(function(a) { return a.slotId !== s.id; });
+        renderAll(); saveToLocal();
+      } else if (s.name) {
+        // Mark as out — freeze
+        s.isOut = true;
+        renderAll(); saveToLocal(); scheduleAutoSave();
+      } else {
+        // Remove empty slot (only if more than 2)
+        if (slots.length > 2) {
+          slots = slots.filter(function(x) { return x.id !== s.id; });
+          renderAll();
+        }
+      }
+    };
+  })(slot);
+  hdr.appendChild(xBtn);
+
+  // ── Stats row ──
+  var statsRow = document.createElement('div');
+  statsRow.className = 'card-stats';
+
+  var dotsBlk = document.createElement('div');
+  dotsBlk.className = 'stat-block';
+  dotsBlk.innerHTML = '<div class="stat-val dots">' + st.dots + '</div><div class="stat-lbl">Dots</div>';
+
+  var ballsBlk = document.createElement('div');
+  ballsBlk.className = 'stat-block';
+  ballsBlk.innerHTML = '<div class="stat-val balls">' + st.balls + '</div><div class="stat-lbl">Balls</div>';
+
+  var rateWrap = document.createElement('div');
+  rateWrap.className = 'rate-wrap';
+  rateWrap.innerHTML = '<div class="rate-bar"><div class="rate-fill" style="width:' + st.pct + '%"></div></div>'
+    + '<div class="rate-lbl">' + st.pct + '% dot rate</div>';
+
+  statsRow.appendChild(dotsBlk);
+  statsRow.appendChild(ballsBlk);
+  statsRow.appendChild(rateWrap);
+
+  // ── Action buttons ──
+  var btnRow = document.createElement('div');
+  btnRow.className = 'card-btns';
+
+  var dotBtn = document.createElement('button');
+  dotBtn.className = 'action-btn btn-dot';
+  dotBtn.textContent = 'DOT';
+  dotBtn.disabled = !hasName || isOut;
+  (function(sid) {
+    dotBtn.onclick = function() { logAction(sid, 'D'); };
+  })(slot.id);
+
+  var runBtn = document.createElement('button');
+  runBtn.className = 'action-btn btn-run';
+  runBtn.textContent = 'RUN';
+  runBtn.disabled = !hasName || isOut;
+  (function(sid) {
+    runBtn.onclick = function() { logAction(sid, 'R'); };
+  })(slot.id);
+
+  btnRow.appendChild(dotBtn);
+  btnRow.appendChild(runBtn);
+
+  card.appendChild(hdr);
+  card.appendChild(statsRow);
+  card.appendChild(btnRow);
+  return card;
+}
+
+function updateSummary() {
+  var totalDots = 0, totalBalls = 0;
+  for (var i = 0; i < slots.length; i++) {
+    var st = slotStats(slots[i]);
+    totalDots += st.dots; totalBalls += st.balls;
+  }
+  var pct = totalBalls > 0 ? Math.round(totalDots / totalBalls * 100) : 0;
+  document.getElementById('sumDots').textContent = totalDots;
+  document.getElementById('sumBalls').textContent = totalBalls;
+  document.getElementById('sumPct').textContent = pct + '%';
+  document.getElementById('undoBtn').disabled = actionStack.length === 0;
+}
+
+// ── Actions ───────────────────────────────────────────────────────
+function logAction(slotId, type) {
+  var slot = findSlot(slotId);
+  if (!slot || slot.isOut) return;
+  slot.history.push(type);
+  actionStack.push({ slotId: slotId, type: type });
+  renderAll();
+  saveToLocal();
+  scheduleAutoSave();
+}
+
+function undoLast() {
+  if (!actionStack.length) return;
+  var last = actionStack.pop();
+  var slot = findSlot(last.slotId);
+  if (slot && slot.history.length > 0) slot.history.pop();
+  renderAll();
+  saveToLocal();
+  scheduleAutoSave();
+}
+
+function addBatter() {
+  // Find first truly empty slot
+  for (var i = 0; i < slots.length; i++) {
+    if (!slots[i].name && !slots[i].isOut) { openSelector(slots[i].id); return; }
+  }
+  // All slots have names — add a new slot
+  var newSlot = { id: nextId++, name: null, history: [], isOut: false };
+  slots.push(newSlot);
+  renderAll();
+  openSelector(newSlot.id);
+}
+
+// ── Batter selector ───────────────────────────────────────────────
+function openSelector(slotId) {
+  pendingSlotId = slotId;
+  var activeName = [];
+  for (var i = 0; i < slots.length; i++) {
+    if (slots[i].name && !slots[i].isOut && slots[i].id !== slotId) activeName.push(slots[i].name);
+  }
+  var list = document.getElementById('playerList');
+  list.innerHTML = '';
+  for (var j = 0; j < PL.length; j++) {
+    (function(name) {
+      var btn = document.createElement('button');
+      btn.className = 'p-opt';
+      btn.textContent = name;
+      btn.disabled = activeName.indexOf(name) >= 0;
+      btn.onclick = function() { selectBatter(slotId, name); };
+      list.appendChild(btn);
+    })(PL[j]);
+  }
+  document.getElementById('selOverlay').classList.add('open');
+}
+
+function selectBatter(slotId, name) {
+  var slot = findSlot(slotId);
+  if (slot) {
+    slot.name = name;
+    slot.history = [];
+    slot.isOut = false;
+    // Clear undo actions for this slot since it's a fresh batter
+    actionStack = actionStack.filter(function(a) { return a.slotId !== slotId; });
+  }
+  closeSelector();
+  renderAll();
+  saveToLocal();
+}
+
+function closeSelector() {
+  document.getElementById('selOverlay').classList.remove('open');
+  pendingSlotId = null;
+}
+
+// ── Reset ─────────────────────────────────────────────────────────
+function askReset() {
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+function doReset() {
+  closeConfirm();
+  slots = [
+    { id: 0, name: null, history: [], isOut: false },
+    { id: 1, name: null, history: [], isOut: false }
+  ];
+  nextId = 2; actionStack = [];
+  var g = document.getElementById('gameSelect').value;
+  if (g) clearLocal(g);
+  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+  renderAll();
+  document.getElementById('autosaveBar').style.display = 'none';
+}
+
+// ── Copy to clipboard ─────────────────────────────────────────────
+function copyStats() {
+  var g = document.getElementById('gameSelect').value || 'Game';
+  var lines = ['Lions — Dot Ball Tracker', 'Game: ' + g, ''];
+  var totalDots = 0, totalBalls = 0;
+  for (var i = 0; i < slots.length; i++) {
+    var s = slots[i];
+    if (!s.name) continue;
+    var st = slotStats(s);
+    totalDots += st.dots; totalBalls += st.balls;
+    lines.push(s.name + (s.isOut ? ' [OUT]' : '') + ': '
+      + st.dots + ' dots / ' + st.balls + ' balls (' + st.pct + '% dot rate)');
+  }
+  if (totalBalls > 0) {
+    lines.push('');
+    lines.push('TOTAL: ' + totalDots + '/' + totalBalls + ' balls — '
+      + Math.round(totalDots / totalBalls * 100) + '% dot rate');
+  }
+  var text = lines.join('\n');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      setAutoSave('as-saved', '✓ Copied to clipboard');
+    }).catch(function() { fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); setAutoSave('as-saved', '✓ Copied to clipboard'); }
+  catch(e) { setAutoSave('as-error', 'Copy failed — share manually'); }
+  document.body.removeChild(ta);
+}
+
+// ── Persistence ───────────────────────────────────────────────────
+function lsKey(g) { return LOCAL_KEY_PREFIX + g; }
+
+function saveToLocal() {
+  var g = document.getElementById('gameSelect').value;
+  if (!g) return;
+  try {
+    localStorage.setItem(lsKey(g), JSON.stringify({
+      ts: Date.now(), slots: slots, nextId: nextId, actionStack: actionStack
+    }));
+  } catch(e) {}
+}
+
+function loadFromLocal(g) {
+  try {
+    var raw = localStorage.getItem(lsKey(g));
+    if (!raw) return false;
+    var d = JSON.parse(raw);
+    slots = d.slots || slots;
+    nextId = d.nextId || nextId;
+    actionStack = d.actionStack || [];
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearLocal(g) {
+  try { localStorage.removeItem(lsKey(g)); } catch(e) {}
+}
+
+function scheduleAutoSave() {
+  var g = document.getElementById('gameSelect').value;
+  if (!g) return;
+  setAutoSave('as-pending', 'Unsaved changes...');
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(function() { submitToSheets(true); }, 8000);
+}
+
+function setAutoSave(cls, text) {
+  var bar = document.getElementById('autosaveBar');
+  bar.className = 'autosave-bar ' + cls;
+  bar.textContent = text;
+}
+
+function submitToSheets(silent) {
+  var g = document.getElementById('gameSelect').value;
+  if (!g) return;
+  var dotballs = [];
+  for (var i = 0; i < slots.length; i++) {
+    var s = slots[i];
+    if (!s.name) continue;
+    var st = slotStats(s);
+    dotballs.push({ name: s.name, dots: st.dots, runs: st.balls - st.dots, balls: st.balls, isOut: s.isOut });
+  }
+  if (silent) setAutoSave('as-saving', 'Saving...');
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ type: 'dotballs', team: 'Lions', game: g, dotballs: dotballs })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.status === 'ok') {
+      clearLocal(g);
+      var t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      setAutoSave('as-saved', '✓ Saved at ' + t);
+    } else {
+      setAutoSave('as-error', 'Save failed — data safe on device');
+    }
+  })
+  .catch(function() {
+    setAutoSave('as-error', 'No connection — data safe on device');
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
-  var sel = document.getElementById('gs');
+  var sel = document.getElementById('gameSelect');
   var today = new Date(); today.setHours(0,0,0,0);
   CFG.games.forEach(function(g) {
     var opt = document.createElement('option');
     opt.value = g.name;
     var parts = g.gameDate.split('-');
     var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    opt.textContent = g.name + ' - ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'})
+    opt.textContent = g.name + ' — ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                     + (today > d ? ' (played)' : '');
     sel.appendChild(opt);
   });
-  sel.addEventListener('change', onGameChange);
-});
 
-function onGameChange() {
-  var game = this.value;
-  var section = document.getElementById('playerSection');
-  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+  sel.addEventListener('change', function() {
+    var g = this.value;
+    slots = [
+      { id: 0, name: null, history: [], isOut: false },
+      { id: 1, name: null, history: [], isOut: false }
+    ];
+    nextId = 2; actionStack = [];
+    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
 
-  if (!game) {
-    section.style.display = 'none';
-    hideBanner();
-    document.getElementById('autosaveBar').style.display = 'none';
-    return;
-  }
+    if (!g) { renderAll(); document.getElementById('autosaveBar').style.display = 'none'; return; }
 
-  var today = new Date(); today.setHours(0,0,0,0);
-  var gCfg = null;
-  for (var i = 0; i < CFG.games.length; i++) {
-    if (CFG.games[i].name === game) { gCfg = CFG.games[i]; break; }
-  }
-  var gdParts = gCfg.gameDate.split('-');
-  var gameDate = new Date(parseInt(gdParts[0]), parseInt(gdParts[1])-1, parseInt(gdParts[2]));
-  gameDate.setHours(0,0,0,0);
-  var daysSince = Math.floor((today - gameDate) / (1000*60*60*24));
-  var isPast = today > gameDate;
-  isLocked = isPast && daysSince > 5;
-
-  // Check localStorage first — most recent local edits take priority
-  var localData = isLocked ? null : loadFromLocal(game);
-
-  if (localData && localData.some(function(p) { return p.dots > 0; })) {
-    // Have local data — use it immediately, no spinner needed
-    buildRows(game, isPast, daysSince, localData, true);
-    setAutoSaveStatus('as-pending', 'Local data restored — tap + to continue, or save to Sheets.');
-    // Also fetch from Sheets in background but don't overwrite local
-  } else {
-    // No local data — fetch from Sheets
-    showBanner('b-load', 'Loading dot ball data from Google Sheets...');
-    section.style.display = 'block';
-    document.getElementById('saveBtn').disabled = true;
-
-    fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(game))
+    // Try localStorage first
+    if (loadFromLocal(g)) {
+      renderAll();
+      setAutoSave('as-pending', '📱 Restored from device — tap an action to continue');
+      return;
+    }
+    // Fetch from Sheets
+    fetch(SCRIPT_URL + '?type=dotballs&team=Lions&game=' + encodeURIComponent(g))
       .then(function(r) { return r.json(); })
-      .then(function(d) {
-        var sheetsData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
-        buildRows(game, isPast, daysSince, sheetsData, false);
-        if (!isLocked && sheetsData && sheetsData.some(function(p){return p.dots>0;})) {
-          setAutoSaveStatus('as-saved', 'Loaded from Sheets. Tap + to start logging.');
+      .then(function(data) {
+        if (data.status === 'ok' && data.data && data.data.length) {
+          slots = [];
+          for (var i = 0; i < data.data.length; i++) {
+            var p = data.data[i];
+            var history = [];
+            for (var d = 0; d < (p.dots || 0); d++) history.push('D');
+            for (var r = 0; r < (p.runs || 0); r++) history.push('R');
+            slots.push({ id: i, name: p.name, history: history, isOut: p.isOut || false });
+          }
+          if (slots.length < 2) {
+            while (slots.length < 2) slots.push({ id: nextId++, name: null, history: [], isOut: false });
+          }
+          nextId = Math.max(nextId, slots.length);
+          actionStack = [];
+          setAutoSave('as-saved', 'Loaded from Sheets');
         }
+        renderAll();
       })
-      .catch(function() {
-        buildRows(game, isPast, daysSince, null, false);
-      });
-  }
-}
-
-function buildRows(game, isPast, daysSince, data, fromLocal) {
-  var hasPrefill = data && data.some(function(p) { return p.dots > 0; });
-
-  if (isLocked) {
-    showBanner('b-lock', '🔒 This game was played ' + daysSince + ' days ago — dot ball data is locked.');
-  } else if (fromLocal) {
-    showBanner('b-pre', '📱 Restored from this device. Tap + to continue logging.');
-  } else if (hasPrefill) {
-    showBanner('b-pre', 'Pre-filled with recorded data. Edit to update.');
-  } else if (isPast) {
-    showBanner('b-past', 'Past game — enter dot ball data below.');
-  } else {
-    showBanner('b-new', 'Live logging mode — tap + per player. Auto-saves as you go.');
-  }
-
-  var rows = document.getElementById('prows');
-  rows.innerHTML = '';
-
-  PL.forEach(function(p) {
-    var pre = null;
-    if (data) {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].name === p) { pre = data[i]; break; }
-      }
-    }
-    var dots = pre ? (pre.dots || 0) : 0;
-    var cls = isLocked ? 'pr locked' : (pre && pre.dots > 0 ? 'pr pre' : 'pr');
-
-    var row = document.createElement('div');
-    row.className = cls;
-
-    var nameEl = document.createElement('span');
-    nameEl.className = 'prname';
-    nameEl.textContent = p;
-
-    var grp = document.createElement('div');
-    grp.className = 'counter-group';
-
-    var minusBtn = document.createElement('button');
-    minusBtn.className = 'cnt-btn btn-minus';
-    minusBtn.textContent = '−';
-    minusBtn.disabled = isLocked;
-
-    var valEl = document.createElement('span');
-    valEl.className = 'cnt-val' + (dots > 0 ? ' has-dots' : '');
-    valEl.id = 'dots-' + p;
-    valEl.textContent = dots;
-
-    var plusBtn = document.createElement('button');
-    plusBtn.className = 'cnt-btn btn-plus';
-    plusBtn.textContent = '+';
-    plusBtn.disabled = isLocked;
-
-    (function(player, valSpan) {
-      plusBtn.addEventListener('click', function() {
-        var v = parseInt(valSpan.textContent) || 0;
-        v++;
-        valSpan.textContent = v;
-        valSpan.className = 'cnt-val has-dots';
-        onCounterChange(game);
-      });
-      minusBtn.addEventListener('click', function() {
-        var v = parseInt(valSpan.textContent) || 0;
-        if (v > 0) v--;
-        valSpan.textContent = v;
-        valSpan.className = 'cnt-val' + (v > 0 ? ' has-dots' : '');
-        onCounterChange(game);
-      });
-    })(p, valEl);
-
-    grp.appendChild(minusBtn);
-    grp.appendChild(valEl);
-    grp.appendChild(plusBtn);
-
-    row.appendChild(nameEl);
-    row.appendChild(grp);
-    rows.appendChild(row);
+      .catch(function() { renderAll(); });
   });
 
-  document.getElementById('playerSection').style.display = 'block';
-  document.getElementById('saveBtn').disabled = isLocked;
-  updateSummary();
-}
-
-function updateSummary() {
-  var total = 0, withDots = 0;
-  PL.forEach(function(p) {
-    var v = parseInt(document.getElementById('dots-' + p).textContent) || 0;
-    total += v;
-    if (v > 0) withDots++;
-  });
-  var avg = withDots ? (total / withDots).toFixed(1) : '0';
-  document.getElementById('summary').innerHTML =
-    '<strong>' + total + '</strong> total dot balls &nbsp;·&nbsp; '
-    + '<strong>' + withDots + '</strong> players with dots &nbsp;·&nbsp; '
-    + '<strong>' + avg + '</strong> avg per player';
-}
-
-function clearAll() {
-  if (isLocked) { show('This game is locked.', 'err'); return; }
-  var game = document.getElementById('gs').value;
-  PL.forEach(function(p) {
-    var el = document.getElementById('dots-' + p);
-    el.textContent = 0;
-    el.className = 'cnt-val';
-  });
-  clearLocal(game);
-  if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
-  document.getElementById('autosaveBar').style.display = 'none';
-  updateSummary();
-}
-
-// silent=true: called by auto-save timer (no big message)
-// silent=false: called by manual Save button (shows message)
-function submitDots(silent, gameOverride) {
-  if (isLocked) { if (!silent) show('This game is locked.', 'err'); return; }
-  var game = gameOverride || document.getElementById('gs').value;
-  if (!game) { if (!silent) show('Pick a game first!', 'err'); return; }
-
-  var dotballs = [];
-  PL.forEach(function(p) {
-    var dots = parseInt(document.getElementById('dots-' + p).textContent) || 0;
-    dotballs.push({ name: p, dots: dots });
-  });
-
-  if (silent) {
-    setAutoSaveStatus('as-saving', 'Saving to Sheets...');
-  } else {
-    show('Saving...', 'info');
-  }
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({ type: 'dotballs', team: 'Lions', game: game, dotballs: dotballs })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    if (d.status === 'ok') {
-      clearLocal(game); // Sheets is now authoritative, clear local copy
-      var t = new Date().toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
-      if (silent) {
-        setAutoSaveStatus('as-saved', '✓ Auto-saved to Sheets at ' + t);
-      } else {
-        show('Saved! Google Sheet updated.', 'ok');
-        setAutoSaveStatus('as-saved', '✓ Saved to Sheets at ' + t);
-      }
-    } else {
-      if (silent) setAutoSaveStatus('as-error', 'Auto-save failed — data safe on this device');
-      else show('Error: ' + d.message, 'err');
-    }
-  })
-  .catch(function() {
-    if (silent) setAutoSaveStatus('as-error', 'No connection — data safe on this device, will retry next tap');
-    else show('Network error. Try again.', 'err');
-  });
-}
-
-function showBanner(cls, txt) {
-  var b = document.getElementById('banner');
-  b.className = 'banner ' + cls; b.textContent = txt; b.style.display = 'block';
-}
-function hideBanner() {
-  var b = document.getElementById('banner');
-  b.style.display = 'none'; b.className = 'banner';
-}
-function show(t, type) {
-  var e = document.getElementById('msg');
-  e.textContent = t; e.className = 'msg ' + type;
-  setTimeout(function() { e.className = 'msg'; }, 4000);
-}
+  renderAll();
+});
 </script>
 </body>
 </html>
