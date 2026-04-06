@@ -108,8 +108,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   background: #EEF2FF; color: #374151; font-weight: 700; font-size: 10px;
   text-transform: uppercase; letter-spacing: 0.03em;
   padding: 8px 7px; text-align: center; white-space: nowrap;
-  border-bottom: 2px solid #E5E7EB;
+  border-bottom: 2px solid #E5E7EB; cursor: pointer; user-select: none;
 }
+.stats-table th:hover { background: #E0E7FF; }
+.stats-table th.sort-asc::after  { content: ' ↑'; }
+.stats-table th.sort-desc::after { content: ' ↓'; }
+.stats-table th.sort-asc, .stats-table th.sort-desc { color: #1A56B0; }
 .stats-table th.col-player { text-align: left; padding-left: 12px; }
 .stats-table td {
   padding: 9px 7px; text-align: center; border-bottom: 1px solid #F3F4F6;
@@ -479,65 +483,144 @@ function rankClass(i) {
   return i === 0 ? 'lb-rank r1' : i === 1 ? 'lb-rank r2' : i === 2 ? 'lb-rank r3' : 'lb-rank';
 }
 
+var _batData = [], _bowlData = [];
+var _batSort  = { key: 'runs',    dir: -1 };
+var _bowlSort = { key: 'wickets', dir: -1 };
+
+function _ovrsToDecimal(overs) {
+  var parts = String(overs||'0').split('.');
+  return parseInt(parts[0]) * 6 + (parts[1] ? parseInt(parts[1]) : 0);
+}
+
+function _sortData(data, key, dir) {
+  return data.slice().sort(function(a, b) {
+    var av = key === 'ovrsPerInn'
+      ? (_ovrsToDecimal(a.overs) / (a.innings||1))
+      : key === 'overs'
+      ? _ovrsToDecimal(a.overs)
+      : (parseFloat(a[key]) != null && !isNaN(parseFloat(a[key])) ? parseFloat(a[key]) : -Infinity);
+    var bv = key === 'ovrsPerInn'
+      ? (_ovrsToDecimal(b.overs) / (b.innings||1))
+      : key === 'overs'
+      ? _ovrsToDecimal(b.overs)
+      : (parseFloat(b[key]) != null && !isNaN(parseFloat(b[key])) ? parseFloat(b[key]) : -Infinity);
+    if (typeof a[key] === 'string' && key !== 'overs' && key !== 'ovrsPerInn') {
+      av = a[key] || ''; bv = b[key] || '';
+      return dir * av.localeCompare(bv);
+    }
+    return dir * (av - bv);
+  });
+}
+
+function _batHeaders(sortKey, sortDir) {
+  var cols = [
+    ['#',''],['Player','name'],['Mat','matches'],['Inns','innings'],
+    ['NO','notOuts'],['Runs','runs'],['Balls','balls'],['HS','highest'],
+    ['4s','fours'],['6s','sixes'],['Avg','average'],['SR','strikeRate'],
+    ['50s','fifties'],['100s','hundreds']
+  ];
+  return cols.map(function(c, i) {
+    var label = c[0], key = c[1];
+    if (!key) return '<th>#</th>';
+    var cls = key === 'name' ? ' class="col-player' : ' class="';
+    if (key === sortKey) cls += (sortDir > 0 ? ' sort-asc' : ' sort-desc');
+    cls += '"';
+    var click = key ? ' onclick="sortBat(\'' + key + '\')"' : '';
+    return '<th' + cls + click + '>' + label + '</th>';
+  }).join('');
+}
+
+function _bowlHeaders(sortKey, sortDir) {
+  var cols = [
+    ['#',''],['Player','name'],['Mat','matches'],['Inns','innings'],
+    ['Overs','overs'],['Ovrs/Inn','ovrsPerInn'],
+    ['Wkts','wickets'],['Econ','economy'],['Avg','average']
+  ];
+  return cols.map(function(c) {
+    var label = c[0], key = c[1];
+    if (!key) return '<th>#</th>';
+    var cls = key === 'name' ? ' class="col-player' : ' class="';
+    if (key === sortKey) cls += (sortDir > 0 ? ' sort-asc' : ' sort-desc');
+    cls += '"';
+    var click = ' onclick="sortBowl(\'' + key + '\')"';
+    return '<th' + cls + click + '>' + label + '</th>';
+  }).join('');
+}
+
+function _renderBatRows(data) {
+  return data.map(function(p, i) {
+    var isThreat = p.average >= 25 && p.strikeRate > 100;
+    var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
+      + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
+      + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
+      + '<td>' + (p.matches||0) + '</td>'
+      + '<td>' + (p.innings||0) + '</td>'
+      + '<td>' + (p.notOuts||0) + '</td>'
+      + '<td style="color:#1A56B0;font-weight:700">' + (p.runs||0) + '</td>'
+      + '<td>' + (p.balls||0) + '</td>'
+      + '<td>' + (p.highest||'-') + '</td>'
+      + '<td>' + (p.fours||0) + '</td>'
+      + '<td>' + (p.sixes||0) + '</td>'
+      + '<td>' + (p.average||'-') + '</td>'
+      + '<td>' + (p.strikeRate||'-') + '</td>'
+      + '<td>' + (p.fifties||0) + '</td>'
+      + '<td>' + (p.hundreds||0) + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function _renderBowlRows(data) {
+  return data.map(function(p, i) {
+    var isThreat = p.economy !== null && p.economy <= 7 && p.average !== null && p.average <= 12;
+    var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    var ovrsPerInn = (p.innings||0) > 0
+      ? (_ovrsToDecimal(p.overs) / p.innings / 6).toFixed(1) : '-';
+    return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
+      + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
+      + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
+      + '<td>' + (p.matches||0) + '</td>'
+      + '<td>' + (p.innings||0) + '</td>'
+      + '<td>' + (p.overs||0) + '</td>'
+      + '<td>' + ovrsPerInn + '</td>'
+      + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
+      + '<td>' + (p.economy||'-') + '</td>'
+      + '<td>' + (p.average||'-') + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function sortBat(key) {
+  if (_batSort.key === key) _batSort.dir *= -1; else { _batSort.key = key; _batSort.dir = -1; }
+  var sorted = _sortData(_batData, key, _batSort.dir);
+  var el = document.getElementById('battingList');
+  el.querySelector('thead tr').innerHTML = _batHeaders(_batSort.key, _batSort.dir);
+  el.querySelector('tbody').innerHTML = _renderBatRows(sorted);
+}
+
+function sortBowl(key) {
+  if (_bowlSort.key === key) _bowlSort.dir *= -1; else { _bowlSort.key = key; _bowlSort.dir = -1; }
+  var sorted = _sortData(_bowlData, key, _bowlSort.dir);
+  var el = document.getElementById('bowlingList');
+  el.querySelector('thead tr').innerHTML = _bowlHeaders(_bowlSort.key, _bowlSort.dir);
+  el.querySelector('tbody').innerHTML = _renderBowlRows(sorted);
+}
+
 function renderTab(tab, opp) {
   if (tab === 'batting') {
-    var bat = opp.batting || [];
-    if (!bat.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
-    var rows = bat.map(function(p, i) {
-      var isThreat = p.average >= 25 && p.strikeRate > 100;
-      var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
-      return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
-        + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
-        + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
-        + '<td>' + (p.matches||0) + '</td>'
-        + '<td>' + (p.innings||0) + '</td>'
-        + '<td>' + (p.notOuts||0) + '</td>'
-        + '<td style="color:#1A56B0;font-weight:700">' + (p.runs||0) + '</td>'
-        + '<td>' + (p.balls||0) + '</td>'
-        + '<td>' + (p.highest||'-') + '</td>'
-        + '<td>' + (p.fours||0) + '</td>'
-        + '<td>' + (p.sixes||0) + '</td>'
-        + '<td>' + (p.average||'-') + '</td>'
-        + '<td>' + (p.strikeRate||'-') + '</td>'
-        + '<td>' + (p.fifties||0) + '</td>'
-        + '<td>' + (p.hundreds||0) + '</td>'
-        + '</tr>';
-    }).join('');
+    _batData = opp.batting || [];
+    if (!_batData.length) { document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No batting data yet</div>'; return; }
+    var sorted = _sortData(_batData, _batSort.key, _batSort.dir);
     document.getElementById('battingList').innerHTML =
-      '<table class="stats-table"><thead><tr>'
-      + '<th>#</th><th class="col-player">Player</th>'
-      + '<th>Mat</th><th>Inns</th><th>NO</th><th>Runs</th><th>Balls</th>'
-      + '<th>HS</th><th>4s</th><th>6s</th><th>Avg</th><th>SR</th>'
-      + '<th>50s</th><th>100s</th>'
-      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+      '<table class="stats-table"><thead><tr>' + _batHeaders(_batSort.key, _batSort.dir) + '</tr></thead>'
+      + '<tbody>' + _renderBatRows(sorted) + '</tbody></table>';
   } else {
-    var bowl = opp.bowling || [];
-    if (!bowl.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
-    var rows = bowl.map(function(p, i) {
-      var isThreat = p.economy !== null && p.economy <= 7 && p.average !== null && p.average <= 12;
-      var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
-      var ovrsParts = String(p.overs||'0').split('.');
-      var totalBalls = parseInt(ovrsParts[0]) * 6 + (ovrsParts[1] ? parseInt(ovrsParts[1]) : 0);
-      var inns = p.innings || 1;
-      var ovrsPerInn = inns > 0 ? (totalBalls / inns / 6).toFixed(1) : '-';
-      return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
-        + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'
-        + '<td class="col-player">' + p.name + (isThreat ? '<span class="threat-dot"></span>' : '') + '</td>'
-        + '<td>' + (p.matches||0) + '</td>'
-        + '<td>' + (p.innings||0) + '</td>'
-        + '<td>' + (p.overs||0) + '</td>'
-        + '<td>' + ovrsPerInn + '</td>'
-        + '<td style="color:#1A8F6A;font-weight:700">' + (p.wickets||0) + '</td>'
-        + '<td>' + (p.economy||'-') + '</td>'
-        + '<td>' + (p.average||'-') + '</td>'
-        + '</tr>';
-    }).join('');
+    _bowlData = opp.bowling || [];
+    if (!_bowlData.length) { document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No bowling data yet</div>'; return; }
+    var sorted = _sortData(_bowlData, _bowlSort.key, _bowlSort.dir);
     document.getElementById('bowlingList').innerHTML =
-      '<table class="stats-table"><thead><tr>'
-      + '<th>#</th><th class="col-player">Player</th>'
-      + '<th>Mat</th><th>Inns</th><th>Overs</th><th>Ovrs/Inn</th>'
-      + '<th>Wkts</th><th>Econ</th><th>Avg</th>'
-      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+      '<table class="stats-table"><thead><tr>' + _bowlHeaders(_bowlSort.key, _bowlSort.dir) + '</tr></thead>'
+      + '<tbody>' + _renderBowlRows(sorted) + '</tbody></table>';
   }
 }
 
