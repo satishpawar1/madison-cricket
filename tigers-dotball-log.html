@@ -326,6 +326,47 @@ var actionStack = []; // [{slotIdx: 0|1, type:'D'|'R'}]
 var autoSaveTimer = null;
 var LOCAL_KEY_PREFIX = 'dottrack2_tigers_';
 
+// Pre-calculated historical game data (loaded when Sheets has no data yet)
+var PRESETS = {
+  'Star Strikers': [
+    { name: 'Kiran',           dots: 6,  runs: 5,  balls: 11, isOut: true  },
+    { name: 'Naren \u00a9',    dots: 9,  runs: 21, balls: 19, isOut: true  },
+    { name: 'Vamsi',           dots: 13, runs: 31, balls: 27, isOut: true  },
+    { name: 'Sharath',         dots: 7,  runs: 22, balls: 18, isOut: true  },
+    { name: 'Tiru',            dots: 1,  runs: 0,  balls: 1,  isOut: true  },
+    { name: 'Mayur L',         dots: 5,  runs: 16, balls: 15, isOut: false },
+    { name: 'Surya',           dots: 3,  runs: 11, balls: 6,  isOut: false }
+  ]
+};
+
+function loadPreset(g) {
+  var preset = PRESETS[g];
+  dismissed = [];
+  slots = [{ name: null, history: [] }, { name: null, history: [] }];
+  var slotIdx = 0;
+  for (var i = 0; i < preset.length; i++) {
+    var p = preset[i];
+    var pct = p.balls > 0 ? Math.round(p.dots / p.balls * 100) : 0;
+    if (p.isOut) {
+      dismissed.push({ name: p.name, dots: p.dots, balls: p.balls, pct: pct });
+    } else {
+      if (slotIdx < 2) {
+        var hist = [];
+        for (var d = 0; d < p.dots; d++) hist.push('D');
+        for (var r = 0; r < (p.balls - p.dots); r++) hist.push('R');
+        slots[slotIdx] = { name: p.name, history: hist };
+        slotIdx++;
+      }
+    }
+  }
+  actionStack = [];
+  renderAll();
+  saveToLocal();
+  setAutoSave('as-pending', 'Game data loaded — saving to Sheets...');
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(function() { submitToSheets(true); }, 2000);
+}
+
 // ── Stats ─────────────────────────────────────────────────────────
 function slotStats(slot) {
   var dots = 0;
@@ -669,6 +710,9 @@ window.addEventListener('DOMContentLoaded', function() {
     if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
     setAutoSave('', '');
     if (!g) { renderAll(); return; }
+
+    // Always use preset for historical games if available
+    if (PRESETS[g]) { loadPreset(g); return; }
 
     if (loadFromLocal(g)) {
       renderAll();
