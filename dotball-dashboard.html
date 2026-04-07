@@ -157,7 +157,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="stat-cards">
       <div class="sc"><div class="sn" id="l-totalDots" style="color:#1A56B0">—</div><div class="sl">Total dots</div></div>
       <div class="sc"><div class="sn" id="l-avgPerGame" style="color:#1A56B0">—</div><div class="sl">Avg dots/game</div></div>
-      <div class="sc"><div class="sn" id="l-mostDots" style="color:#1A56B0">—</div><div class="sl">Most dots (player)</div></div>
+      <div class="sc"><div class="sn" id="l-mostDots" style="color:#1A56B0">—</div><div class="sl">Overall dot %</div></div>
     </div>
     <div class="lb-card">
       <div class="lb-card-header">
@@ -188,7 +188,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="stat-cards">
       <div class="sc"><div class="sn" id="t-totalDots" style="color:#C05000">—</div><div class="sl">Total dots</div></div>
       <div class="sc"><div class="sn" id="t-avgPerGame" style="color:#C05000">—</div><div class="sl">Avg dots/game</div></div>
-      <div class="sc"><div class="sn" id="t-mostDots" style="color:#C05000">—</div><div class="sl">Most dots (player)</div></div>
+      <div class="sc"><div class="sn" id="t-mostDots" style="color:#C05000">—</div><div class="sl">Overall dot %</div></div>
     </div>
     <div class="lb-card">
       <div class="lb-card-header">
@@ -313,14 +313,15 @@ function renderTeam(team) {
 
   // Summary tiles
   var totalDots = players.reduce(function(sum, p) { return sum + p.total; }, 0);
+  var totalBalls = players.reduce(function(sum, p) { return sum + p.balls; }, 0);
   var gamesPlayed = games.length;
   var avgPerGame = gamesPlayed ? (totalDots / gamesPlayed).toFixed(1) : '—';
-  var topPlayer = players.length ? players.slice().sort(function(a,b){return b.total-a.total;})[0] : null;
+  var overallDotPct = totalBalls ? Math.round(totalDots / totalBalls * 100) + '%' : '—';
 
   var prefix = team === 'lions' ? 'l' : 't';
   document.getElementById(prefix + '-totalDots').textContent = totalDots || '—';
   document.getElementById(prefix + '-avgPerGame').textContent = avgPerGame;
-  document.getElementById(prefix + '-mostDots').textContent = topPlayer ? topPlayer.total : '—';
+  document.getElementById(prefix + '-mostDots').textContent = overallDotPct;
 
   // Table
   var tbodyId = team + 'Tbody';
