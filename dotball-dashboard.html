@@ -170,6 +170,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th onclick="sortTable('lions','name')">Player</th>
             <th onclick="sortTable('lions','games')">Games</th>
             <th onclick="sortTable('lions','total')">Total Dots</th>
+            <th onclick="sortTable('lions','balls')">Total Balls</th>
+            <th onclick="sortTable('lions','dotpct')">Dot %</th>
             <th onclick="sortTable('lions','avg')">Avg/Game</th>
           </tr>
         </thead>
@@ -199,6 +201,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th onclick="sortTable('tigers','name')">Player</th>
             <th onclick="sortTable('tigers','games')">Games</th>
             <th onclick="sortTable('tigers','total')">Total Dots</th>
+            <th onclick="sortTable('tigers','balls')">Total Balls</th>
+            <th onclick="sortTable('tigers','dotpct')">Dot %</th>
             <th onclick="sortTable('tigers','avg')">Avg/Game</th>
           </tr>
         </thead>
@@ -255,12 +259,13 @@ function fetchTeam(team, label) {
 }
 
 function buildPlayerSummary(games) {
-  // Returns array: { name, total, games, max }
+  // Returns array: { name, total, balls, games, max }
   var map = {};
   (games || []).forEach(function(g) {
     (g.players || []).forEach(function(p) {
-      if (!map[p.name]) map[p.name] = { name: p.name, total: 0, games: 0, max: 0 };
+      if (!map[p.name]) map[p.name] = { name: p.name, total: 0, balls: 0, games: 0, max: 0 };
       map[p.name].total += (p.dots || 0);
+      map[p.name].balls += (p.balls || 0);
       if (p.dots > 0) map[p.name].games++;
       if ((p.dots || 0) > map[p.name].max) map[p.name].max = p.dots;
     });
@@ -298,6 +303,10 @@ function renderTeam(team) {
       va = a.games ? a.total / a.games : 0;
       vb = b.games ? b.total / b.games : 0;
     }
+    if (s.key === 'dotpct') {
+      va = a.balls ? a.total / a.balls : 0;
+      vb = b.balls ? b.total / b.balls : 0;
+    }
     if (typeof va === 'string') return s.dir * va.localeCompare(vb);
     return s.dir * ((vb || 0) - (va || 0));
   });
@@ -317,15 +326,18 @@ function renderTeam(team) {
   var tbodyId = team + 'Tbody';
   var tbody = document.getElementById(tbodyId);
   if (!players.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:2rem">No dot ball data recorded yet.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:2rem">No dot ball data recorded yet.</td></tr>';
   } else {
     tbody.innerHTML = players.map(function(p, i) {
       var avg = p.games ? (p.total / p.games).toFixed(1) : '—';
+      var dotPct = p.balls ? Math.round(p.total / p.balls * 100) + '%' : '—';
       return '<tr>'
         + '<td>' + (i+1) + '</td>'
         + '<td>' + p.name + '</td>'
         + '<td>' + p.games + '</td>'
         + '<td class="highlight-val">' + p.total + '</td>'
+        + '<td>' + (p.balls || '—') + '</td>'
+        + '<td>' + dotPct + '</td>'
         + '<td>' + avg + '</td>'
         + '</tr>';
     }).join('');
