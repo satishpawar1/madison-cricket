@@ -171,7 +171,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th onclick="sortTable('lions','games')">Games</th>
             <th onclick="sortTable('lions','total')">Total Dots</th>
             <th onclick="sortTable('lions','avg')">Avg/Game</th>
-            <th onclick="sortTable('lions','max')">Best Game</th>
           </tr>
         </thead>
         <tbody id="lionsTbody"></tbody>
@@ -201,7 +200,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th onclick="sortTable('tigers','games')">Games</th>
             <th onclick="sortTable('tigers','total')">Total Dots</th>
             <th onclick="sortTable('tigers','avg')">Avg/Game</th>
-            <th onclick="sortTable('tigers','max')">Best Game</th>
           </tr>
         </thead>
         <tbody id="tigersTbody"></tbody>
@@ -329,7 +327,6 @@ function renderTeam(team) {
         + '<td>' + p.games + '</td>'
         + '<td class="highlight-val">' + p.total + '</td>'
         + '<td>' + avg + '</td>'
-        + '<td>' + (p.max || '—') + '</td>'
         + '</tr>';
     }).join('');
   }
