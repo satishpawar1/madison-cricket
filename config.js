@@ -45,7 +45,7 @@ const MCC_CONFIG = {
     // Pre-loaded availability data for completed games
     catchData: [
       {name:'Sunny(W) ©', att:15, tak:11},
-      {name:'Chinmay',    att:3,  tak:1},
+      {name:'Chinmay',    att:4,  tak:2},
       {name:'Hardik',     att:2,  tak:2},
       {name:'Manish',     att:2,  tak:2},
       {name:'Mahesh',     att:2,  tak:2},
@@ -66,7 +66,7 @@ const MCC_CONFIG = {
     catchByGame: {
       'FSC': [
       {name:'Sunny(W) ©', att:2, tak:2},
-      {name:'Chinmay', att:0, tak:0},
+      {name:'Chinmay', att:1, tak:1},
       {name:'Hardik', att:0, tak:0},
       {name:'Manish', att:0, tak:0},
       {name:'Mahesh', att:1, tak:1},
