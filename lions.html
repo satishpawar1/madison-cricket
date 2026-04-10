@@ -260,30 +260,31 @@ document.getElementById('gs').addEventListener('change', function() {
   document.getElementById('msg').className = 'msg';
   if (!cur) { PL.forEach(function(p) { renderCard(p); }); updateStats(); return; }
 
-  // For past games, fetch live data from Sheets to get latest state
-  if (isPast(cur)) {
-    fetch(SCRIPT_URL + '?team=Lions&game=' + encodeURIComponent(cur))
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (d.status === 'ok' && d.data && d.data.length) {
-          d.data.forEach(function(p) {
-            state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
-          });
-        }
-        PL.forEach(function(p) { renderCard(p); });
-        updateStats();
-        applyFreeze(true);
-      })
-      .catch(function() {
-        PL.forEach(function(p) { renderCard(p); });
-        updateStats();
-        applyFreeze(true);
-      });
-  } else {
-    PL.forEach(function(p) { renderCard(p); });
-    updateStats();
-    applyFreeze(false);
-  }
+  var past = isPast(cur);
+  // Always fetch live data from Sheets so previously recorded selections are shown
+  var st = document.getElementById('syncStatus');
+  st.className = 'sync'; st.textContent = 'Loading saved data…';
+  fetch(SCRIPT_URL + '?team=Lions&game=' + encodeURIComponent(cur))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.status === 'ok' && d.data && d.data.length) {
+        d.data.forEach(function(p) {
+          state[cur][p.name] = p.selected ? 2 : p.available ? 1 : 0;
+        });
+        st.className = 'sync ok'; st.textContent = 'Loaded from Sheets';
+      } else {
+        st.textContent = 'No saved data for this game';
+      }
+      PL.forEach(function(p) { renderCard(p); });
+      updateStats();
+      applyFreeze(past);
+    })
+    .catch(function() {
+      st.textContent = 'Could not load saved data';
+      PL.forEach(function(p) { renderCard(p); });
+      updateStats();
+      applyFreeze(past);
+    });
 });
 
 function genWA() {
