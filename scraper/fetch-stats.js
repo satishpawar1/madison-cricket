@@ -50,6 +50,35 @@ const PAGES = [
   },
 ];
 
+// Hard kill: if the whole script takes more than 4 minutes, exit with failure
+setTimeout(() => {
+  console.error('Hard timeout reached (4 min) — exiting');
+  process.exit(1);
+}, 4 * 60 * 1000);
+
+// Helper: wait up to `ms` for a response matching `matchFn`, navigating to `url`
+function fetchPage(page, url, ms, matchFn) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (val) => { if (!done) { done = true; clearTimeout(timer); resolve(val); } };
+    const timer = setTimeout(() => {
+      console.log('  ⚠ per-page timeout');
+      finish(null);
+    }, ms);
+
+    page.on('response', async (response) => {
+      if (done) return;
+      try {
+        const result = await matchFn(response);
+        if (result !== null) finish(result);
+      } catch(e) {}
+    });
+
+    page.goto(url, { waitUntil: 'domcontentloaded', timeout: ms })
+      .catch(() => {});
+  });
+}
+
 async function fetchStats() {
   console.log('Launching browser...');
   const browser = await puppeteer.launch({
@@ -60,6 +89,7 @@ async function fetchStats() {
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36');
 
   const captured = {};
+  const PAGE_TIMEOUT = 25000; // 25s per page
 
   for (const { label, url, match } of PAGES) {
     const isResults = label === 'results' || label === 'results2025';
@@ -79,72 +109,58 @@ async function fetchStats() {
           } else {
             req.continue();
           }
-        } catch(e) {}
+        } catch(e) { try { req.continue(); } catch(_) {} }
       });
 
-      await new Promise((resolve) => {
-        let done = false;
-        page.on('response', async (response) => {
-          if (done) return;
-          const u = response.url();
-          if (!u.includes(match)) return;
-          const ct = response.headers()['content-type'] || '';
-          if (!ct.includes('json')) return;
-          try {
-            const data = await response.json();
-            const inner = data.data || data;
-            const completed = inner.completed || [];
-            if (!completed.length) return;
-            done = true;
-            captured[label] = completed;
-            console.log(`  ✓ ${label}: ${completed.length} records`);
-            resolve();
-          } catch(e) { console.log('  Results parse error:', e.message); }
-        });
-
-        page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
-          .then(() => setTimeout(resolve, 5000))
-          .catch(() => resolve());
+      const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
+        const u = response.url();
+        if (!u.includes(match)) return null;
+        const ct = response.headers()['content-type'] || '';
+        if (!ct.includes('json')) return null;
+        const data = await response.json();
+        const inner = data.data || data;
+        const completed = inner.completed || [];
+        if (!completed.length) return null;
+        return completed;
       });
+
+      if (result) {
+        captured[label] = result;
+        console.log(`  ✓ ${label}: ${result.length} records`);
+      } else {
+        console.log(`  ✗ ${label}: no data captured`);
+      }
 
       page.removeAllListeners('request');
-      await page.setRequestInterception(false);
+      await page.setRequestInterception(false).catch(() => {});
 
     } else {
-      await new Promise((resolve) => {
-        let done = false;
-        page.on('response', async (response) => {
-          if (done) return;
-          const u = response.url();
-          if (!u.includes(match)) return;
-          const ct = response.headers()['content-type'] || '';
-          if (!ct.includes('json')) return;
-          try {
-            const data = await response.json();
-            let arr = data.data || data;
-            if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
-              // Flatten all groups into one list
-              arr = arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
-            }
-            if (Array.isArray(arr) && arr.length > 0) {
-              if (!captured[label] || arr.length > captured[label].length) {
-                captured[label] = arr;
-              }
-              console.log(`  ✓ ${label}: ${arr.length} records`);
-              done = true;
-              resolve();
-            }
-          } catch(e) {}
-        });
-
-        page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
-          .then(() => setTimeout(resolve, 3000))
-          .catch(() => resolve());
+      const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
+        const u = response.url();
+        if (!u.includes(match)) return null;
+        const ct = response.headers()['content-type'] || '';
+        if (!ct.includes('json')) return null;
+        const data = await response.json();
+        let arr = data.data || data;
+        if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
+          arr = arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
+        }
+        if (!Array.isArray(arr) || arr.length === 0) return null;
+        return arr;
       });
+
+      if (result) {
+        if (!captured[label] || result.length > captured[label].length) {
+          captured[label] = result;
+        }
+        console.log(`  ✓ ${label}: ${result.length} records`);
+      } else {
+        console.log(`  ✗ ${label}: no data captured`);
+      }
     }
   }
 
-  await browser.close();
+  await browser.close().catch(() => {});
 
   if (!captured.batting && !captured.bowling) {
     console.error('Failed to capture batting/bowling data.');
@@ -369,6 +385,8 @@ var CRICCLUBS_STATS = ${JSON.stringify(output, null, 2)};
   console.log('\n🐯 TIGERS BOWLING (top 5):');
   output.tigers.bowling.slice(0,5).forEach((p,i) =>
     console.log(`  ${i+1}. ${p.name} — ${p.wickets} wkts | Econ: ${p.economy} | Avg: ${p.average} | Best: ${p.bestFigures}`));
+
+  process.exit(0);
 }
 
-fetchStats().catch(console.error);
+fetchStats().catch((err) => { console.error(err); process.exit(1); });
