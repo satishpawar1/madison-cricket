@@ -95,13 +95,22 @@ async function fetchStats() {
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36');
 
   const captured = {};
-  const PAGE_TIMEOUT = 25000; // 25s per page
+  const PAGE_TIMEOUT = 35000; // 35s per page
 
   for (const { label, url, match } of PAGES) {
     const isResults = label === 'results' || label === 'results2025';
     console.log(`\nFetching ${label}...`);
     page.removeAllListeners('request');
     page.removeAllListeners('response');
+    // Re-attach debug listener after clearing
+    page.on('response', (response) => {
+      const u = response.url();
+      if (u.includes('cricclubs.com') && !u.includes('freestar') && !u.includes('gumgum') &&
+          !u.includes('rubicon') && !u.includes('triplelift') && !u.includes('hadron') &&
+          !u.includes('ad.gt') && !u.includes('liadm') && !u.includes('cdn-cgi')) {
+        console.log(`  [dbg] ${response.status()} ${u.substring(0, 150)}`);
+      }
+    });
 
     if (isResults) {
       // For results: intercept the outgoing API request and upgrade size=30 to size=200
@@ -138,12 +147,11 @@ async function fetchStats() {
       }
 
       page.removeAllListeners('request');
-      // Race with a 3s timeout — setRequestInterception(false) can hang if
-      // requests are still pending when we pull out early.
-      await Promise.race([
-        page.setRequestInterception(false),
-        new Promise(r => setTimeout(r, 3000)),
-      ]).catch(() => {});
+      // setRequestInterception(false) can hang/throw a ProtocolError (after 3 min)
+      // if requests are pending. Catch the rejection immediately on the promise
+      // itself, then race with a 3s timeout so we don't block the next page.
+      const disableInterception = page.setRequestInterception(false).catch(() => {});
+      await Promise.race([disableInterception, new Promise(r => setTimeout(r, 3000))]);
 
     } else {
       const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
