@@ -82,7 +82,7 @@ function fetchPage(page, url, ms, matchFn) {
 async function fetchStats() {
   console.log('Launching browser...');
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   const page = await browser.newPage();
