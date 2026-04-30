@@ -1,355 +1,373 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const stealth = require('puppeteer-extra-plugin-stealth');
 const fs = require('fs');
 const path = require('path');
 
-const PAGES = [
-  {
-    label: 'rankings',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/rankings-records?year=2026&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=all&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
-    match: 'getPlayerRankings'
-  },
-  {
-    label: 'batting',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/batting-records?filter=Most+Runs&year=2026&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
-    match: 'getBattingStats'
-  },
-  {
-    label: 'bowling',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/bowling-records?filter=Most+Wickets&year=2026&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
-    match: 'getBowlingStats'
-  },
-  {
-    label: 'results',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/results?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2026&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
-    match: 'WfZbUYmZkdi9WXyOM_8S1A/matches',
-  },
-  {
-    label: 'standings',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/points-table?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2026&series=WfZbUYmZkdi9WXyOM_8S1A&seriesName=2026+-+Tape+20',
-    match: 'getPointsTable',
-  },
-  {
-    label: 'standings2025',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/points-table?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2025&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
-    match: 'getPointsTable',
-  },
-  {
-    label: 'batting2025',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/batting-records?filter=Most+Runs&year=2025&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
-    match: 'getBattingStats'
-  },
-  {
-    label: 'bowling2025',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/statistics/bowling-records?filter=Most+Wickets&year=2025&leagueId=Pj7NL8S3pXOPdIPaHDwboQ&matchType=All&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
-    match: 'getBowlingStats'
-  },
-  {
-    label: 'results2025',
-    url: 'https://cricclubs.com/NashvilleCricketLeague/results?leagueId=Pj7NL8S3pXOPdIPaHDwboQ&year=2025&series=jzSTpzuunaGCjZKzp83FqA&seriesName=2025+-+Tape+20',
-    match: 'jzSTpzuunaGCjZKzp83FqA/matches',
-  },
-];
+puppeteer.use(stealth());
 
-// Hard kill: if the whole script takes more than 5 minutes, exit with failure
+// Hard kill: if the whole script takes more than 6 minutes, exit with failure
 setTimeout(() => {
-  console.error('Hard timeout reached (5 min) — exiting');
+  console.error('Hard timeout reached (6 min) — exiting');
   process.exit(1);
-}, 5 * 60 * 1000);
+}, 6 * 60 * 1000);
 
-const LEAGUE_ID  = 'Pj7NL8S3pXOPdIPaHDwboQ';
-const S2026      = 'WfZbUYmZkdi9WXyOM_8S1A';
-const S2025      = 'jzSTpzuunaGCjZKzp83FqA';
-const API        = 'https://core-prod-origin.cricclubs.com/core/public/league';
-const SERIES_API = 'https://core-prod-origin.cricclubs.com/core/public/series';
+const BASE = 'https://cricclubs.com/NashvilleCricketLeague';
+const CLUB = '1092658';
 
-// All API endpoints to call (from within the page's JS context)
-const API_CALLS = [
-  { label: 'rankings',    url: `${API}/getPlayerRankings?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=&year=2026` },
-  { label: 'batting',     url: `${API}/getBattingStats?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=All&year=2026` },
-  { label: 'bowling',     url: `${API}/getBowlingStats?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=All&year=2026` },
-  { label: 'standings',   url: `${API}/getPointsTable?clubId=${LEAGUE_ID}&seriesId=${S2026}&year=2026` },
-  { label: 'results',     url: `${SERIES_API}/${S2026}/matches?clubId=${LEAGUE_ID}&size=200` },
-  { label: 'batting2025', url: `${API}/getBattingStats?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=All&year=2025` },
-  { label: 'bowling2025', url: `${API}/getBowlingStats?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=All&year=2025` },
-  { label: 'standings2025', url: `${API}/getPointsTable?clubId=${LEAGUE_ID}&seriesId=${S2025}&year=2025` },
-  { label: 'results2025',   url: `${SERIES_API}/${S2025}/matches?clubId=${LEAGUE_ID}&size=200` },
-  { label: 'rankings2025',  url: `${API}/getPlayerRankings?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=&year=2025` },
-];
+// Old JSP interface league IDs:
+const LEAGUE_2026 = '28'; // 2026 - Tape 20
+const LEAGUE_2025 = '26'; // 2025 - Tape 20 (TBD — updated after checking)
 
-async function fetchStats() {
-  console.log('Launching browser...');
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
-
-  // Navigate to CricClubs once to establish cookies/session
-  console.log('Establishing session...');
-  await page.goto(
-    `https://cricclubs.com/NashvilleCricketLeague/statistics/rankings-records?year=2026&leagueId=${LEAGUE_ID}&series=${S2026}`,
-    { waitUntil: 'domcontentloaded', timeout: 30000 }
-  ).catch(e => console.log('  page load warning:', e.message));
-  await new Promise(r => setTimeout(r, 2000));
-
-  // Make each API call directly from the page's JS context.
-  // This uses whatever cookies/session the page established, bypassing
-  // the React app's rendering entirely.
-  const captured = {};
-  for (const { label, url } of API_CALLS) {
-    console.log(`\nFetching ${label}...`);
-    try {
-      const raw = await page.evaluate(async (apiUrl) => {
-        try {
-          const r = await fetch(apiUrl, { credentials: 'include' });
-          const text = await r.text();
-          return { status: r.status, text };
-        } catch(e) {
-          return { error: e.message };
-        }
-      }, url);
-
-      if (raw.error) {
-        console.log(`  ✗ ${label}: fetch error — ${raw.error}`);
-        continue;
-      }
-      if (raw.status !== 200) {
-        console.log(`  ✗ ${label}: HTTP ${raw.status} — ${raw.text.substring(0, 100)}`);
-        continue;
-      }
-
-      const data = JSON.parse(raw.text);
-      captured[label] = data;
-      const count = Array.isArray(data.data) ? data.data.length
-        : data.completed ? data.completed.length : '?';
-      console.log(`  ✓ ${label}: ${count} records`);
-    } catch(e) {
-      console.log(`  ✗ ${label}: ${e.message}`);
-    }
+// ── Helper: extract table rows from the page's largest table ──
+async function extractTable(page, url, minCols = 4) {
+  console.log(`  Loading ${url.split('?')[0].split('/').pop()}...`);
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+  } catch(e) {
+    console.log(`  ⚠ load warning: ${e.message.split('\n')[0]}`);
   }
+  await new Promise(r => setTimeout(r, 3000));
 
-  await browser.close().catch(() => {});
+  return page.evaluate((minCols) => {
+    const tables = Array.from(document.querySelectorAll('table'));
+    // Find the table with the most rows that has enough columns
+    const best = tables
+      .map(t => {
+        const rows = Array.from(t.rows);
+        if (!rows[0] || rows[0].cells.length < minCols) return null;
+        return {
+          headers: Array.from(rows[0].cells).map(c => c.textContent.trim()),
+          rows: rows.slice(1).map(r => Array.from(r.cells).map(c => c.textContent.trim())),
+          rowCount: rows.length
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.rowCount - a.rowCount)[0];
+    return best || null;
+  }, minCols);
+}
 
-  // Unpack the raw API responses into the expected shapes
-  const getRaw = (label) => {
-    const d = captured[label];
-    if (!d) return [];
-    const arr = d.data || d.completed || [];
-    // Standings response: array of groups, each with a .teams array — flatten
-    if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
-      return arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
-    }
-    return arr;
-  };
+// ── Column parsers ──
 
-  const batting   = getRaw('batting');
-  const bowling   = getRaw('bowling');
-  const rankings  = getRaw('rankings');
-  const standings = getRaw('standings');
-  const results   = getRaw('results');
-  const batting2025   = getRaw('batting2025');
-  const bowling2025   = getRaw('bowling2025');
-  const rankings2025  = getRaw('rankings2025');
-  const standings2025 = getRaw('standings2025');
-  const results2025   = getRaw('results2025');
+function parseBatting(table) {
+  // Headers: "#", "Player", "Team", "Mat", "Inns", "NO", "Runs", "4's", "6's", "50's", "100's", "HS", "SR", "Avg", "Points"
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 9 && /^\d+$/.test(r[0]))
+    .map(r => ({
+      name: r[1],
+      team: r[2],
+      matches: +r[3] || 0,
+      innings: +r[4] || 0,
+      notOuts: +r[5] || 0,
+      runs: +r[6] || 0,
+      fours: +r[7] || 0,
+      sixes: +r[8] || 0,
+      fifties: +r[9] || 0,
+      hundreds: +r[10] || 0,
+      highest: r[11] || '0',
+      strikeRate: parseFloat(r[12]) || 0,
+      average: parseFloat(r[13]) || 0,
+    }))
+    .sort((a, b) => b.runs - a.runs);
+}
 
-  if (!batting.length && !bowling.length) {
-    console.error('Failed to capture batting/bowling data.');
-    process.exit(1);
-  }
+function parseBowling(table) {
+  // Headers: "#", "Player", "Team", "Mat", "Inns", "Overs", "Runs", "Wkts", "BBF", "Mdns", "dots", "Econ", "Avg", "SR", "Hat-trick", "4w", "5w", ...
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 8 && /^\d+$/.test(r[0]))
+    .map(r => {
+      // Convert "18.1" overs → display format unchanged; also derive balls
+      const overs = r[5] || '0';
+      const [overInt, ballPart] = overs.split('.');
+      const balls = parseInt(overInt) * 6 + (parseInt(ballPart) || 0);
 
-  // Helper to filter by team
-  const filterTeam = (arr, teamKeyword) =>
-    (arr || []).filter(p => p.teamName && p.teamName.includes(teamKeyword));
+      // BBF format in old interface is "runsGiven/ wickets" e.g. "26/ 4" → normalize to "wickets/runs" e.g. "4/26"
+      const bbfRaw = (r[8] || '').replace(/\s/g, '');
+      const bbfParts = bbfRaw.split('/');
+      const bestFigures = bbfParts.length === 2
+        ? bbfParts[1] + '/' + bbfParts[0]
+        : bbfRaw;
 
-  // ── Batting: compute average & strike rate ──
-  const cleanBatting = (players) => players.map(p => ({
-    name: p.firstName + ' ' + p.lastName,
-    team: p.teamName,
-    matches: p.matches,
-    innings: p.innings,
-    runs: p.runsScored,
-    balls: p.ballsFaced,
-    notOuts: p.notOuts,
-    highest: p.highestScore,
-    fours: p.fours,
-    sixes: p.sixers,
-    fifties: p.fifties,
-    hundreds: p.hundreds,
-    average: p.innings - p.notOuts > 0
-      ? +(p.runsScored / (p.innings - p.notOuts)).toFixed(1) : p.runsScored,
-    strikeRate: p.ballsFaced > 0
-      ? +(p.runsScored / p.ballsFaced * 100).toFixed(1) : 0,
-  })).sort((a, b) => b.runs - a.runs);
+      return {
+        name: r[1],
+        team: r[2],
+        matches: +r[3] || 0,
+        innings: +r[4] || 0,
+        overs,
+        wickets: +r[7] || 0,
+        runs: +r[6] || 0,
+        maidens: +r[9] || 0,
+        bestFigures,
+        hattricks: +r[14] || 0,
+        fourWickets: +r[15] || 0,
+        fiveWickets: +r[16] || 0,
+        average: parseFloat(r[12]) || null,
+        economy: parseFloat(r[11]) || null,
+        strikeRate: parseFloat(r[13]) || null,
+      };
+    })
+    .sort((a, b) => b.wickets - a.wickets);
+}
 
-  // ── Bowling: compute average, economy, strike rate ──
-  const cleanBowling = (players) => players.map(p => {
-    const balls = p.balls || 0;
-    const oversDisplay = Math.floor(balls / 6) + (balls % 6 ? '.' + (balls % 6) : '');
-    const oversDecimal = balls / 6;
-    const totalRuns = p.runs || 0;
-    return {
-      name: p.firstName + ' ' + p.lastName,
-      team: p.teamName,
-      matches: p.matches,
-      innings: p.innings || 0,
-      overs: oversDisplay,
-      wickets: p.wickets,
-      runs: totalRuns,
-      maidens: p.maidens || 0,
-      bestFigures: (p.maxWickets || 0) + '/' + (p.runsGiven != null ? p.runsGiven : '-'),
-      hattricks: p.hattricks || 0,
-      fiveWickets: p.fiveWickets || 0,
-      fourWickets: p.fourWickets || 0,
-      average: p.wickets > 0 ? +(totalRuns / p.wickets).toFixed(1) : null,
-      economy: oversDecimal > 0 ? +(totalRuns / oversDecimal).toFixed(2) : null,
-      strikeRate: p.wickets > 0 && balls > 0 ? +(balls / p.wickets).toFixed(1) : null,
-    };
-  }).sort((a, b) => b.wickets - a.wickets);
+function parseRankings(table) {
+  // Headers: "#", "Player", "Team", "Matches", "Batting", "Bowling", "Fielding", "Other", "MOM #", "Total"
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 9 && /^\d+$/.test(r[0]))
+    .map(r => ({
+      name: r[1],
+      team: r[2],
+      matches: +r[3] || 0,
+      batting: +r[4] || 0,
+      bowling: +r[5] || 0,
+      fielding: +r[6] || 0,
+      total: +r[9] || 0,
+      mom: +r[8] || 0,
+    }))
+    .sort((a, b) => b.total - a.total);
+}
 
-  // ── Standings ──
-  const cleanStandings = (teams) => teams.map(t => ({
-    team: t.teamName,
-    matches: t.matches || 0,
-    won: t.won || 0,
-    lost: t.lost || 0,
-    tied: t.tied || 0,
-    noResult: t.noResult || 0,
-    points: t.points || 0,
-    nrr: t.netRunRate ? +t.netRunRate.toFixed(3) : 0,
-  })).sort((a, b) => b.points - a.points || b.nrr - a.nrr);
+function parseStandings(table) {
+  // Headers: "#", "TEAM", "MAT", "WON", "LOST", "N/R", "TIE", "PTS", "WIN %", "NET RR", "FOR", "AGAINST"
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 9 && /^\d+$/.test(r[0]))
+    .map(r => ({
+      team: r[1],
+      matches: +r[2] || 0,
+      won: +r[3] || 0,
+      lost: +r[4] || 0,
+      noResult: +r[5] || 0,
+      tied: +r[6] || 0,
+      points: +r[7] || 0,
+      nrr: parseFloat(r[9]) || 0,
+    }))
+    .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
+}
 
-  // ── Rankings ──
-  const cleanRankings = (players) => players.map(p => ({
-    name: p.firstName + ' ' + p.lastName,
-    team: p.teamName,
-    matches: p.matchesPlayed,
-    batting: p.battingPoints,
-    bowling: p.bowlingPoints,
-    fielding: p.fieldingPoints,
-    total: p.total,
-    mom: p.mom,
-  })).sort((a, b) => b.total - a.total);
+function parseMatches(table) {
+  // Headers: "#", "Match Type", "Date", "Team One", "Team two", "Result", "Scores Summary", "Points"
+  // OR: "SNO", "MATCH TYPE", "DATE", "Team ONE", "TEAM TWO", "RESULT", "SCORE SUMMARY"
+  if (!table) return {};
+  const byTeam = {};
 
-  // ── Match results: score summary per team ──
-  const cleanResults = (matches) => {
-    const byTeam = {};
-    matches.forEach(m => {
-      const ss = m.scoreSummary;
-      if (!ss) return;
-      const t1 = m.teamOne && m.teamOne.name;
-      const t2 = m.teamTwo && m.teamTwo.name;
-      if (!t1 || !t2) return;
-      const date = m.matchDateTime ? m.matchDateTime.split('T')[0] : '';
+  table.rows
+    .filter(r => r.length >= 7)
+    .forEach(r => {
+      // Figure out column positions based on header detection
+      const dateStr = r[2];
+      if (!dateStr || !/\d{2}\/\d{2}\/\d{4}/.test(dateStr)) return;
 
-      const resultText = (ss.result || '').trim();
-      const isAbandoned = /abandoned/i.test(resultText);
-      const isForfeited = /forfeited/i.test(resultText);
-      const isDL        = /d\/l|duckworth/i.test(resultText);
+      const t1 = r[3];
+      const t2 = r[4];
+      const resultText = r[5] || '';
+      const summary = r[6] || '';
+
+      // Parse date: MM/DD/YYYY → YYYY-MM-DD
+      const [mm, dd, yyyy] = dateStr.split('/');
+      const date = `${yyyy}-${mm}-${dd}`;
+
+      // Determine winner from result text
+      const isAbandoned = /abandoned|no result/i.test(resultText);
+
+      // Parse score summary: "TeamOne: runs/wkts(overs)TeamTwo: runs/wkts(overs)"
+      function parseTeamScore(teamName, text) {
+        const escaped = teamName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const m = new RegExp(escaped + ':\\s*(\\d+)/(\\d+)\\(([\\d.]+)\\)').exec(text);
+        if (!m) return { runs: 0, wickets: 0, overs: '0' };
+        return { runs: +m[1], wickets: +m[2], overs: m[3] };
+      }
+
+      const s1 = parseTeamScore(t1, summary);
+      const s2 = parseTeamScore(t2, summary);
 
       [t1, t2].forEach(team => {
         const isT1 = team === t1;
-        const runsScored    = isT1 ? ss.teamOneScore1 : ss.teamTwoScore1;
-        const wickets       = isT1 ? ss.teamOneWicketsLost1 : ss.teamTwoWicketsLost1;
-        const balls         = isT1 ? ss.teamOneBallsPlayed1 : ss.teamTwoBallsPlayed1;
-        const runsConceded  = isT1 ? ss.teamTwoScore1 : ss.teamOneScore1;
-        const overs         = Math.floor(balls / 6) + (balls % 6 ? '.' + (balls % 6) : '');
+        const scored = isT1 ? s1 : s2;
+        const conceded = isT1 ? s2 : s1;
 
         let won = false, noResult = false;
         if (isAbandoned) {
           noResult = true;
-        } else if (isForfeited) {
-          won = resultText.toLowerCase().includes(team.toLowerCase());
         } else {
-          won = runsScored > runsConceded || (isDL && resultText.toLowerCase().includes(team.toLowerCase()));
+          won = scored.runs > conceded.runs
+            || (resultText.toLowerCase().includes(team.toLowerCase()) && !resultText.toLowerCase().includes('lost'));
         }
 
         if (!byTeam[team]) byTeam[team] = [];
-        byTeam[team].push({ opponent: isT1 ? t2 : t1, date, runsScored, wickets, overs, runsConceded, won, noResult });
+        byTeam[team].push({
+          opponent: isT1 ? t2 : t1,
+          date,
+          runsScored: scored.runs,
+          wickets: scored.wickets,
+          overs: scored.overs,
+          runsConceded: conceded.runs,
+          won,
+          noResult,
+        });
       });
     });
 
-    const result = {};
-    Object.keys(byTeam).forEach(team => {
-      const games = byTeam[team];
-      const scores = games.map(g => g.runsScored);
-      result[team] = {
-        games: games.sort((a, b) => a.date.localeCompare(b.date)),
-        highestTotal: Math.max.apply(null, scores),
-        lowestTotal:  Math.min.apply(null, scores),
-        averageScore: Math.round(scores.reduce((s, r) => s + r, 0) / scores.length),
-      };
-    });
-    return result;
-  };
+  const result = {};
+  Object.keys(byTeam).forEach(team => {
+    const games = byTeam[team].sort((a, b) => a.date.localeCompare(b.date));
+    const scores = games.map(g => g.runsScored).filter(s => s > 0);
+    result[team] = {
+      games,
+      highestTotal: scores.length ? Math.max(...scores) : 0,
+      lowestTotal: scores.length ? Math.min(...scores) : 0,
+      averageScore: scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0,
+    };
+  });
+  return result;
+}
 
-  // ── Group all-teams batting/bowling by teamName (for opponent analysis) ──
+async function fetchStats() {
+  console.log('Launching browser (stealth mode)...');
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
+
+  const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
+
+  // ── 2026 Season ──
+  console.log('\n=== 2026 Season ===');
+
+  const batting2026Table = await extractTable(page,
+    `${BASE}/battingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+  console.log(`  batting: ${batting2026Table ? batting2026Table.rows.length : 0} rows`);
+
+  const bowling2026Table = await extractTable(page,
+    `${BASE}/bowlingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+  console.log(`  bowling: ${bowling2026Table ? bowling2026Table.rows.length : 0} rows`);
+
+  const rankings2026Table = await extractTable(page,
+    `${BASE}/playerRankings.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+  console.log(`  rankings: ${rankings2026Table ? rankings2026Table.rows.length : 0} rows`);
+
+  const standings2026Table = await extractTable(page,
+    `${BASE}/viewPointsTable.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+  console.log(`  standings: ${standings2026Table ? standings2026Table.rows.length : 0} rows`);
+
+  const matches2026Table = await extractTable(page,
+    `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`, 7);
+  console.log(`  matches: ${matches2026Table ? matches2026Table.rows.length : 0} rows`);
+
+  // ── 2025 Season ──
+  console.log('\n=== 2025 Season ===');
+
+  const batting2025Table = await extractTable(page,
+    `${BASE}/battingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+  console.log(`  batting: ${batting2025Table ? batting2025Table.rows.length : 0} rows`);
+
+  const bowling2025Table = await extractTable(page,
+    `${BASE}/bowlingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+  console.log(`  bowling: ${bowling2025Table ? bowling2025Table.rows.length : 0} rows`);
+
+  const rankings2025Table = await extractTable(page,
+    `${BASE}/playerRankings.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+  console.log(`  rankings: ${rankings2025Table ? rankings2025Table.rows.length : 0} rows`);
+
+  const standings2025Table = await extractTable(page,
+    `${BASE}/viewPointsTable.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+  console.log(`  standings: ${standings2025Table ? standings2025Table.rows.length : 0} rows`);
+
+  const matches2025Table = await extractTable(page,
+    `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`, 7);
+  console.log(`  matches: ${matches2025Table ? matches2025Table.rows.length : 0} rows`);
+
+  await browser.close().catch(() => {});
+
+  // ── Parse all tables ──
+  const batting   = parseBatting(batting2026Table);
+  const bowling   = parseBowling(bowling2026Table);
+  const rankings  = parseRankings(rankings2026Table);
+  const standings = parseStandings(standings2026Table);
+  const results   = parseMatches(matches2026Table);
+
+  const batting2025   = parseBatting(batting2025Table);
+  const bowling2025   = parseBowling(bowling2025Table);
+  const rankings2025  = parseRankings(rankings2025Table);
+  const standings2025 = parseStandings(standings2025Table);
+  const results2025   = parseMatches(matches2025Table);
+
+  if (!batting.length && !bowling.length) {
+    console.error('\nFailed to capture 2026 batting/bowling data.');
+    process.exit(1);
+  }
+
+  // ── Filter helpers ──
+  const filterTeam = (arr, keyword) =>
+    arr.filter(p => p.team && p.team.includes(keyword));
+
   const groupByTeam = (arr) => {
     const map = {};
-    (arr || []).forEach(p => {
-      const team = p.teamName || 'Unknown';
+    arr.forEach(p => {
+      const team = p.team || 'Unknown';
       if (!map[team]) map[team] = [];
       map[team].push(p);
     });
     return map;
   };
 
-  const allBattingByTeam = groupByTeam(batting);
-  const allBowlingByTeam = groupByTeam(bowling);
-  const allTeams = [...new Set([
-    ...Object.keys(allBattingByTeam),
-    ...Object.keys(allBowlingByTeam),
-  ])].filter(t => !t.includes('Lions') && !t.includes('Tigers')).sort();
+  // ── Opponent stats for 2026 ──
+  const battingByTeam = groupByTeam(batting);
+  const bowlingByTeam = groupByTeam(bowling);
+  const allTeams2026 = [...new Set([...Object.keys(battingByTeam), ...Object.keys(bowlingByTeam)])]
+    .filter(t => !t.includes('Lions') && !t.includes('Tigers'))
+    .sort();
 
   const opponents = {};
-  allTeams.forEach(team => {
+  allTeams2026.forEach(team => {
     opponents[team] = {
-      batting: cleanBatting(allBattingByTeam[team] || []),
-      bowling: cleanBowling(allBowlingByTeam[team] || []),
+      batting: battingByTeam[team] || [],
+      bowling: bowlingByTeam[team] || [],
     };
   });
 
-  // 2025 opponents
-  const allBattingByTeam2025 = groupByTeam(batting2025);
-  const allBowlingByTeam2025 = groupByTeam(bowling2025);
-  const allTeams2025 = [...new Set([
-    ...Object.keys(allBattingByTeam2025),
-    ...Object.keys(allBowlingByTeam2025),
-  ])].filter(t => !t.includes('Lions') && !t.includes('Tigers')).sort();
+  // ── Opponent stats for 2025 ──
+  const battingByTeam2025 = groupByTeam(batting2025);
+  const bowlingByTeam2025 = groupByTeam(bowling2025);
+  const allTeams2025 = [...new Set([...Object.keys(battingByTeam2025), ...Object.keys(bowlingByTeam2025)])]
+    .filter(t => !t.includes('Lions') && !t.includes('Tigers'))
+    .sort();
 
   const opponents2025 = {};
   allTeams2025.forEach(team => {
     opponents2025[team] = {
-      batting: cleanBatting(allBattingByTeam2025[team] || []),
-      bowling: cleanBowling(allBowlingByTeam2025[team] || []),
+      batting: battingByTeam2025[team] || [],
+      bowling: bowlingByTeam2025[team] || [],
     };
   });
 
   const output = {
     lastUpdated: new Date().toISOString(),
     lions: {
-      rankings: cleanRankings(filterTeam(rankings, 'Lions')),
-      batting:  cleanBatting(filterTeam(batting,  'Lions')),
-      bowling:  cleanBowling(filterTeam(bowling,  'Lions')),
+      rankings: filterTeam(rankings, 'Lions'),
+      batting:  filterTeam(batting,  'Lions'),
+      bowling:  filterTeam(bowling,  'Lions'),
     },
     tigers: {
-      rankings: cleanRankings(filterTeam(rankings, 'Tigers')),
-      batting:  cleanBatting(filterTeam(batting,  'Tigers')),
-      bowling:  cleanBowling(filterTeam(bowling,  'Tigers')),
+      rankings: filterTeam(rankings, 'Tigers'),
+      batting:  filterTeam(batting,  'Tigers'),
+      bowling:  filterTeam(bowling,  'Tigers'),
     },
     combined: {
-      rankings: cleanRankings([
+      rankings: [
         ...filterTeam(rankings, 'Lions'),
         ...filterTeam(rankings, 'Tigers'),
-      ].sort((a, b) => (b.total||0) - (a.total||0))),
+      ].sort((a, b) => (b.total || 0) - (a.total || 0)),
     },
     opponents,
     opponents2025,
-    standings: cleanStandings(standings),
-    standings2025: cleanStandings(standings2025),
-    results: cleanResults(results),
-    results2025: cleanResults(results2025),
+    standings,
+    standings2025,
+    results,
+    results2025,
   };
 
   const jsContent = `// Auto-generated by fetch-stats.js — do not edit manually
@@ -361,22 +379,21 @@ var CRICCLUBS_STATS = ${JSON.stringify(output, null, 2)};
   fs.writeFileSync(outPath, jsContent);
   console.log(`\n✓ Saved to cricclubs-stats.js`);
 
-  // Print preview
   console.log('\n🦁 LIONS BATTING (top 5):');
-  output.lions.batting.slice(0,5).forEach((p,i) =>
+  output.lions.batting.slice(0, 5).forEach((p, i) =>
     console.log(`  ${i+1}. ${p.name} — ${p.runs} runs | Avg: ${p.average} | SR: ${p.strikeRate} | HS: ${p.highest}`));
 
   console.log('\n🦁 LIONS BOWLING (top 5):');
-  output.lions.bowling.slice(0,5).forEach((p,i) =>
-    console.log(`  ${i+1}. ${p.name} — ${p.wickets} wkts | Econ: ${p.economy} | Avg: ${p.average} | Best: ${p.bestFigures}`));
+  output.lions.bowling.slice(0, 5).forEach((p, i) =>
+    console.log(`  ${i+1}. ${p.name} — ${p.wickets} wkts | Econ: ${p.economy} | Avg: ${p.average}`));
 
   console.log('\n🐯 TIGERS BATTING (top 5):');
-  output.tigers.batting.slice(0,5).forEach((p,i) =>
+  output.tigers.batting.slice(0, 5).forEach((p, i) =>
     console.log(`  ${i+1}. ${p.name} — ${p.runs} runs | Avg: ${p.average} | SR: ${p.strikeRate} | HS: ${p.highest}`));
 
   console.log('\n🐯 TIGERS BOWLING (top 5):');
-  output.tigers.bowling.slice(0,5).forEach((p,i) =>
-    console.log(`  ${i+1}. ${p.name} — ${p.wickets} wkts | Econ: ${p.economy} | Avg: ${p.average} | Best: ${p.bestFigures}`));
+  output.tigers.bowling.slice(0, 5).forEach((p, i) =>
+    console.log(`  ${i+1}. ${p.name} — ${p.wickets} wkts | Econ: ${p.economy} | Avg: ${p.average}`));
 
   process.exit(0);
 }
