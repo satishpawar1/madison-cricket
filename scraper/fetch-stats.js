@@ -50,138 +50,111 @@ const PAGES = [
   },
 ];
 
-// Hard kill: if the whole script takes more than 4 minutes, exit with failure
+// Hard kill: if the whole script takes more than 5 minutes, exit with failure
 setTimeout(() => {
-  console.error('Hard timeout reached (7 min) — exiting');
+  console.error('Hard timeout reached (5 min) — exiting');
   process.exit(1);
-}, 7 * 60 * 1000);
+}, 5 * 60 * 1000);
 
-// Helper: wait up to `ms` for a response matching `matchFn`, navigating to `url`.
-// Uses networkidle2 so the page fully settles (JS loads + API calls complete)
-// before the goto resolves. Falls back to a hard per-page timeout.
-function fetchPage(page, url, ms, matchFn) {
-  return new Promise((resolve) => {
-    let done = false;
-    const finish = (val) => { if (!done) { done = true; clearTimeout(timer); resolve(val); } };
-    // Hard per-page safety: resolve (with null) if nothing fires within ms
-    const timer = setTimeout(() => {
-      console.log('  ⚠ per-page timeout');
-      finish(null);
-    }, ms);
+const LEAGUE_ID  = 'Pj7NL8S3pXOPdIPaHDwboQ';
+const S2026      = 'WfZbUYmZkdi9WXyOM_8S1A';
+const S2025      = 'jzSTpzuunaGCjZKzp83FqA';
+const API        = 'https://core-prod-origin.cricclubs.com/core/public/league';
+const SERIES_API = 'https://core-prod-origin.cricclubs.com/core/public/series';
 
-    page.on('response', async (response) => {
-      if (done) return;
-      try {
-        const result = await matchFn(response);
-        if (result !== null) finish(result);
-      } catch(e) {}
-    });
-
-    // networkidle2: waits until the page has settled (JS run, XHRs returned).
-    // After goto resolves, give a brief extra window then close out.
-    page.goto(url, { waitUntil: 'networkidle2', timeout: ms })
-      .then(() => { if (!done) setTimeout(() => finish(null), 3000); })
-      .catch(() => { finish(null); });
-  });
-}
+// All API endpoints to call (from within the page's JS context)
+const API_CALLS = [
+  { label: 'rankings',    url: `${API}/getPlayerRankings?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=&year=2026` },
+  { label: 'batting',     url: `${API}/getBattingStats?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=All&year=2026` },
+  { label: 'bowling',     url: `${API}/getBowlingStats?clubId=${LEAGUE_ID}&seriesId=${S2026}&matchType=All&year=2026` },
+  { label: 'standings',   url: `${API}/getPointsTable?clubId=${LEAGUE_ID}&seriesId=${S2026}&year=2026` },
+  { label: 'results',     url: `${SERIES_API}/${S2026}/matches?clubId=${LEAGUE_ID}&size=200` },
+  { label: 'batting2025', url: `${API}/getBattingStats?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=All&year=2025` },
+  { label: 'bowling2025', url: `${API}/getBowlingStats?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=All&year=2025` },
+  { label: 'standings2025', url: `${API}/getPointsTable?clubId=${LEAGUE_ID}&seriesId=${S2025}&year=2025` },
+  { label: 'results2025',   url: `${SERIES_API}/${S2025}/matches?clubId=${LEAGUE_ID}&size=200` },
+  { label: 'rankings2025',  url: `${API}/getPlayerRankings?clubId=${LEAGUE_ID}&seriesId=${S2025}&matchType=&year=2025` },
+];
 
 async function fetchStats() {
   console.log('Launching browser...');
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36');
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
 
+  // Navigate to CricClubs once to establish cookies/session
+  console.log('Establishing session...');
+  await page.goto(
+    `https://cricclubs.com/NashvilleCricketLeague/statistics/rankings-records?year=2026&leagueId=${LEAGUE_ID}&series=${S2026}`,
+    { waitUntil: 'domcontentloaded', timeout: 30000 }
+  ).catch(e => console.log('  page load warning:', e.message));
+  await new Promise(r => setTimeout(r, 2000));
+
+  // Make each API call directly from the page's JS context.
+  // This uses whatever cookies/session the page established, bypassing
+  // the React app's rendering entirely.
   const captured = {};
-  const PAGE_TIMEOUT = 35000; // 35s per page
-
-  for (const { label, url, match } of PAGES) {
-    const isResults = label === 'results' || label === 'results2025';
+  for (const { label, url } of API_CALLS) {
     console.log(`\nFetching ${label}...`);
-    page.removeAllListeners('request');
-    page.removeAllListeners('response');
-    // Re-attach debug listener after clearing
-    page.on('response', (response) => {
-      const u = response.url();
-      if (u.includes('cricclubs.com') && !u.includes('freestar') && !u.includes('gumgum') &&
-          !u.includes('rubicon') && !u.includes('triplelift') && !u.includes('hadron') &&
-          !u.includes('ad.gt') && !u.includes('liadm') && !u.includes('cdn-cgi')) {
-        console.log(`  [dbg] ${response.status()} ${u.substring(0, 150)}`);
-      }
-    });
-
-    if (isResults) {
-      // For results: intercept the outgoing API request and upgrade size=30 to size=200
-      // so we get all matches in a single response without pagination.
-      await page.setRequestInterception(true);
-      page.on('request', (req) => {
+    try {
+      const raw = await page.evaluate(async (apiUrl) => {
         try {
-          const u = req.url();
-          if (u.includes(match) && u.includes('size=')) {
-            req.continue({ url: u.replace(/size=\d+/, 'size=200') });
-          } else {
-            req.continue();
-          }
-        } catch(e) { try { req.continue(); } catch(_) {} }
-      });
+          const r = await fetch(apiUrl, { credentials: 'include' });
+          const text = await r.text();
+          return { status: r.status, text };
+        } catch(e) {
+          return { error: e.message };
+        }
+      }, url);
 
-      const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
-        const u = response.url();
-        if (!u.includes(match)) return null;
-        const ct = response.headers()['content-type'] || '';
-        if (!ct.includes('json')) return null;
-        const data = await response.json();
-        const inner = data.data || data;
-        const completed = inner.completed || [];
-        if (!completed.length) return null;
-        return completed;
-      });
-
-      if (result) {
-        captured[label] = result;
-        console.log(`  ✓ ${label}: ${result.length} records`);
-      } else {
-        console.log(`  ✗ ${label}: no data captured`);
+      if (raw.error) {
+        console.log(`  ✗ ${label}: fetch error — ${raw.error}`);
+        continue;
+      }
+      if (raw.status !== 200) {
+        console.log(`  ✗ ${label}: HTTP ${raw.status} — ${raw.text.substring(0, 100)}`);
+        continue;
       }
 
-      page.removeAllListeners('request');
-      // setRequestInterception(false) can hang/throw a ProtocolError (after 3 min)
-      // if requests are pending. Catch the rejection immediately on the promise
-      // itself, then race with a 3s timeout so we don't block the next page.
-      const disableInterception = page.setRequestInterception(false).catch(() => {});
-      await Promise.race([disableInterception, new Promise(r => setTimeout(r, 3000))]);
-
-    } else {
-      const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
-        const u = response.url();
-        if (!u.includes(match)) return null;
-        const ct = response.headers()['content-type'] || '';
-        if (!ct.includes('json')) return null;
-        const data = await response.json();
-        let arr = data.data || data;
-        if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
-          arr = arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
-        }
-        if (!Array.isArray(arr) || arr.length === 0) return null;
-        return arr;
-      });
-
-      if (result) {
-        if (!captured[label] || result.length > captured[label].length) {
-          captured[label] = result;
-        }
-        console.log(`  ✓ ${label}: ${result.length} records`);
-      } else {
-        console.log(`  ✗ ${label}: no data captured`);
-      }
+      const data = JSON.parse(raw.text);
+      captured[label] = data;
+      const count = Array.isArray(data.data) ? data.data.length
+        : data.completed ? data.completed.length : '?';
+      console.log(`  ✓ ${label}: ${count} records`);
+    } catch(e) {
+      console.log(`  ✗ ${label}: ${e.message}`);
     }
   }
 
   await browser.close().catch(() => {});
 
-  if (!captured.batting && !captured.bowling) {
+  // Unpack the raw API responses into the expected shapes
+  const getRaw = (label) => {
+    const d = captured[label];
+    if (!d) return [];
+    const arr = d.data || d.completed || [];
+    // Standings response: array of groups, each with a .teams array — flatten
+    if ((label === 'standings' || label === 'standings2025') && Array.isArray(arr) && arr[0] && arr[0].teams) {
+      return arr.flatMap(group => (group.teams || []).map(t => t.team)).filter(Boolean);
+    }
+    return arr;
+  };
+
+  const batting   = getRaw('batting');
+  const bowling   = getRaw('bowling');
+  const rankings  = getRaw('rankings');
+  const standings = getRaw('standings');
+  const results   = getRaw('results');
+  const batting2025   = getRaw('batting2025');
+  const bowling2025   = getRaw('bowling2025');
+  const rankings2025  = getRaw('rankings2025');
+  const standings2025 = getRaw('standings2025');
+  const results2025   = getRaw('results2025');
+
+  if (!batting.length && !bowling.length) {
     console.error('Failed to capture batting/bowling data.');
     process.exit(1);
   }
@@ -322,8 +295,8 @@ async function fetchStats() {
     return map;
   };
 
-  const allBattingByTeam = groupByTeam(captured.batting);
-  const allBowlingByTeam = groupByTeam(captured.bowling);
+  const allBattingByTeam = groupByTeam(batting);
+  const allBowlingByTeam = groupByTeam(bowling);
   const allTeams = [...new Set([
     ...Object.keys(allBattingByTeam),
     ...Object.keys(allBowlingByTeam),
@@ -338,8 +311,8 @@ async function fetchStats() {
   });
 
   // 2025 opponents
-  const allBattingByTeam2025 = groupByTeam(captured.batting2025);
-  const allBowlingByTeam2025 = groupByTeam(captured.bowling2025);
+  const allBattingByTeam2025 = groupByTeam(batting2025);
+  const allBowlingByTeam2025 = groupByTeam(bowling2025);
   const allTeams2025 = [...new Set([
     ...Object.keys(allBattingByTeam2025),
     ...Object.keys(allBowlingByTeam2025),
@@ -356,27 +329,27 @@ async function fetchStats() {
   const output = {
     lastUpdated: new Date().toISOString(),
     lions: {
-      rankings: cleanRankings(filterTeam(captured.rankings || [], 'Lions')),
-      batting:  cleanBatting(filterTeam(captured.batting  || [], 'Lions')),
-      bowling:  cleanBowling(filterTeam(captured.bowling  || [], 'Lions')),
+      rankings: cleanRankings(filterTeam(rankings, 'Lions')),
+      batting:  cleanBatting(filterTeam(batting,  'Lions')),
+      bowling:  cleanBowling(filterTeam(bowling,  'Lions')),
     },
     tigers: {
-      rankings: cleanRankings(filterTeam(captured.rankings || [], 'Tigers')),
-      batting:  cleanBatting(filterTeam(captured.batting  || [], 'Tigers')),
-      bowling:  cleanBowling(filterTeam(captured.bowling  || [], 'Tigers')),
+      rankings: cleanRankings(filterTeam(rankings, 'Tigers')),
+      batting:  cleanBatting(filterTeam(batting,  'Tigers')),
+      bowling:  cleanBowling(filterTeam(bowling,  'Tigers')),
     },
     combined: {
       rankings: cleanRankings([
-        ...filterTeam(captured.rankings || [], 'Lions'),
-        ...filterTeam(captured.rankings || [], 'Tigers'),
+        ...filterTeam(rankings, 'Lions'),
+        ...filterTeam(rankings, 'Tigers'),
       ].sort((a, b) => (b.total||0) - (a.total||0))),
     },
     opponents,
     opponents2025,
-    standings: cleanStandings(captured.standings || []),
-    standings2025: cleanStandings(captured.standings2025 || []),
-    results: cleanResults(captured.results || []),
-    results2025: cleanResults(captured.results2025 || []),
+    standings: cleanStandings(standings),
+    standings2025: cleanStandings(standings2025),
+    results: cleanResults(results),
+    results2025: cleanResults(results2025),
   };
 
   const jsContent = `// Auto-generated by fetch-stats.js — do not edit manually
