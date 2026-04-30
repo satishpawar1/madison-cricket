@@ -16,7 +16,8 @@ const CLUB = '1092658';
 
 // Old JSP interface league IDs:
 const LEAGUE_2026 = '28'; // 2026 - Tape 20
-const LEAGUE_2025 = '26'; // 2025 - Tape 20 (TBD — updated after checking)
+// 2025 Tape T20 tournament — uses viewLeagueBatting.do / viewLeagueBowling.do with league=17
+const LEAGUE_2025_T20 = '17';
 
 // ── Helper: extract table rows from the page's largest table ──
 async function extractTable(page, url, minCols = 4) {
@@ -127,6 +128,85 @@ function parseRankings(table) {
       mom: +r[8] || 0,
     }))
     .sort((a, b) => b.total - a.total);
+}
+
+function parse2025Batting(table) {
+  // Headers: "#", "Player", "Group", "Team", "Mat", "Ins", "No", "Runs", "Balls",
+  //          "Avg", "Sr", "Hs", "100's", "75's", "50's", "25's", "0", "6's", "4's"
+  // r[0]=#, r[1]=name, r[2]=group, r[3]=team, r[4]=mat, r[5]=ins, r[6]=no, r[7]=runs,
+  // r[8]=balls, r[9]=avg, r[10]=sr, r[11]=hs, r[12]=100s, r[13]=75s, r[14]=50s, r[15]=25s,
+  // r[16]=ducks, r[17]=6s, r[18]=4s
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 10 && /^\d+$/.test(r[0]) && r[1])
+    .map(r => ({
+      name: r[1],
+      team2025: r[3],
+      matches: +r[4] || 0,
+      innings: +r[5] || 0,
+      notOuts: +r[6] || 0,
+      runs: +r[7] || 0,
+      balls: +r[8] || 0,
+      average: parseFloat(r[9]) || 0,
+      strikeRate: parseFloat(r[10]) || 0,
+      highest: r[11] || '0',
+      hundreds: +r[12] || 0,
+      fifties: +r[14] || 0,
+      sixes: +r[17] || 0,
+      fours: +r[18] || 0,
+    }))
+    .sort((a, b) => b.runs - a.runs);
+}
+
+function parse2025Bowling(table) {
+  // Headers: "#", "Player", "Group", "Team", "Mat", "Inns", "Overs", "Runs", "Wkts",
+  //          "BBf", "Mdns", "Dots", "Econ", "Ave", "SR", "Hat-trick", "4W", "5W", "Wides", "Nb"
+  // r[0]=#, r[1]=name, r[2]=group, r[3]=team, r[4]=mat, r[5]=inns, r[6]=overs,
+  // r[7]=runs, r[8]=wkts, r[9]=bbf, r[10]=mdns, r[11]=dots, r[12]=econ, r[13]=avg,
+  // r[14]=sr, r[15]=hat, r[16]=4w, r[17]=5w, r[18]=wides, r[19]=nb
+  if (!table) return [];
+  return table.rows
+    .filter(r => r.length >= 10 && /^\d+$/.test(r[0]) && r[1])
+    .map(r => {
+      // BBf format "30/ 5" → normalize to "5/30"
+      const bbfRaw = (r[9] || '').replace(/\s/g, '');
+      const bbfParts = bbfRaw.split('/');
+      const bestFigures = bbfParts.length === 2
+        ? bbfParts[1] + '/' + bbfParts[0]
+        : bbfRaw;
+      return {
+        name: r[1],
+        team2025: r[3],
+        matches: +r[4] || 0,
+        innings: +r[5] || 0,
+        overs: r[6] || '0',
+        runs: +r[7] || 0,
+        wickets: +r[8] || 0,
+        bestFigures,
+        maidens: +r[10] || 0,
+        economy: parseFloat(r[12]) || null,
+        average: parseFloat(r[13]) || null,
+        strikeRate: parseFloat(r[14]) || null,
+        hattricks: +r[15] || 0,
+        fourWickets: +r[16] || 0,
+        fiveWickets: +r[17] || 0,
+      };
+    })
+    .sort((a, b) => b.wickets - a.wickets);
+}
+
+// Build a case-insensitive name → record lookup map
+function buildNameMap(records) {
+  const map = {};
+  records.forEach(r => {
+    map[r.name.toLowerCase().trim()] = r;
+  });
+  return map;
+}
+
+// Look up a player by name (case-insensitive, trims whitespace)
+function lookupByName(name, map) {
+  return map[name.toLowerCase().trim()] || null;
 }
 
 function parseStandings(table) {
@@ -257,28 +337,16 @@ async function fetchStats() {
     `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`, 7);
   console.log(`  matches: ${matches2026Table ? matches2026Table.rows.length : 0} rows`);
 
-  // ── 2025 Season ──
-  console.log('\n=== 2025 Season ===');
+  // ── 2025 Tape T20 Tournament (league=17) — all-player lookup ──
+  console.log('\n=== 2025 Tape T20 (league=17) ===');
 
   const batting2025Table = await extractTable(page,
-    `${BASE}/battingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+    `${BASE}/viewLeagueBatting.do?league=${LEAGUE_2025_T20}&clubId=${CLUB}`, 8);
   console.log(`  batting: ${batting2025Table ? batting2025Table.rows.length : 0} rows`);
 
   const bowling2025Table = await extractTable(page,
-    `${BASE}/bowlingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
+    `${BASE}/viewLeagueBowling.do?league=${LEAGUE_2025_T20}&clubId=${CLUB}`, 8);
   console.log(`  bowling: ${bowling2025Table ? bowling2025Table.rows.length : 0} rows`);
-
-  const rankings2025Table = await extractTable(page,
-    `${BASE}/playerRankings.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
-  console.log(`  rankings: ${rankings2025Table ? rankings2025Table.rows.length : 0} rows`);
-
-  const standings2025Table = await extractTable(page,
-    `${BASE}/viewPointsTable.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`);
-  console.log(`  standings: ${standings2025Table ? standings2025Table.rows.length : 0} rows`);
-
-  const matches2025Table = await extractTable(page,
-    `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2025}`, 7);
-  console.log(`  matches: ${matches2025Table ? matches2025Table.rows.length : 0} rows`);
 
   await browser.close().catch(() => {});
 
@@ -289,11 +357,8 @@ async function fetchStats() {
   const standings = parseStandings(standings2026Table);
   const results   = parseMatches(matches2026Table);
 
-  const batting2025   = parseBatting(batting2025Table);
-  const bowling2025   = parseBowling(bowling2025Table);
-  const rankings2025  = parseRankings(rankings2025Table);
-  const standings2025 = parseStandings(standings2025Table);
-  const results2025   = parseMatches(matches2025Table);
+  const allBatting2025  = parse2025Batting(batting2025Table);
+  const allBowling2025  = parse2025Bowling(bowling2025Table);
 
   if (!batting.length && !bowling.length) {
     console.error('\nFailed to capture 2026 batting/bowling data.');
@@ -314,6 +379,21 @@ async function fetchStats() {
     return map;
   };
 
+  // ── 2025 name-keyed lookup maps ──
+  const battingMap2025 = buildNameMap(allBatting2025);
+  const bowlingMap2025 = buildNameMap(allBowling2025);
+  console.log(`\n2025 lookup maps: ${Object.keys(battingMap2025).length} batters, ${Object.keys(bowlingMap2025).length} bowlers`);
+
+  // Cross-reference: given a list of 2026 players (with .name), return their 2025 records
+  function crossRef2025(players2026, map2025) {
+    const found = [];
+    players2026.forEach(p => {
+      const rec = lookupByName(p.name, map2025);
+      if (rec) found.push(rec);
+    });
+    return found.sort((a, b) => (b.runs || b.wickets || 0) - (a.runs || a.wickets || 0));
+  }
+
   // ── Opponent stats for 2026 ──
   const battingByTeam = groupByTeam(batting);
   const bowlingByTeam = groupByTeam(bowling);
@@ -329,32 +409,57 @@ async function fetchStats() {
     };
   });
 
-  // ── Opponent stats for 2025 ──
-  const battingByTeam2025 = groupByTeam(batting2025);
-  const bowlingByTeam2025 = groupByTeam(bowling2025);
-  const allTeams2025 = [...new Set([...Object.keys(battingByTeam2025), ...Object.keys(bowlingByTeam2025)])]
-    .filter(t => !t.includes('Lions') && !t.includes('Tigers'))
-    .sort();
-
+  // ── Opponent 2025 cross-reference ──
+  // For each 2026 opponent team's players, look up their 2025 stats by name
   const opponents2025 = {};
-  allTeams2025.forEach(team => {
+  allTeams2026.forEach(team => {
+    const players2026bat = battingByTeam[team] || [];
+    const players2026bowl = bowlingByTeam[team] || [];
+    // Union of unique player names from batting + bowling
+    const allPlayerNames = [...new Set([
+      ...players2026bat.map(p => p.name),
+      ...players2026bowl.map(p => p.name),
+    ])].map(name => ({ name }));
+
     opponents2025[team] = {
-      batting: battingByTeam2025[team] || [],
-      bowling: bowlingByTeam2025[team] || [],
+      batting: crossRef2025(allPlayerNames, battingMap2025),
+      bowling: crossRef2025(allPlayerNames, bowlingMap2025),
     };
   });
+
+  // ── Lions/Tigers 2025 cross-reference ──
+  const lionsBatters2026  = filterTeam(batting, 'Lions');
+  const lionsBosters2026  = filterTeam(bowling, 'Lions');
+  const tigersBatters2026 = filterTeam(batting, 'Tigers');
+  const tigersBosters2026 = filterTeam(bowling, 'Tigers');
+
+  // All unique Lions/Tigers player names (from batting + bowling)
+  const lionsPlayers   = [...new Set([...lionsBatters2026, ...lionsBosters2026].map(p => p.name))].map(n => ({ name: n }));
+  const tigersPlayers  = [...new Set([...tigersBatters2026, ...tigersBosters2026].map(p => p.name))].map(n => ({ name: n }));
+
+  const lionsBatting2025  = crossRef2025(lionsPlayers,  battingMap2025);
+  const lionsBowling2025  = crossRef2025(lionsPlayers,  bowlingMap2025);
+  const tigersBatting2025 = crossRef2025(tigersPlayers, battingMap2025);
+  const tigersBowling2025 = crossRef2025(tigersPlayers, bowlingMap2025);
+
+  console.log(`\nLions 2025 cross-ref: ${lionsBatting2025.length} batters, ${lionsBowling2025.length} bowlers`);
+  console.log(`Tigers 2025 cross-ref: ${tigersBatting2025.length} batters, ${tigersBowling2025.length} bowlers`);
 
   const output = {
     lastUpdated: new Date().toISOString(),
     lions: {
       rankings: filterTeam(rankings, 'Lions'),
-      batting:  filterTeam(batting,  'Lions'),
-      bowling:  filterTeam(bowling,  'Lions'),
+      batting:  lionsBatters2026,
+      bowling:  lionsBosters2026,
+      batting2025: lionsBatting2025,
+      bowling2025: lionsBowling2025,
     },
     tigers: {
       rankings: filterTeam(rankings, 'Tigers'),
-      batting:  filterTeam(batting,  'Tigers'),
-      bowling:  filterTeam(bowling,  'Tigers'),
+      batting:  tigersBatters2026,
+      bowling:  tigersBosters2026,
+      batting2025: tigersBatting2025,
+      bowling2025: tigersBowling2025,
     },
     combined: {
       rankings: [
@@ -365,9 +470,7 @@ async function fetchStats() {
     opponents,
     opponents2025,
     standings,
-    standings2025,
     results,
-    results2025,
   };
 
   const jsContent = `// Auto-generated by fetch-stats.js — do not edit manually
