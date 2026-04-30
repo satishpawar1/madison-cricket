@@ -52,15 +52,18 @@ const PAGES = [
 
 // Hard kill: if the whole script takes more than 4 minutes, exit with failure
 setTimeout(() => {
-  console.error('Hard timeout reached (4 min) — exiting');
+  console.error('Hard timeout reached (7 min) — exiting');
   process.exit(1);
-}, 4 * 60 * 1000);
+}, 7 * 60 * 1000);
 
-// Helper: wait up to `ms` for a response matching `matchFn`, navigating to `url`
+// Helper: wait up to `ms` for a response matching `matchFn`, navigating to `url`.
+// Uses networkidle2 so the page fully settles (JS loads + API calls complete)
+// before the goto resolves. Falls back to a hard per-page timeout.
 function fetchPage(page, url, ms, matchFn) {
   return new Promise((resolve) => {
     let done = false;
     const finish = (val) => { if (!done) { done = true; clearTimeout(timer); resolve(val); } };
+    // Hard per-page safety: resolve (with null) if nothing fires within ms
     const timer = setTimeout(() => {
       console.log('  ⚠ per-page timeout');
       finish(null);
@@ -74,8 +77,11 @@ function fetchPage(page, url, ms, matchFn) {
       } catch(e) {}
     });
 
-    page.goto(url, { waitUntil: 'domcontentloaded', timeout: ms })
-      .catch(() => {});
+    // networkidle2: waits until the page has settled (JS run, XHRs returned).
+    // After goto resolves, give a brief extra window then close out.
+    page.goto(url, { waitUntil: 'networkidle2', timeout: ms })
+      .then(() => { if (!done) setTimeout(() => finish(null), 3000); })
+      .catch(() => { finish(null); });
   });
 }
 
@@ -132,7 +138,12 @@ async function fetchStats() {
       }
 
       page.removeAllListeners('request');
-      await page.setRequestInterception(false).catch(() => {});
+      // Race with a 3s timeout — setRequestInterception(false) can hang if
+      // requests are still pending when we pull out early.
+      await Promise.race([
+        page.setRequestInterception(false),
+        new Promise(r => setTimeout(r, 3000)),
+      ]).catch(() => {});
 
     } else {
       const result = await fetchPage(page, url, PAGE_TIMEOUT, async (response) => {
