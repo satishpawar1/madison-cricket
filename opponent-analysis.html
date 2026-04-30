@@ -456,20 +456,24 @@ function renderStats(opp) {
   var highestScore = bat.length ? Math.max.apply(null, bat.map(function(p) { return p.highest || 0; })) : '—';
   document.getElementById('statTopRuns').textContent  = highestScore;
 
+  var team = cricclubsTeam(selectedGame);
   var is2025 = currentSeason === '2025';
-  document.getElementById('teamStatCards').style.display  = is2025 ? 'none' : 'contents';
-  document.getElementById('noTeamDataMsg').style.display  = is2025 ? '' : 'none';
+  var standings = is2025
+    ? (CRICCLUBS_STATS.standings2025 || [])
+    : (CRICCLUBS_STATS.standings || []);
+  var standing = standings.filter(function(s) { return s.team === team; })[0];
+  var hasTeamData = !!standing;
 
-  if (!is2025) {
-    var team = cricclubsTeam(selectedGame);
-    var standings = CRICCLUBS_STATS.standings || [];
-    var standing = standings.filter(function(s) { return s.team === team; })[0];
-    var rank = standing ? standings.indexOf(standing) + 1 : '—';
-    document.getElementById('statWon').textContent  = standing ? standing.won    : '—';
-    document.getElementById('statLost').textContent = standing ? standing.lost   : '—';
+  document.getElementById('teamStatCards').style.display = hasTeamData ? 'contents' : 'none';
+  document.getElementById('noTeamDataMsg').style.display = hasTeamData ? 'none' : '';
+
+  if (hasTeamData) {
+    var rank = standings.indexOf(standing) + 1;
+    document.getElementById('statWon').textContent  = standing.won;
+    document.getElementById('statLost').textContent = standing.lost;
     document.getElementById('statRank').textContent = rank;
-    document.getElementById('statPts').textContent  = standing ? standing.points : '—';
-    document.getElementById('statNrr').textContent  = standing ? (standing.nrr > 0 ? '+' : '') + standing.nrr : '—';
+    document.getElementById('statPts').textContent  = standing.points;
+    document.getElementById('statNrr').textContent  = (standing.nrr > 0 ? '+' : '') + standing.nrr;
   }
 }
 

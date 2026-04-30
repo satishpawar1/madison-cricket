@@ -31,7 +31,6 @@ async function extractTable(page, url, minCols = 4) {
 
   return page.evaluate((minCols) => {
     const tables = Array.from(document.querySelectorAll('table'));
-    // Find the table with the most rows that has enough columns
     const best = tables
       .map(t => {
         const rows = Array.from(t.rows);
@@ -45,6 +44,32 @@ async function extractTable(page, url, minCols = 4) {
       .filter(Boolean)
       .sort((a, b) => b.rowCount - a.rowCount)[0];
     return best || null;
+  }, minCols);
+}
+
+// ── Helper: extract ALL matching tables (used for multi-group standings) ──
+async function extractAllTables(page, url, minCols = 4) {
+  console.log(`  Loading ${url.split('?')[0].split('/').pop()} (all tables)...`);
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+  } catch(e) {
+    console.log(`  ⚠ load warning: ${e.message.split('\n')[0]}`);
+  }
+  await new Promise(r => setTimeout(r, 3000));
+
+  return page.evaluate((minCols) => {
+    const tables = Array.from(document.querySelectorAll('table'));
+    return tables
+      .map(t => {
+        const rows = Array.from(t.rows);
+        if (!rows[0] || rows[0].cells.length < minCols) return null;
+        return {
+          headers: Array.from(rows[0].cells).map(c => c.textContent.trim()),
+          rows: rows.slice(1).map(r => Array.from(r.cells).map(c => c.textContent.trim())),
+          rowCount: rows.length
+        };
+      })
+      .filter(Boolean);
   }, minCols);
 }
 
@@ -128,6 +153,32 @@ function parseRankings(table) {
       mom: +r[8] || 0,
     }))
     .sort((a, b) => b.total - a.total);
+}
+
+function parse2025Standings(tables) {
+  // viewLeaguePointstable.do has two group tables, each with headers:
+  // "#", "TEAM", "MAT", "WON", "LOST", "N/R", "TIE", "PTS", "WIN %", "NET RR", "FOR", "AGAINST"
+  // r[0]=#, r[1]=team, r[2]=mat, r[3]=won, r[4]=lost, r[5]=nr, r[6]=tie, r[7]=pts, r[8]=win%, r[9]=nrr
+  if (!tables || !tables.length) return [];
+  const all = [];
+  tables.forEach(table => {
+    if (!table || !table.rows) return;
+    table.rows
+      .filter(r => r.length >= 9 && /^\d+$/.test(r[0]) && r[1])
+      .forEach(r => {
+        all.push({
+          team: r[1],
+          matches:  +r[2] || 0,
+          won:      +r[3] || 0,
+          lost:     +r[4] || 0,
+          noResult: +r[5] || 0,
+          tied:     +r[6] || 0,
+          points:   +r[7] || 0,
+          nrr:      parseFloat(r[9]) || 0,
+        });
+      });
+  });
+  return all.sort((a, b) => b.points - a.points || b.nrr - a.nrr);
 }
 
 function parse2025Batting(table) {
@@ -348,6 +399,10 @@ async function fetchStats() {
     `${BASE}/viewLeagueBowling.do?league=${LEAGUE_2025_T20}&clubId=${CLUB}`, 8);
   console.log(`  bowling: ${bowling2025Table ? bowling2025Table.rows.length : 0} rows`);
 
+  const standings2025Tables = await extractAllTables(page,
+    `${BASE}/viewLeaguePointstable.do?league=${LEAGUE_2025_T20}&clubId=${CLUB}`, 10);
+  console.log(`  standings: ${standings2025Tables.length} tables`);
+
   await browser.close().catch(() => {});
 
   // ── Parse all tables ──
@@ -359,6 +414,8 @@ async function fetchStats() {
 
   const allBatting2025  = parse2025Batting(batting2025Table);
   const allBowling2025  = parse2025Bowling(bowling2025Table);
+  const standings2025   = parse2025Standings(standings2025Tables);
+  console.log(`  standings2025: ${standings2025.length} teams`);
 
   if (!batting.length && !bowling.length) {
     console.error('\nFailed to capture 2026 batting/bowling data.');
@@ -470,6 +527,7 @@ async function fetchStats() {
     opponents,
     opponents2025,
     standings,
+    standings2025,
     results,
   };
 
