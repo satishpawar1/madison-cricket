@@ -745,6 +745,7 @@ function renderTossAnalysis(teamName) {
     });
   }
 
+  var matchRows = [];
   teamMatches.forEach(function(t) {
     var oppName = t.team1 === teamName ? t.team2 : t.team1;
     // Did this team bat first?
@@ -773,7 +774,24 @@ function renderTossAnalysis(teamName) {
         if (matchResult.won) fieldFirstWins++;
       }
     }
+
+    // Build per-match row info
+    var wonToss = t.tossWinner === teamName;
+    var d = new Date(t.date + 'T00:00:00');
+    var dateStr = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    var resultBadge = '';
+    if (matchResult) {
+      if (matchResult.noResult) resultBadge = '<span style="font-size:10px;font-weight:600;color:#9CA3AF;background:#F3F4F6;padding:2px 6px;border-radius:4px">NR</span>';
+      else if (matchResult.won) resultBadge = '<span style="font-size:10px;font-weight:600;color:#1A8F6A;background:#ECFDF5;padding:2px 6px;border-radius:4px">W</span>';
+      else resultBadge = '<span style="font-size:10px;font-weight:600;color:#DC2626;background:#FEF2F2;padding:2px 6px;border-radius:4px">L</span>';
+    }
+    var tossLabel = wonToss
+      ? '<span style="font-size:10px;font-weight:700;color:#1A56B0">WON TOSS</span> → chose to ' + (t.electedTo === 'bat' ? 'bat' : 'field')
+      : '<span style="font-size:10px;font-weight:600;color:#9CA3AF">Lost toss</span> → ' + (teamBattedFirst ? 'batted' : 'fielded') + ' first';
+    matchRows.push({ dateStr: dateStr, oppName: oppName, tossLabel: tossLabel, resultBadge: resultBadge, date: t.date });
   });
+  // Sort by date ascending (oldest first)
+  matchRows.sort(function(a, b) { return a.date < b.date ? -1 : 1; });
 
   var total = batFirstCount + fieldFirstCount;
   if (!total) return '';
@@ -827,6 +845,17 @@ function renderTossAnalysis(teamName) {
     +   '<div class="toss-win-detail">' + fieldFirstWins + 'W – ' + (fieldFirstGames - fieldFirstWins) + 'L from ' + fieldFirstGames + ' games</div></div>'
     +   '<div class="toss-win-pct" style="color:' + winColor(fieldWinPct) + '">' + fieldWinStr + '</div>'
     + '</div>' : '')
+    + '<div style="margin-top:10px;border-top:1px solid #F3F4F6;padding-top:8px">'
+    +   '<div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Match breakdown</div>'
+    +   matchRows.map(function(r) {
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F9FAFB">'
+            + '<div style="font-size:11px;color:#6B7280;flex-shrink:0;width:52px">' + r.dateStr + '</div>'
+            + '<div style="font-size:12px;font-weight:500;color:#111827;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">vs ' + r.oppName + '</div>'
+            + '<div style="font-size:11px;color:#374151;flex-shrink:0;text-align:right;margin-right:8px">' + r.tossLabel + '</div>'
+            + '<div style="flex-shrink:0">' + r.resultBadge + '</div>'
+            + '</div>';
+        }).join('')
+    + '</div>'
     + '</div></div>';
 }
 
