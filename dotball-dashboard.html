@@ -266,7 +266,7 @@ function buildPlayerSummary(games) {
       if (!map[p.name]) map[p.name] = { name: p.name, total: 0, balls: 0, games: 0, max: 0 };
       map[p.name].total += (p.dots || 0);
       map[p.name].balls += (p.balls || 0);
-      if (p.dots > 0) map[p.name].games++;
+      if ((p.balls || 0) > 0) map[p.name].games++;
       if ((p.dots || 0) > map[p.name].max) map[p.name].max = p.dots;
     });
   });
