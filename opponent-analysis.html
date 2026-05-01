@@ -281,6 +281,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div id="battingList" class="lb-card"></div>
     <div id="bowlingList" class="lb-card" style="display:none"></div>
     <div id="resultsList" style="display:none"></div>
+    <div id="tossList"></div>
 
     <div class="lb-updated" id="lbUpdated"></div>
   </div>
@@ -313,6 +314,7 @@ function switchSeason(season, btn) {
     // Hide stat tiles too
     document.getElementById('teamStatCards').style.display = 'none';
     document.getElementById('noTeamDataMsg').style.display = 'none';
+    renderTossSection(team);
     return;
   }
   document.getElementById('strengthBanner').style.display = '';
@@ -323,6 +325,7 @@ function switchSeason(season, btn) {
   } else {
     renderTab(currentTab, opp);
   }
+  renderTossSection(team);
 }
 
 function cricclubsTeam(game) {
@@ -393,6 +396,7 @@ function selectGame(name) {
   } else {
     renderTab(currentTab, opp);
   }
+  renderTossSection(team);
   document.getElementById('analysis').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -704,8 +708,13 @@ function renderResults(team) {
       + '</div>';
   }).join('');
 
-  container.innerHTML = agg + '<div class="lb-card">' + rows + '</div>'
-    + (currentSeason === '2026' ? renderTossAnalysis(team) : '');
+  container.innerHTML = agg + '<div class="lb-card">' + rows + '</div>';
+}
+
+function renderTossSection(teamName) {
+  var el = document.getElementById('tossList');
+  if (!el) return;
+  el.innerHTML = (currentSeason === '2026' && teamName) ? renderTossAnalysis(teamName) : '';
 }
 
 function renderTossAnalysis(teamName) {
