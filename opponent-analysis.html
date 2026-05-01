@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="cricclubs-stats.js"></script>
+<script src="toss-data.js"></script>
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -168,6 +169,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-loss { background: #FEE2E2; color: #991B1B; }
 .badge-tie  { background: #FEF3C7; color: #92400E; }
 .badge-nr   { background: #F3F4F6; color: #6B7280; }
+
+/* ── Toss analysis ── */
+.toss-section { margin-top: 12px; }
+.toss-section-title {
+  font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 0 14px 6px;
+}
+.toss-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;
+}
+.toss-card {
+  background: #fff; border-radius: 12px; padding: 12px 14px;
+  border: 1.5px solid #E5E7EB;
+}
+.toss-card-label { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.toss-card-count { font-size: 22px; font-weight: 800; color: #111827; line-height: 1; }
+.toss-card-sub   { font-size: 10px; color: #9CA3AF; margin-top: 3px; }
+.toss-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.toss-bar-bg { flex: 1; height: 5px; background: #F3F4F6; border-radius: 99px; overflow: hidden; }
+.toss-bar-fill { height: 100%; border-radius: 99px; transition: width 0.3s; }
+.toss-bar-pct { font-size: 11px; font-weight: 700; min-width: 32px; text-align: right; }
+.toss-win-row {
+  background: #fff; border-radius: 12px; padding: 11px 14px;
+  border: 1.5px solid #E5E7EB; margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.toss-win-label { font-size: 12px; font-weight: 600; color: #374151; }
+.toss-win-detail { font-size: 10px; color: #9CA3AF; margin-top: 1px; }
+.toss-win-pct { font-size: 18px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -674,7 +704,121 @@ function renderResults(team) {
       + '</div>';
   }).join('');
 
-  container.innerHTML = agg + '<div class="lb-card">' + rows + '</div>';
+  container.innerHTML = agg + '<div class="lb-card">' + rows + '</div>'
+    + (currentSeason === '2026' ? renderTossAnalysis(team) : '');
+}
+
+function renderTossAnalysis(teamName) {
+  if (typeof TOSS_DATA === 'undefined') return '';
+
+  // Find all toss entries where this team played
+  var teamMatches = TOSS_DATA.filter(function(t) {
+    return t.team1 === teamName || t.team2 === teamName;
+  }).filter(function(t) { return t.tossWinner !== null; }); // skip no-toss matches
+
+  if (!teamMatches.length) return '';
+
+  // Determine for each match: did this team bat first?
+  // tossWinner elected "bat"  → tossWinner batted first
+  // tossWinner elected "field"→ the OTHER team batted first
+  var batFirstCount = 0, fieldFirstCount = 0;
+  var batFirstWins = 0, batFirstGames = 0;
+  var fieldFirstWins = 0, fieldFirstGames = 0;
+
+  // We need per-match results. Build a lookup: teamName → date → won?
+  // Use results from CRICCLUBS_STATS.results (covers all teams, not just MCC)
+  var allResults = CRICCLUBS_STATS.results || {};
+  var teamResultsByDate = {};
+  if (allResults[teamName] && allResults[teamName].games) {
+    allResults[teamName].games.forEach(function(g) {
+      teamResultsByDate[g.date] = teamResultsByDate[g.date] || [];
+      teamResultsByDate[g.date].push({ opponent: g.opponent, won: g.won, noResult: g.noResult });
+    });
+  }
+
+  teamMatches.forEach(function(t) {
+    var oppName = t.team1 === teamName ? t.team2 : t.team1;
+    // Did this team bat first?
+    var teamBattedFirst;
+    if (t.tossWinner === teamName) {
+      teamBattedFirst = t.electedTo === 'bat';
+    } else {
+      // Other team won toss
+      teamBattedFirst = t.electedTo === 'field'; // other team elected to field → this team bats
+    }
+
+    if (teamBattedFirst) batFirstCount++; else fieldFirstCount++;
+
+    // Find result for this match
+    var dayResults = teamResultsByDate[t.date] || [];
+    var matchResult = null;
+    for (var i = 0; i < dayResults.length; i++) {
+      if (dayResults[i].opponent === oppName) { matchResult = dayResults[i]; break; }
+    }
+    if (matchResult && !matchResult.noResult) {
+      if (teamBattedFirst) {
+        batFirstGames++;
+        if (matchResult.won) batFirstWins++;
+      } else {
+        fieldFirstGames++;
+        if (matchResult.won) fieldFirstWins++;
+      }
+    }
+  });
+
+  var total = batFirstCount + fieldFirstCount;
+  if (!total) return '';
+
+  var batPct   = Math.round(batFirstCount   / total * 100);
+  var fieldPct = 100 - batPct;
+  var batWinPct   = batFirstGames   ? Math.round(batFirstWins   / batFirstGames   * 100) : null;
+  var fieldWinPct = fieldFirstGames ? Math.round(fieldFirstWins / fieldFirstGames * 100) : null;
+
+  function winColor(pct) {
+    if (pct === null) return '#9CA3AF';
+    if (pct >= 60) return '#1A8F6A';
+    if (pct >= 40) return '#D97706';
+    return '#DC2626';
+  }
+
+  function barHtml(pct, color) {
+    return '<div class="toss-bar-wrap">'
+      + '<div class="toss-bar-bg"><div class="toss-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>'
+      + '<div class="toss-bar-pct" style="color:' + color + '">' + pct + '%</div>'
+      + '</div>';
+  }
+
+  var batWinStr   = batWinPct   !== null ? batWinPct   + '%' : 'N/A';
+  var fieldWinStr = fieldWinPct !== null ? fieldWinPct + '%' : 'N/A';
+
+  return '<div class="toss-section lb-card" style="margin-top:8px">'
+    + '<div class="toss-section-title" style="padding-top:12px">Toss Analysis (2026)</div>'
+    + '<div style="padding: 0 14px 12px">'
+    + '<div class="toss-grid">'
+    + '<div class="toss-card">'
+    +   '<div class="toss-card-label">Bat first</div>'
+    +   '<div class="toss-card-count">' + batFirstCount + '</div>'
+    +   '<div class="toss-card-sub">of ' + total + ' matches</div>'
+    +   barHtml(batPct, '#1A56B0')
+    + '</div>'
+    + '<div class="toss-card">'
+    +   '<div class="toss-card-label">Field first</div>'
+    +   '<div class="toss-card-count">' + fieldFirstCount + '</div>'
+    +   '<div class="toss-card-sub">of ' + total + ' matches</div>'
+    +   barHtml(fieldPct, '#7C3AED')
+    + '</div>'
+    + '</div>'
+    + (batFirstGames ? '<div class="toss-win-row">'
+    +   '<div><div class="toss-win-label">Win % batting first</div>'
+    +   '<div class="toss-win-detail">' + batFirstWins + 'W – ' + (batFirstGames - batFirstWins) + 'L from ' + batFirstGames + ' games</div></div>'
+    +   '<div class="toss-win-pct" style="color:' + winColor(batWinPct) + '">' + batWinStr + '</div>'
+    + '</div>' : '')
+    + (fieldFirstGames ? '<div class="toss-win-row">'
+    +   '<div><div class="toss-win-label">Win % fielding first</div>'
+    +   '<div class="toss-win-detail">' + fieldFirstWins + 'W – ' + (fieldFirstGames - fieldFirstWins) + 'L from ' + fieldFirstGames + ' games</div></div>'
+    +   '<div class="toss-win-pct" style="color:' + winColor(fieldWinPct) + '">' + fieldWinStr + '</div>'
+    + '</div>' : '')
+    + '</div></div>';
 }
 
 window.addEventListener('DOMContentLoaded', function() {
