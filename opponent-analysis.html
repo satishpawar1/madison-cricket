@@ -275,15 +275,17 @@ function switchSeason(season, btn) {
   if (!selectedGame) return;
   var team = cricclubsTeam(selectedGame);
   var opp = getOpponents()[team];
-  if (!opp) {
-    document.getElementById('strengthBanner').className = 'strength-banner str-weak';
-    document.getElementById('strIcon').textContent = '—';
-    document.getElementById('strTitle').textContent = 'No ' + season + ' data available';
-    document.getElementById('strSub').textContent = '';
-    document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No ' + season + ' data for this opponent</div>';
-    document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No ' + season + ' data for this opponent</div>';
+  var noData = !opp || (season === '2025' && !(opp.batting || []).length && !(opp.bowling || []).length);
+  if (noData) {
+    document.getElementById('strengthBanner').style.display = 'none';
+    document.getElementById('battingList').innerHTML = '<div class="no-data-msg">No 2025 data for this opponent</div>';
+    document.getElementById('bowlingList').innerHTML = '<div class="no-data-msg">No 2025 data for this opponent</div>';
+    // Hide stat tiles too
+    document.getElementById('teamStatCards').style.display = 'none';
+    document.getElementById('noTeamDataMsg').style.display = 'none';
     return;
   }
+  document.getElementById('strengthBanner').style.display = '';
   renderStrength(team, opp);
   renderStats(opp);
   if (currentTab === 'results') {
