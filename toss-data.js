@@ -2,8 +2,68 @@
 // Contains toss results for all 2026 Tape 20 league matches
 var TOSS_DATA = [
   {
+    "matchId": "1799",
+    "date": "2026-05-03",
+    "team1": "Madison Tigers",
+    "team2": "Rockvale Risers",
+    "resultText": null,
+    "tossWinner": "Madison Tigers",
+    "electedTo": "bat",
+    "tossText": "Madison Tigers won the toss and elected to bat"
+  },
+  {
+    "matchId": "1798",
+    "date": "2026-05-03",
+    "team1": "Mumbai Risers",
+    "team2": "Franklin Falcons",
+    "resultText": null,
+    "tossWinner": "Mumbai Risers",
+    "electedTo": "bat",
+    "tossText": "Mumbai Risers won the toss and elected to bat"
+  },
+  {
+    "matchId": "1797",
+    "date": "2026-05-03",
+    "team1": "Star Strikers",
+    "team2": "Shoals Strikers",
+    "resultText": null,
+    "tossWinner": "Star Strikers",
+    "electedTo": "bat",
+    "tossText": "Star Strikers won the toss and elected to bat"
+  },
+  {
+    "matchId": "1796",
+    "date": "2026-05-03",
+    "team1": "Madison Lions",
+    "team2": "Cool Springs Titans",
+    "resultText": null,
+    "tossWinner": "Madison Lions",
+    "electedTo": "bat",
+    "tossText": "Madison Lions won the toss and elected to bat"
+  },
+  {
+    "matchId": "1792",
+    "date": "2026-05-03",
+    "team1": "Game Swingers",
+    "team2": "Afghan Eagles",
+    "resultText": null,
+    "tossWinner": "Game Swingers",
+    "electedTo": "bat",
+    "tossText": "Game Swingers won the toss and elected to bat"
+  },
+  {
+    "matchId": "1791",
+    "date": "2026-05-03",
+    "team1": "Fearless Raiders",
+    "team2": "Fearless Fighters",
+    "resultText": null,
+    "tossWinner": "Fearless Raiders",
+    "electedTo": "bat",
+    "tossText": "Fearless Raiders won the toss and elected to bat"
+  },
+  {
     "matchId": "1785",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "FSC Raptors",
     "team2": "Rockvale Risers",
     "resultText": null,
@@ -13,7 +73,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1784",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "Game Swingers",
     "team2": "Shoals Strikers",
     "resultText": null,
@@ -23,7 +83,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1783",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "Madison Tigers",
     "team2": "Afghan Eagles",
     "resultText": null,
@@ -33,7 +93,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1782",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "Fearless Fighters",
     "team2": "Mumbai Risers",
     "resultText": null,
@@ -43,7 +103,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1777",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "Nashville Underdogs",
     "team2": "Cool Springs Titans",
     "resultText": null,
@@ -53,7 +113,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1776",
-    "date": "2026-04-26",
+    "date": "04/26/2026",
     "team1": "Fearless Raiders",
     "team2": "Great Marathas",
     "resultText": null,
@@ -63,7 +123,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1770",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Franklin Falcons",
     "team2": "Shoals Strikers",
     "resultText": null,
@@ -73,7 +133,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1769",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Game Swingers",
     "team2": "Mumbai Risers",
     "resultText": null,
@@ -83,7 +143,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1768",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Madison Tigers",
     "team2": "Fearless Fighters",
     "resultText": null,
@@ -93,7 +153,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1767",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Great Marathas",
     "team2": "Rockvale Risers",
     "resultText": null,
@@ -103,7 +163,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1763",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Fearless Raiders",
     "team2": "Afghan Eagles",
     "resultText": null,
@@ -113,7 +173,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1762",
-    "date": "2026-04-19",
+    "date": "04/19/2026",
     "team1": "Cool Springs Titans",
     "team2": "FSC Raptors",
     "resultText": null,
@@ -123,7 +183,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1771",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "Fearless Fighters",
     "team2": "Madison Lions",
     "resultText": null,
@@ -133,7 +193,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1756",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "Afghan Eagles",
     "team2": "Mumbai Risers",
     "resultText": null,
@@ -143,7 +203,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1755",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "Madison Tigers",
     "team2": "Great Marathas",
     "resultText": null,
@@ -153,7 +213,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1754",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "MCA",
     "team2": "Shoals Strikers",
     "resultText": null,
@@ -163,7 +223,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1753",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "Franklin Falcons",
     "team2": "Nashville Underdogs",
     "resultText": null,
@@ -173,7 +233,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1748",
-    "date": "2026-04-12",
+    "date": "04/12/2026",
     "team1": "Fearless Raiders",
     "team2": "Rockvale Risers",
     "resultText": null,
@@ -183,7 +243,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1742",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "Madison Lions",
     "team2": "Rockvale Risers",
     "resultText": null,
@@ -193,7 +253,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1741",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "MCA",
     "team2": "Cool Springs Titans",
     "resultText": null,
@@ -203,7 +263,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1740",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "Great Marathas",
     "team2": "Nashville Underdogs",
     "resultText": null,
@@ -213,7 +273,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1739",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "Afghan Eagles",
     "team2": "Fearless Fighters",
     "resultText": null,
@@ -223,7 +283,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1735",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "Star Strikers",
     "team2": "Fearless Raiders",
     "resultText": null,
@@ -233,7 +293,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1734",
-    "date": "2026-04-05",
+    "date": "04/05/2026",
     "team1": "FSC Raptors",
     "team2": "Madison Tigers",
     "resultText": null,
@@ -243,7 +303,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1728",
-    "date": "2026-03-29",
+    "date": "03/29/2026",
     "team1": "Mumbai Risers",
     "team2": "Shoals Strikers",
     "resultText": null,
@@ -253,7 +313,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1727",
-    "date": "2026-03-29",
+    "date": "03/29/2026",
     "team1": "Madison Lions",
     "team2": "Nashville Underdogs",
     "resultText": null,
@@ -263,7 +323,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1723",
-    "date": "2026-03-29",
+    "date": "03/29/2026",
     "team1": "Fearless Fighters",
     "team2": "Rockvale Risers",
     "resultText": null,
@@ -273,7 +333,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1722",
-    "date": "2026-03-29",
+    "date": "03/29/2026",
     "team1": "Franklin Falcons",
     "team2": "Cool Springs Titans",
     "resultText": null,
@@ -283,7 +343,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1716",
-    "date": "2026-03-22",
+    "date": "03/22/2026",
     "team1": "Madison Tigers",
     "team2": "Franklin Falcons",
     "resultText": null,
@@ -293,7 +353,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1715",
-    "date": "2026-03-22",
+    "date": "03/22/2026",
     "team1": "Cool Springs Titans",
     "team2": "Great Marathas",
     "resultText": null,
@@ -303,7 +363,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1710",
-    "date": "2026-03-22",
+    "date": "03/22/2026",
     "team1": "Nashville Underdogs",
     "team2": "Star Strikers",
     "resultText": null,
@@ -313,7 +373,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1709",
-    "date": "2026-03-22",
+    "date": "03/22/2026",
     "team1": "FSC Raptors",
     "team2": "Afghan Eagles",
     "resultText": null,
@@ -323,7 +383,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1704",
-    "date": "2026-03-15",
+    "date": "03/15/2026",
     "team1": "Franklin Falcons",
     "team2": "Game Swingers",
     "resultText": null,
@@ -333,7 +393,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1703",
-    "date": "2026-03-15",
+    "date": "03/15/2026",
     "team1": "Great Marathas",
     "team2": "Madison Lions",
     "resultText": null,
@@ -343,7 +403,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1698",
-    "date": "2026-03-15",
+    "date": "03/15/2026",
     "team1": "FSC Raptors",
     "team2": "Mumbai Risers",
     "resultText": null,
@@ -353,7 +413,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1697",
-    "date": "2026-03-15",
+    "date": "03/15/2026",
     "team1": "Fearless Raiders",
     "team2": "MCA",
     "resultText": null,
@@ -363,7 +423,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1692",
-    "date": "2026-03-08",
+    "date": "03/08/2026",
     "team1": "Game Swingers",
     "team2": "Cool Springs Titans",
     "resultText": null,
@@ -373,7 +433,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1691",
-    "date": "2026-03-08",
+    "date": "03/08/2026",
     "team1": "Star Strikers",
     "team2": "MCA",
     "resultText": null,
@@ -383,7 +443,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1686",
-    "date": "2026-03-07",
+    "date": "03/07/2026",
     "team1": "Rockvale Risers",
     "team2": "Nashville Underdogs",
     "resultText": null,
@@ -393,7 +453,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1681",
-    "date": "2026-03-07",
+    "date": "03/07/2026",
     "team1": "Fearless Raiders",
     "team2": "FSC Raptors",
     "resultText": null,
@@ -403,7 +463,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1680",
-    "date": "2026-03-01",
+    "date": "03/01/2026",
     "team1": "Game Swingers",
     "team2": "Fearless Fighters",
     "resultText": null,
@@ -413,7 +473,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1675",
-    "date": "2026-03-01",
+    "date": "03/01/2026",
     "team1": "FSC Raptors",
     "team2": "Madison Lions",
     "resultText": null,
@@ -423,7 +483,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1674",
-    "date": "2026-02-28",
+    "date": "02/28/2026",
     "team1": "Mumbai Risers",
     "team2": "MCA",
     "resultText": null,
@@ -433,7 +493,7 @@ var TOSS_DATA = [
   },
   {
     "matchId": "1669",
-    "date": "2026-02-28",
+    "date": "02/28/2026",
     "team1": "Star Strikers",
     "team2": "Madison Tigers",
     "resultText": null,
