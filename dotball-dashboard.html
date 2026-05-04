@@ -128,8 +128,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .gdr-bar-wrap { flex: 1; margin: 0 10px; }
 .gdr-bar-track { background: #F3F4F6; border-radius: 4px; height: 6px; overflow: hidden; }
 .gdr-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3B82F6, #1A56B0); }
-.gdr-val { font-size: 13px; font-weight: 700; color: #1A56B0; min-width: 28px; text-align: right; }
-.gdr-val.zero { color: #D1D5DB; font-weight: 400; }
+.gdr-stats { display: flex; gap: 10px; align-items: center; }
+.gdr-stat { display: flex; flex-direction: column; align-items: flex-end; min-width: 28px; }
+.gdr-stat-val { font-size: 13px; font-weight: 700; color: #1A56B0; line-height: 1; }
+.gdr-stat-val.muted { color: #9CA3AF; font-weight: 400; }
+.gdr-stat-lbl { font-size: 9px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px; }
 
 .loading { text-align: center; color: #9CA3AF; font-size: 14px; padding: 3rem; }
 .no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; }
@@ -365,11 +368,16 @@ function renderTeam(team) {
     var total = gamePlayers.reduce(function(sum, p) { return sum + p.dots; }, 0);
     var playersHtml = gamePlayers.length
       ? gamePlayers.sort(function(a,b){return b.dots-a.dots;}).map(function(p) {
-          var pct = maxVal ? Math.round((p.dots / maxVal) * 100) : 0;
+          var barPct = maxVal ? Math.round((p.dots / maxVal) * 100) : 0;
+          var playerDotPct = p.balls > 0 ? Math.round(p.dots / p.balls * 100) : 0;
           return '<div class="gdr">'
             + '<span class="gdr-name">' + p.name + '</span>'
-            + '<div class="gdr-bar-wrap"><div class="gdr-bar-track"><div class="gdr-bar-fill" style="width:' + pct + '%"></div></div></div>'
-            + '<span class="gdr-val">' + p.dots + '</span>'
+            + '<div class="gdr-bar-wrap"><div class="gdr-bar-track"><div class="gdr-bar-fill" style="width:' + barPct + '%"></div></div></div>'
+            + '<div class="gdr-stats">'
+            + '<div class="gdr-stat"><span class="gdr-stat-val muted">' + (p.balls || 0) + '</span><span class="gdr-stat-lbl">Balls</span></div>'
+            + '<div class="gdr-stat"><span class="gdr-stat-val">' + p.dots + '</span><span class="gdr-stat-lbl">Dots</span></div>'
+            + '<div class="gdr-stat"><span class="gdr-stat-val">' + playerDotPct + '%</span><span class="gdr-stat-lbl">Dot%</span></div>'
+            + '</div>'
             + '</div>';
         }).join('')
       : '<div class="no-data" style="padding:0.75rem 1rem">No data recorded for this game.</div>';
