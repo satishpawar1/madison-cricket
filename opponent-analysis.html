@@ -345,7 +345,7 @@ function buildGameList(games, containerId, teamClass) {
   games.forEach(function(g) {
     var parts = g.gameDate.split('-');
     var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
-    var isPast = today > gd;
+    var isPast = today >= gd;
     var day = gd.getDate();
     var mon = gd.toLocaleDateString('en-US', {month:'short'});
     var stats = hasStats(g);
