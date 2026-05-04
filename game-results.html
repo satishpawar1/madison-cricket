@@ -137,7 +137,8 @@ function buildMatchCards(games, mccLabel, mccCricclubsName, dotClass, containerI
     return;
   }
 
-  var html = '<div class="section-label">' + (dotClass === 'dot-lions' ? '🦁' : '🐯') + ' ' + mccLabel + '</div>';
+  var labelStyle = dotClass === 'dot-lions' ? ' style="color:#fff"' : '';
+  var html = '<div class="section-label"' + labelStyle + '>' + (dotClass === 'dot-lions' ? '🦁' : '🐯') + ' ' + mccLabel + '</div>';
 
   played.forEach(function(g) {
     var parts = g.gameDate.split('-');
