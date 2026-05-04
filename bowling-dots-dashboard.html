@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <script src="config.js"></script>
 <script src="cricclubs-stats.js"></script>
-<title>Bowling Extras Dashboard — MCC</title>
+<title>Tikka Shake Shack Green Dot Balls — MCC</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
 
 .page-header {
-  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  background: linear-gradient(150deg, #15803D 0%, #14532D 100%);
   padding: 1.25rem 1.25rem 1.5rem;
   display: flex; align-items: center; gap: 12px;
 }
@@ -68,8 +68,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .stats-table th:first-child  { text-align: left; padding-left: 16px; }
 .stats-table th:nth-child(2) { text-align: left; }
-.stats-table th.sort-asc::after  { content: ' ↑'; color: #1A56B0; }
-.stats-table th.sort-desc::after { content: ' ↓'; color: #1A56B0; }
+.stats-table th.sort-asc::after  { content: ' ↑'; color: #15803D; }
+.stats-table th.sort-desc::after { content: ' ↓'; color: #15803D; }
 .stats-table td {
   padding: 9px 10px; text-align: right;
   border-bottom: 1px solid #F9FAFB;
@@ -80,7 +80,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .stats-table tr:last-child td { border-bottom: none; }
 .stats-table tr:hover td { background: #F9FAFB; }
 
-.highlight-val { color: #DC2626; font-weight: 700; }
+.highlight-val { color: #15803D; font-weight: 700; }
 
 /* ── Per-game breakdown ── */
 .game-section { margin-bottom: 1.25rem; }
@@ -104,14 +104,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .game-card-meta { font-size: 11px; color: #9CA3AF; }
 .game-summary-strip {
   display: flex; gap: 16px; padding: 7px 14px;
-  background: #F8FAFF; border-bottom: 1px solid #F3F4F6;
+  background: #F0FDF4; border-bottom: 1px solid #F3F4F6;
   font-size: 12px;
 }
 .gss-item { display: flex; flex-direction: column; align-items: center; }
-.gss-val { font-weight: 700; color: #1A56B0; font-size: 15px; line-height: 1; }
+.gss-val { font-weight: 700; color: #15803D; font-size: 15px; line-height: 1; }
 .gss-val.red   { color: #DC2626; }
 .gss-val.amber { color: #D97706; }
-.gss-val.green { color: #16A34A; }
+.gss-val.green { color: #15803D; }
 .gss-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
 .gss-div { width: 1px; background: #E5E7EB; align-self: stretch; margin: 2px 0; }
 
@@ -131,12 +131,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .gdr-name { font-size: 13px; color: #374151; }
 .gdr-bar-wrap { flex: 1; margin: 0 10px; }
 .gdr-bar-track { background: #F3F4F6; border-radius: 4px; height: 6px; overflow: hidden; }
-.gdr-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #F87171, #DC2626); }
+.gdr-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #4ADE80, #15803D); }
 .gdr-cols { display: flex; gap: 0; }
 .gdr-col { font-size: 13px; color: #6B7280; text-align: right; width: 44px; }
-.gdr-col.ext-hi  { font-weight: 700; color: #DC2626; }
-.gdr-col.ext-mid { font-weight: 700; color: #D97706; }
-.gdr-col.ext-lo  { font-weight: 700; color: #16A34A; }
+.gdr-col.dot-hi  { font-weight: 700; color: #15803D; }
+.gdr-col.dot-mid { font-weight: 700; color: #D97706; }
+.gdr-col.dot-lo  { font-weight: 700; color: #DC2626; }
 
 .no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; }
 .updated { font-size: 11px; color: #9CA3AF; text-align: right; margin-bottom: 1rem; }
@@ -147,8 +147,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="page-header">
   <a href="index.html">&#8249;</a>
   <div class="hdr-text">
-    <h2>🎯 Bowling Extras Dashboard</h2>
-    <p>Wides &amp; no-balls per bowler — Lions &amp; Tigers</p>
+    <h2>🟢 Tikka Shake Shack Green Dot Balls</h2>
+    <p>Dots bowled per bowler — Lions &amp; Tigers</p>
   </div>
 </div>
 
@@ -162,13 +162,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <div id="lionsView" style="display:none">
     <div class="stat-cards">
-      <div class="sc"><div class="sn" id="l-totalExtras" style="color:#DC2626">—</div><div class="sl">Total Extras</div></div>
-      <div class="sc"><div class="sn" id="l-totalBalls"  style="color:#1A56B0">—</div><div class="sl">Total Balls</div></div>
-      <div class="sc"><div class="sn" id="l-avgPerGame"  style="color:#1A56B0">—</div><div class="sl">Avg Extras/Game</div></div>
+      <div class="sc"><div class="sn" id="l-totalDots" style="color:#15803D">—</div><div class="sl">Total Dots Bowled</div></div>
+      <div class="sc"><div class="sn" id="l-totalBalls" style="color:#1A56B0">—</div><div class="sl">Total Balls</div></div>
+      <div class="sc"><div class="sn" id="l-dotPct" style="color:#15803D">—</div><div class="sl">Overall Dot %</div></div>
     </div>
     <div class="lb-card">
       <div class="lb-card-header">
-        <div class="lb-title">🦁 Lions — Bowling Extras Totals</div>
+        <div class="lb-title">🦁 Lions — Bowling Dot Totals</div>
       </div>
       <table class="stats-table" id="lionsTable">
         <thead>
@@ -176,11 +176,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th>#</th>
             <th onclick="sortTable('lions','name')">Bowler</th>
             <th onclick="sortTable('lions','games')">Games</th>
-            <th onclick="sortTable('lions','extras')">Extras</th>
-            <th onclick="sortTable('lions','wides')">Wides</th>
-            <th onclick="sortTable('lions','noballs')">NB</th>
+            <th onclick="sortTable('lions','total')">Total Dots</th>
             <th onclick="sortTable('lions','balls')">Balls</th>
-            <th onclick="sortTable('lions','avg')">Ext/Game</th>
+            <th onclick="sortTable('lions','dotpct')">Dot %</th>
+            <th onclick="sortTable('lions','avg')">Avg/Game</th>
           </tr>
         </thead>
         <tbody id="lionsTbody"></tbody>
@@ -194,13 +193,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <div id="tigersView" style="display:none">
     <div class="stat-cards">
-      <div class="sc"><div class="sn" id="t-totalExtras" style="color:#DC2626">—</div><div class="sl">Total Extras</div></div>
-      <div class="sc"><div class="sn" id="t-totalBalls"  style="color:#C05000">—</div><div class="sl">Total Balls</div></div>
-      <div class="sc"><div class="sn" id="t-avgPerGame"  style="color:#C05000">—</div><div class="sl">Avg Extras/Game</div></div>
+      <div class="sc"><div class="sn" id="t-totalDots" style="color:#15803D">—</div><div class="sl">Total Dots Bowled</div></div>
+      <div class="sc"><div class="sn" id="t-totalBalls" style="color:#C05000">—</div><div class="sl">Total Balls</div></div>
+      <div class="sc"><div class="sn" id="t-dotPct" style="color:#15803D">—</div><div class="sl">Overall Dot %</div></div>
     </div>
     <div class="lb-card">
       <div class="lb-card-header">
-        <div class="lb-title">🐯 Tigers — Bowling Extras Totals</div>
+        <div class="lb-title">🐯 Tigers — Bowling Dot Totals</div>
       </div>
       <table class="stats-table" id="tigersTable">
         <thead>
@@ -208,11 +207,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <th>#</th>
             <th onclick="sortTable('tigers','name')">Bowler</th>
             <th onclick="sortTable('tigers','games')">Games</th>
-            <th onclick="sortTable('tigers','extras')">Extras</th>
-            <th onclick="sortTable('tigers','wides')">Wides</th>
-            <th onclick="sortTable('tigers','noballs')">NB</th>
+            <th onclick="sortTable('tigers','total')">Total Dots</th>
             <th onclick="sortTable('tigers','balls')">Balls</th>
-            <th onclick="sortTable('tigers','avg')">Ext/Game</th>
+            <th onclick="sortTable('tigers','dotpct')">Dot %</th>
+            <th onclick="sortTable('tigers','avg')">Avg/Game</th>
           </tr>
         </thead>
         <tbody id="tigersTbody"></tbody>
@@ -229,11 +227,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 var activeTab = 'lions';
 
 var _sort = {
-  lions:  { key: 'extras', dir: -1 },
-  tigers: { key: 'extras', dir: -1 }
+  lions:  { key: 'total', dir: -1 },
+  tigers: { key: 'total', dir: -1 }
 };
 
-// Load from CRICCLUBS_STATS — extrasGames: [{game, date, players:[{name,overs,balls,wides,noballs}]}]
+// Load from CRICCLUBS_STATS — bowlingGames: [{game, date, players:[{name,overs,balls,dots,wides,noballs}]}]
 var _data = {
   lions:  (CRICCLUBS_STATS.lions.bowlingGames  || CRICCLUBS_STATS.lions.extrasGames  || []),
   tigers: (CRICCLUBS_STATS.tigers.bowlingGames || CRICCLUBS_STATS.tigers.extrasGames || []),
@@ -250,15 +248,12 @@ function buildPlayerSummary(games) {
   var map = {};
   (games || []).forEach(function(g) {
     (g.players || []).forEach(function(p) {
-      if (!map[p.name]) map[p.name] = { name: p.name, extras: 0, wides: 0, noballs: 0, balls: 0, games: 0 };
-      var w  = p.wides   || 0;
-      var nb = p.noballs || 0;
-      var b  = p.balls   || 0;
-      map[p.name].wides   += w;
-      map[p.name].noballs += nb;
-      map[p.name].extras  += w + nb;
-      map[p.name].balls   += b;
-      if (b > 0 || w > 0 || nb > 0) map[p.name].games++;
+      if (!map[p.name]) map[p.name] = { name: p.name, total: 0, balls: 0, games: 0 };
+      var d = p.dots  || 0;
+      var b = p.balls || 0;
+      map[p.name].total += d;
+      map[p.name].balls += b;
+      if (b > 0) map[p.name].games++;
     });
   });
   return Object.values(map);
@@ -274,8 +269,6 @@ function renderTeam(team) {
   var games   = _data[team] || [];
   var players = buildPlayerSummary(games);
   var s       = _sort[team];
-  var isLions = team === 'lions';
-  var accent  = isLions ? '#1A56B0' : '#C05000';
 
   // Update sort indicators
   var table = document.getElementById(team + 'Table');
@@ -290,38 +283,42 @@ function renderTeam(team) {
   players.sort(function(a, b) {
     var va = a[s.key], vb = b[s.key];
     if (s.key === 'avg') {
-      va = a.games ? a.extras / a.games : 0;
-      vb = b.games ? b.extras / b.games : 0;
+      va = a.games ? a.total / a.games : 0;
+      vb = b.games ? b.total / b.games : 0;
+    }
+    if (s.key === 'dotpct') {
+      va = a.balls ? a.total / a.balls : 0;
+      vb = b.balls ? b.total / b.balls : 0;
     }
     if (typeof va === 'string') return s.dir * va.localeCompare(vb);
     return s.dir * ((vb || 0) - (va || 0));
   });
 
   // Summary tiles
-  var totalExtras = players.reduce(function(sum, p) { return sum + p.extras; }, 0);
-  var totalBalls  = players.reduce(function(sum, p) { return sum + p.balls;  }, 0);
-  var avgPerGame  = games.length ? (totalExtras / games.length).toFixed(1) : '—';
+  var totalDots  = players.reduce(function(sum, p) { return sum + p.total; }, 0);
+  var totalBalls = players.reduce(function(sum, p) { return sum + p.balls; }, 0);
+  var dotPct     = totalBalls ? Math.round(totalDots / totalBalls * 100) + '%' : '—';
 
-  var prefix = isLions ? 'l' : 't';
-  document.getElementById(prefix + '-totalExtras').textContent = totalExtras || '—';
-  document.getElementById(prefix + '-totalBalls').textContent  = totalBalls  || '—';
-  document.getElementById(prefix + '-avgPerGame').textContent  = avgPerGame;
+  var prefix = team === 'lions' ? 'l' : 't';
+  document.getElementById(prefix + '-totalDots').textContent  = totalDots  || '—';
+  document.getElementById(prefix + '-totalBalls').textContent = totalBalls || '—';
+  document.getElementById(prefix + '-dotPct').textContent     = dotPct;
 
   // Table rows
   var tbody = document.getElementById(team + 'Tbody');
   if (!players.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:2rem">No extras data yet — run the scraper after completed games.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:2rem">No bowling dot data yet — run the scraper after completed games.</td></tr>';
   } else {
     tbody.innerHTML = players.map(function(p, i) {
-      var avg = p.games ? (p.extras / p.games).toFixed(1) : '—';
+      var avg    = p.games ? (p.total / p.games).toFixed(1) : '—';
+      var dpct   = p.balls ? Math.round(p.total / p.balls * 100) + '%' : '—';
       return '<tr>'
         + '<td>' + (i+1) + '</td>'
         + '<td>' + p.name + '</td>'
         + '<td>' + p.games + '</td>'
-        + '<td class="highlight-val">' + p.extras + '</td>'
-        + '<td>' + p.wides   + '</td>'
-        + '<td>' + p.noballs + '</td>'
+        + '<td class="highlight-val">' + p.total + '</td>'
         + '<td>' + (p.balls || '—') + '</td>'
+        + '<td>' + dpct + '</td>'
         + '<td>' + avg + '</td>'
         + '</tr>';
     }).join('');
@@ -334,50 +331,45 @@ function renderTeam(team) {
     return;
   }
 
-  // Max extras in any bowler-game for bar scaling
+  // Max dots in any bowler-game for bar scaling
   var maxVal = 0;
   games.forEach(function(g) {
     (g.players || []).forEach(function(p) {
-      var ext = (p.wides || 0) + (p.noballs || 0);
-      if (ext > maxVal) maxVal = ext;
+      if ((p.dots || 0) > maxVal) maxVal = p.dots;
     });
   });
+  if (!maxVal) maxVal = 1;
 
   container.innerHTML = games.map(function(g) {
     var gPlayers = (g.players || []).slice().sort(function(a, b) {
-      return ((b.wides||0)+(b.noballs||0)) - ((a.wides||0)+(a.noballs||0));
+      return (b.dots || 0) - (a.dots || 0);
     });
-    var totalExt = gPlayers.reduce(function(s, p) { return s + (p.wides||0) + (p.noballs||0); }, 0);
-    var totalW   = gPlayers.reduce(function(s, p) { return s + (p.wides||0);   }, 0);
-    var totalNB  = gPlayers.reduce(function(s, p) { return s + (p.noballs||0); }, 0);
-    var totalB   = gPlayers.reduce(function(s, p) { return s + (p.balls||0);   }, 0);
-    var extCls   = totalExt >= 15 ? 'red' : (totalExt <= 5 ? 'green' : 'amber');
+    var totalD = gPlayers.reduce(function(s, p) { return s + (p.dots  || 0); }, 0);
+    var totalB = gPlayers.reduce(function(s, p) { return s + (p.balls || 0); }, 0);
+    var gameDP = totalB > 0 ? Math.round(totalD / totalB * 100) : 0;
+    var gameCls = gameDP >= 40 ? 'green' : (gameDP >= 25 ? 'amber' : 'red');
 
-    var colHeader = gPlayers.length
-      ? '<div class="gdr-header">'
-        + '<span class="gdr-header-name">Bowler</span>'
-        + '<div class="gdr-header-spacer"></div>'
-        + '<div class="gdr-header-cols">'
-        + '<span class="gdr-header-col">Balls</span>'
-        + '<span class="gdr-header-col">Wd</span>'
-        + '<span class="gdr-header-col">NB</span>'
-        + '<span class="gdr-header-col">Ext</span>'
-        + '</div></div>'
-      : '';
+    var colHeader = '<div class="gdr-header">'
+      + '<span class="gdr-header-name">Bowler</span>'
+      + '<div class="gdr-header-spacer"></div>'
+      + '<div class="gdr-header-cols">'
+      + '<span class="gdr-header-col">Balls</span>'
+      + '<span class="gdr-header-col">Dots</span>'
+      + '<span class="gdr-header-col">Dot%</span>'
+      + '</div></div>';
 
     var rowsHtml = gPlayers.length
       ? gPlayers.map(function(p) {
-          var ext = (p.wides||0) + (p.noballs||0);
-          var barPct = maxVal ? Math.round(ext / maxVal * 100) : 0;
-          var extCls2 = ext >= 5 ? 'ext-hi' : (ext <= 2 && ext >= 0 ? 'ext-lo' : 'ext-mid');
+          var barPct   = Math.round(((p.dots || 0) / maxVal) * 100);
+          var playerDP = (p.balls || 0) > 0 ? Math.round((p.dots || 0) / p.balls * 100) : 0;
+          var dpCls    = playerDP >= 40 ? 'dot-hi' : (playerDP >= 25 ? 'dot-mid' : 'dot-lo');
           return '<div class="gdr">'
             + '<span class="gdr-name">' + p.name + '</span>'
             + '<div class="gdr-bar-wrap"><div class="gdr-bar-track"><div class="gdr-bar-fill" style="width:' + barPct + '%"></div></div></div>'
             + '<div class="gdr-cols">'
-            + '<span class="gdr-col">'  + (p.balls   || 0) + '</span>'
-            + '<span class="gdr-col">'  + (p.wides   || 0) + '</span>'
-            + '<span class="gdr-col">'  + (p.noballs || 0) + '</span>'
-            + '<span class="gdr-col ' + extCls2 + '">' + ext + '</span>'
+            + '<span class="gdr-col">' + (p.balls || 0) + '</span>'
+            + '<span class="gdr-col">' + (p.dots  || 0) + '</span>'
+            + '<span class="gdr-col ' + dpCls + '">' + playerDP + '%</span>'
             + '</div>'
             + '</div>';
         }).join('')
@@ -386,16 +378,14 @@ function renderTeam(team) {
     return '<div class="game-card">'
       + '<div class="game-card-header">'
       + '<span class="game-card-title">vs ' + (g.game || 'Unknown') + '</span>'
-      + '<span class="game-card-meta">' + totalExt + ' total extras</span>'
+      + '<span class="game-card-meta">' + totalD + ' dots bowled</span>'
       + '</div>'
       + '<div class="game-summary-strip">'
-      + '<div class="gss-item"><span class="gss-val">'             + totalB   + '</span><span class="gss-lbl">Balls</span></div>'
+      + '<div class="gss-item"><span class="gss-val">' + totalB + '</span><span class="gss-lbl">Balls</span></div>'
       + '<div class="gss-div"></div>'
-      + '<div class="gss-item"><span class="gss-val">'             + totalW   + '</span><span class="gss-lbl">Wides</span></div>'
+      + '<div class="gss-item"><span class="gss-val">' + totalD + '</span><span class="gss-lbl">Dots</span></div>'
       + '<div class="gss-div"></div>'
-      + '<div class="gss-item"><span class="gss-val">'             + totalNB  + '</span><span class="gss-lbl">No-Balls</span></div>'
-      + '<div class="gss-div"></div>'
-      + '<div class="gss-item"><span class="gss-val ' + extCls + '">' + totalExt + '</span><span class="gss-lbl">Extras</span></div>'
+      + '<div class="gss-item"><span class="gss-val ' + gameCls + '">' + gameDP + '%</span><span class="gss-lbl">Dot %</span></div>'
       + '</div>'
       + '<div class="game-dot-rows">' + colHeader + rowsHtml + '</div>'
       + '</div>';
@@ -414,7 +404,7 @@ function showTab(team) {
   document.getElementById('tigersView').style.display = team === 'tigers' ? 'block' : 'none';
 }
 
-// Initial render (no async fetch needed — data is in CRICCLUBS_STATS)
+// Initial render (data is in CRICCLUBS_STATS)
 renderTeam('lions');
 renderTeam('tigers');
 showTab('lions');

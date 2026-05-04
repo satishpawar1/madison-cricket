@@ -56,49 +56,85 @@ async function extractMatchLinksForTeam(page, url, teamKeyword) {
 }
 
 // ── Helper: extract all bowling tables from a scorecard page ──
+// CricClubs scorecard bowling table format:
+//   Headers: ["Bowling","O","M","Dot","R","W","Econ",""]   (8 cols)
+//   Data row: ["", name, overs, maidens, dots, runs, wkts, econ, extrasStr]  (9 cells, leading empty)
+//   extrasStr format: "(7 w1 nb)" = 7 wides, 1 no-ball
 async function extractScorecardBowlingTables(page, matchId) {
   const url = `${BASE}/viewScorecard.do?matchId=${matchId}&clubId=${CLUB}`;
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   } catch(e) {
     console.log(`  ⚠ scorecard load warning (matchId=${matchId}): ${e.message.split('\n')[0]}`);
   }
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 3000));
 
   return page.evaluate(() => {
+    function parseExtrasStr(str) {
+      const s = (str || '').replace(/\s+/g, ' ').trim();
+      // Format: "(Nw Mnb)" — number before 'w' = wides, number before 'nb' = no-balls
+      const wm = s.match(/(\d+)\s*w/i);
+      const nm = s.match(/(\d+)\s*nb/i);
+      return {
+        wides:   wm ? parseInt(wm[1]) : 0,
+        noballs: nm ? parseInt(nm[1]) : 0,
+      };
+    }
+
     const tables = Array.from(document.querySelectorAll('table'));
     const result = [];
+
     tables.forEach(table => {
       const rows = Array.from(table.rows);
       if (rows.length < 3) return;
       const headers = Array.from((rows[0] || { cells: [] }).cells)
         .map(c => c.textContent.trim().toUpperCase());
-      const hasW = headers.some(h => h === 'W' || h === 'WKTS' || h === 'WKT');
-      const hasO = headers.some(h => h === 'O' || h === 'OVERS');
-      if (!hasW || !hasO) return;
-      const oIdx  = headers.findIndex(h => h === 'O' || h === 'OVERS');
-      const wdIdx = headers.findIndex(h => h === 'WD' || h === 'WIDES');
-      const nbIdx = headers.findIndex(h => h === 'NB');
+
+      // Identify CricClubs scorecard bowling table by "BOWLING" + "DOT" headers
+      if (!headers.some(h => h === 'BOWLING') || !headers.some(h => h === 'DOT')) return;
+
+      // Data rows have one extra leading empty cell → data index = header index + 1
+      const hi = (key) => {
+        const i = headers.indexOf(key);
+        return i >= 0 ? i + 1 : -1;
+      };
+      const nameIdx = hi('BOWLING'); // always 1
+      const oIdx    = hi('O');
+      const dotIdx  = hi('DOT');
+      const rIdx    = hi('R');
+      const wktIdx  = hi('W');
+      const econIdx = hi('ECON');
+      const extIdx  = headers.lastIndexOf('') + 1; // last column (extras string)
+
       const bowlers = [];
       rows.slice(1).forEach(row => {
         const cells = Array.from(row.cells).map(c => c.textContent.trim());
-        if (cells.length < 4) return;
-        const name = cells[0].replace(/\s+/g, ' ').trim();
-        if (!name || /^[\d\-\s]+$/.test(name)) return;
-        if (/extras|total|yet to bat/i.test(name)) return;
-        const overs = oIdx >= 0 ? (cells[oIdx] || '0') : (cells[1] || '0');
+        if (cells.length < 5) return;
+        const name = nameIdx >= 0 ? (cells[nameIdx] || '').replace(/\s+/g, ' ').trim() : '';
+        if (!name || /extras|total|yet to bat/i.test(name)) return;
+        if (/^[\d\-\s*()]+$/.test(name)) return;
+
+        const overs = oIdx >= 0 ? (cells[oIdx] || '0') : '0';
         const parts = overs.split('.');
         const balls = parseInt(parts[0] || 0) * 6 + (parseInt(parts[1] || 0) || 0);
+        const ex    = extIdx > 0 ? parseExtrasStr(cells[extIdx] || '') : { wides: 0, noballs: 0 };
+
         bowlers.push({
           name,
           overs,
           balls,
-          wides:   wdIdx >= 0 ? (+cells[wdIdx] || 0) : 0,
-          noballs: nbIdx >= 0 ? (+cells[nbIdx] || 0) : 0,
+          dots:    dotIdx  >= 0 ? (+cells[dotIdx]  || 0) : 0,
+          runs:    rIdx    >= 0 ? (+cells[rIdx]     || 0) : 0,
+          wickets: wktIdx  >= 0 ? (+cells[wktIdx]   || 0) : 0,
+          economy: econIdx >= 0 ? (parseFloat(cells[econIdx]) || null) : null,
+          wides:   ex.wides,
+          noballs: ex.noballs,
         });
       });
+
       if (bowlers.length >= 2) result.push(bowlers);
     });
+
     return result;
   });
 }
@@ -121,16 +157,25 @@ function findOurBowlingInnings(tables, ourBowlerNames) {
 }
 
 // ── Helper: fetch per-game extras for a team ──
-async function fetchExtrasGames(page, matchesUrl, teamKeyword, knownBowlerNames) {
+async function fetchExtrasGames(page, matchesUrl, teamKeyword, knownBowlerNames, existingGames) {
+  // Index existing data by matchId so we can skip re-scraping
+  const existingById = {};
+  (existingGames || []).forEach(g => { if (g.matchId) existingById[g.matchId] = g; });
+
   const matches = await extractMatchLinksForTeam(page, matchesUrl, teamKeyword);
   console.log(`  ${teamKeyword}: ${matches.length} completed games found`);
   const extrasGames = [];
   for (const match of matches) {
-    process.stdout.write(`  → Scorecard vs ${match.opponent} (matchId=${match.matchId})... `);
+    if (existingById[match.matchId]) {
+      console.log(`  → Skipping vs ${match.opponent} (matchId=${match.matchId}) — already scraped`);
+      extrasGames.push(existingById[match.matchId]);
+      continue;
+    }
+    process.stdout.write(`  → Scraping vs ${match.opponent} (matchId=${match.matchId})... `);
     const tables = await extractScorecardBowlingTables(page, match.matchId);
     const innings = findOurBowlingInnings(tables, knownBowlerNames);
     if (innings && innings.length) {
-      extrasGames.push({ game: match.opponent, date: match.date, players: innings });
+      extrasGames.push({ matchId: match.matchId, game: match.opponent, date: match.date, players: innings });
       console.log(`${innings.length} bowlers`);
     } else {
       console.log('no bowling data found');
@@ -250,6 +295,8 @@ function parseBowling(table) {
         hattricks: +r[14] || 0,
         fourWickets: +r[15] || 0,
         fiveWickets: +r[16] || 0,
+        wides:   +r[17] || 0,
+        noballs: +r[18] || 0,
         average: parseFloat(r[12]) || null,
         economy: parseFloat(r[11]) || null,
         strikeRate: parseFloat(r[13]) || null,
@@ -367,6 +414,10 @@ function parse2025Bowling(table) {
     .sort((a, b) => b.wickets - a.wickets);
 }
 
+// ── Filter helpers (module-level so available before browser.close()) ──
+const filterTeam = (arr, keyword) =>
+  arr.filter(p => p.team && p.team.includes(keyword));
+
 // Build a case-insensitive name → record lookup map
 function buildNameMap(records) {
   const map = {};
@@ -477,6 +528,23 @@ function parseMatches(table) {
 }
 
 async function fetchStats() {
+  // Load existing cricclubs-stats.js to seed incremental extras data
+  let existingLionsExtras = [], existingTigersExtras = [];
+  try {
+    const outPath = path.join(__dirname, '..', 'cricclubs-stats.js');
+    const existing = fs.readFileSync(outPath, 'utf8');
+    // Extract the JSON blob after "var CRICCLUBS_STATS = "
+    const m = existing.match(/var CRICCLUBS_STATS\s*=\s*(\{[\s\S]*\});?\s*$/);
+    if (m) {
+      const parsed = JSON.parse(m[1]);
+      existingLionsExtras  = (parsed.lions  && (parsed.lions.bowlingGames  || parsed.lions.extrasGames))  || [];
+      existingTigersExtras = (parsed.tigers && (parsed.tigers.bowlingGames || parsed.tigers.extrasGames)) || [];
+      console.log(`Loaded existing extras: ${existingLionsExtras.length} Lions, ${existingTigersExtras.length} Tigers games`);
+    }
+  } catch(e) {
+    console.log('No existing extras data found — will scrape all completed games');
+  }
+
   console.log('Launching browser (stealth mode)...');
   const browser = await puppeteer.launch({
     headless: true,
@@ -541,10 +609,10 @@ async function fetchStats() {
   const matchesUrl = `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`;
   const lionsBowlerNames  = filterTeam(bowling, 'Lions').map(p => p.name);
   const tigersBowlerNames = filterTeam(bowling, 'Tigers').map(p => p.name);
-  const lionsExtrasGames  = await fetchExtrasGames(page, matchesUrl, 'Lions',  lionsBowlerNames);
-  const tigersExtrasGames = await fetchExtrasGames(page, matchesUrl, 'Tigers', tigersBowlerNames);
-  console.log(`  Lions extras games scraped: ${lionsExtrasGames.length}`);
-  console.log(`  Tigers extras games scraped: ${tigersExtrasGames.length}`);
+  const lionsExtrasGames  = await fetchExtrasGames(page, matchesUrl, 'Lions',  lionsBowlerNames,  existingLionsExtras);
+  const tigersExtrasGames = await fetchExtrasGames(page, matchesUrl, 'Tigers', tigersBowlerNames, existingTigersExtras);
+  console.log(`  Lions extras games: ${lionsExtrasGames.length} total (new + cached)`);
+  console.log(`  Tigers extras games: ${tigersExtrasGames.length} total (new + cached)`);
 
   await browser.close().catch(() => {});
 
@@ -552,10 +620,6 @@ async function fetchStats() {
     console.error('\nFailed to capture 2026 batting/bowling data.');
     process.exit(1);
   }
-
-  // ── Filter helpers ──
-  const filterTeam = (arr, keyword) =>
-    arr.filter(p => p.team && p.team.includes(keyword));
 
   const groupByTeam = (arr) => {
     const map = {};
@@ -641,7 +705,7 @@ async function fetchStats() {
       bowling:  lionsBosters2026,
       batting2025: lionsBatting2025,
       bowling2025: lionsBowling2025,
-      extrasGames: lionsExtrasGames,
+      bowlingGames: lionsExtrasGames,
     },
     tigers: {
       rankings: filterTeam(rankings, 'Tigers'),
@@ -649,7 +713,7 @@ async function fetchStats() {
       bowling:  tigersBosters2026,
       batting2025: tigersBatting2025,
       bowling2025: tigersBowling2025,
-      extrasGames: tigersExtrasGames,
+      bowlingGames: tigersExtrasGames,
     },
     combined: {
       rankings: [
