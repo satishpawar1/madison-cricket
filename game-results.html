@@ -70,7 +70,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .team-name-row {
   display: flex; align-items: center; gap: 7px;
-  font-size: 13px; font-weight: 600; flex: 1; min-width: 0;
+  font-size: 13px; font-weight: 600; color: #111827; flex: 1; min-width: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .team-dot {
@@ -127,7 +127,7 @@ function buildMatchCards(games, mccLabel, mccCricclubsName, dotClass, containerI
   var played = games.filter(function(g) {
     var parts = g.gameDate.split('-');
     var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
-    return today > gd;
+    return today >= gd;
   });
 
   var container = document.getElementById(containerId);
