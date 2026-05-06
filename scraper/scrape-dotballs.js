@@ -5,13 +5,7 @@
 //   node scrape-dotballs.js lions    -- scrape all Lions games
 //   node scrape-dotballs.js tigers   -- scrape all Tigers games
 
-const puppeteer = require('puppeteer-extra');
-const stealth   = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(stealth());
-
-const BASE       = 'https://cricclubs.com/NashvilleCricketLeague';
-const CLUB       = '1092658';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyvPf-XcHewBNf755D6kW2baY7hHacXuT5ZNAmrGnDy9NELheaLkfEqIZMbTRMZsP_dg/exec';
+const { BASE_URL: BASE, CLUB, SCRIPT_URL, sleep, createBrowser, postToSheets, getFromSheets } = require('./utils');
 
 // ── Match IDs for each team ─────────────────────────────────────────────────
 const LIONS_MATCHES = [
@@ -105,7 +99,7 @@ async function scrapeBallByBall(page, matchId, battingTeam, nameMap) {
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 40000 });
   } catch(e) {}
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   // Find which tab corresponds to the batting team and click it
   const tabClicked = await page.evaluate((battingTeam) => {
@@ -124,7 +118,7 @@ async function scrapeBallByBall(page, matchId, battingTeam, nameMap) {
     return null;
   }
 
-  await new Promise(r => setTimeout(r, 500));
+  await sleep(500);
 
   // Get innings text from the tab content div
   const divId = tabClicked.replace('#', '');
@@ -198,8 +192,7 @@ async function scrapeBallByBall(page, matchId, battingTeam, nameMap) {
 // ── Fetch already-scraped game names from Sheets ───────────────────────────
 async function fetchExistingGames(teamLabel) {
   try {
-    const res  = await fetch(`${SCRIPT_URL}?type=dotballs&team=${teamLabel}`, { redirect: 'follow' });
-    const json = await res.json();
+    const json = await getFromSheets({ type: 'dotballs', team: teamLabel });
     return new Set((json.games || []).map(g => g.game));
   } catch (e) {
     console.log(`  ⚠ Could not fetch existing games: ${e.message}`);
@@ -209,16 +202,9 @@ async function fetchExistingGames(teamLabel) {
 
 // ── Push game data to Apps Script ───────────────────────────────────────────
 async function pushGame(teamLabel, game, dotballs) {
-  const body = JSON.stringify({ type: 'dotballs', team: teamLabel, game, dotballs });
   try {
-    const res  = await fetch(SCRIPT_URL, { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, redirect: 'follow' });
-    const text = await res.text();
-    try {
-      const j = JSON.parse(text);
-      console.log(`    → Sheets: ${j.status}`);
-    } catch {
-      console.log(`    → Sheets: ${text.slice(0, 80)}`);
-    }
+    const j = await postToSheets({ type: 'dotballs', team: teamLabel, game, dotballs });
+    console.log(`    → Sheets: ${j.status}`);
   } catch (e) {
     console.log(`    → Sheets ERROR: ${e.message}`);
   }
@@ -240,12 +226,7 @@ async function pushGame(teamLabel, game, dotballs) {
   const teamLabel = arg === 'lions' ? 'Lions'          : 'Tigers';
   const nameMap   = arg === 'lions' ? LIONS_BBB_NAME_MAP : TIGERS_BBB_NAME_MAP;
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
+  const { browser, page } = await createBrowser();
 
   const existingGames = await fetchExistingGames(teamLabel);
   const newMatches = force ? matches : matches.filter(m => !existingGames.has(m.game));
@@ -274,7 +255,7 @@ async function pushGame(teamLabel, game, dotballs) {
     });
 
     await pushGame(teamLabel, game, players);
-    await new Promise(r => setTimeout(r, 600));
+    await sleep(600);
   }
 
   await browser.close();

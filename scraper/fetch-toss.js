@@ -16,12 +16,9 @@
  *   ]
  */
 
-const puppeteer = require('puppeteer-extra');
-const stealth   = require('puppeteer-extra-plugin-stealth');
-const fs        = require('fs');
-const path      = require('path');
-
-puppeteer.use(stealth());
+const fs   = require('fs');
+const path = require('path');
+const { sleep, createBrowser } = require('./utils');
 
 const RESULTS_URL = 'https://cricclubs.com/NashvilleCricketLeague/viewLeagueResults.do?league=28&clubId=1092658';
 const SCORECARD   = (id) => `https://cricclubs.com/NashvilleCricketLeague/viewScorecard.do?matchId=${id}&clubId=1092658`;
@@ -47,24 +44,7 @@ function parseToss(html) {
 
 async function fetchToss() {
   console.log('Launching browser...');
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
-  const page = await browser.newPage();
-  await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
-  );
-  // Block ads/trackers to speed up loads
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const u = req.url();
-    if (/ad\.|doubleclick|googlesyndication|gumgum|freestar|prebid|rubiconproject|3lift|liadm|taboola|outbrain|amazon-adsystem/i.test(u)) {
-      req.abort();
-    } else {
-      req.continue();
-    }
-  });
+  const { browser, page } = await createBrowser({ blockAds: true });
 
   // ── Load existing toss data to skip already-scraped matches ──
   const outPath = path.join(__dirname, 'toss-results.json');
@@ -88,7 +68,7 @@ async function fetchToss() {
   } catch(e) {
     console.log('  load warning:', e.message.split('\n')[0]);
   }
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   const matches = await page.evaluate(() => {
     const rows = Array.from(document.querySelectorAll('table tr'));
@@ -147,7 +127,7 @@ async function fetchToss() {
       } catch(e) {
         // Page often times out due to ad scripts — HTML still loads, so continue
       }
-      await new Promise(r => setTimeout(r, 2000));
+      await sleep(2000);
 
       const html = await page.content();
       const toss = parseToss(html);

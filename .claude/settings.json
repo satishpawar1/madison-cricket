@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const p=process.env.TOOL_INPUT_FILE_PATH||''; const bad=['cricclubs-stats.js','all-api-calls.json','stats-raw.json']; const hit=bad.find(b=>p.endsWith(b)); if(hit) process.stderr.write('WARNING: Read '+hit+' — this file is large and auto-generated. Use the Data Shape Reference in CLAUDE.md instead.\\n');\""
+          }
+        ]
+      }
+    ]
+  }
+}

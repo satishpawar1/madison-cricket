@@ -1,0 +1,16 @@
+# OS artifacts
+.DS_Store
+**/.DS_Store
+
+# Debug / instrumentation dumps — never commit
+scraper/all-api-calls.json
+scraper/stats-raw.json
+
+# Scraper exploration scripts — not part of the production pipeline
+scraper/fetch-ball-by-ball.js
+scraper/fetch-bbb-nashville.js
+scraper/fetch-bbb.js
+scraper/extract-bbb-nashville.js
+
+# Node
+scraper/node_modules/

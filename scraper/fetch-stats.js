@@ -1,9 +1,6 @@
-const puppeteer = require('puppeteer-extra');
-const stealth = require('puppeteer-extra-plugin-stealth');
-const fs = require('fs');
+const fs   = require('fs');
 const path = require('path');
-
-puppeteer.use(stealth());
+const { sleep, createBrowser } = require('./utils');
 
 // Hard kill: if the whole script takes more than 6 minutes, exit with failure
 setTimeout(() => {
@@ -27,7 +24,7 @@ async function extractMatchLinksForTeam(page, url, teamKeyword) {
   } catch(e) {
     console.log(`  ⚠ load warning: ${e.message.split('\n')[0]}`);
   }
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   return page.evaluate((keyword) => {
     const rows = Array.from(document.querySelectorAll('table tr'));
@@ -67,7 +64,7 @@ async function extractScorecardBowlingTables(page, matchId) {
   } catch(e) {
     console.log(`  ⚠ scorecard load warning (matchId=${matchId}): ${e.message.split('\n')[0]}`);
   }
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   return page.evaluate(() => {
     function parseExtrasStr(str) {
@@ -180,7 +177,7 @@ async function fetchExtrasGames(page, matchesUrl, teamKeyword, knownBowlerNames,
     } else {
       console.log('no bowling data found');
     }
-    await new Promise(r => setTimeout(r, 800));
+    await sleep(800);
   }
   return extrasGames;
 }
@@ -193,7 +190,7 @@ async function extractTable(page, url, minCols = 4) {
   } catch(e) {
     console.log(`  ⚠ load warning: ${e.message.split('\n')[0]}`);
   }
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   return page.evaluate((minCols) => {
     const tables = Array.from(document.querySelectorAll('table'));
@@ -221,7 +218,7 @@ async function extractAllTables(page, url, minCols = 4) {
   } catch(e) {
     console.log(`  ⚠ load warning: ${e.message.split('\n')[0]}`);
   }
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   return page.evaluate((minCols) => {
     const tables = Array.from(document.querySelectorAll('table'));
@@ -546,13 +543,7 @@ async function fetchStats() {
   }
 
   console.log('Launching browser (stealth mode)...');
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
-
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
+  const { browser, page } = await createBrowser();
 
   // ── 2026 Season ──
   console.log('\n=== 2026 Season ===');
