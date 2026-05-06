@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Catch Efficiency Dashboard — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #0F766E 0%, #134E4A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+/* ── Team tabs ── */
+.tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.tab {
+  flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: all 0.15s;
+}
+.tab.lions  { color: #1A56B0; }
+.tab.tigers { color: #C05000; }
+.tab.active.lions  { background: #E8F1FC; border-color: #1A56B0; }
+.tab.active.tigers { background: #FEF0E6; border-color: #C05000; }
+
+/* ── Summary tiles ── */
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc {
+  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sn { font-size: 26px; font-weight: 700; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Table card ── */
+.lb-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem; overflow-x: auto;
+}
+.lb-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 12px; border-bottom: 1.5px solid #F3F4F6;
+  flex-wrap: wrap; gap: 8px;
+}
+.lb-title { font-size: 13px; font-weight: 700; color: #111827; }
+
+.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 400px; }
+.stats-table th {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 10px; text-align: right;
+  border-bottom: 1.5px solid #F3F4F6;
+  white-space: nowrap; cursor: pointer; user-select: none;
+  background: #FAFAFA;
+}
+.stats-table th:first-child  { text-align: left; padding-left: 16px; }
+.stats-table th:nth-child(2) { text-align: left; }
+.stats-table th.sort-asc::after  { content: ' ↑'; color: #0F766E; }
+.stats-table th.sort-desc::after { content: ' ↓'; color: #0F766E; }
+.stats-table td {
+  padding: 9px 10px; text-align: right;
+  border-bottom: 1px solid #F9FAFB;
+  color: #111827; white-space: nowrap;
+}
+.stats-table td:first-child  { text-align: left; padding-left: 16px; color: #9CA3AF; font-size: 12px; }
+.stats-table td:nth-child(2) { text-align: left; font-weight: 600; }
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: #F9FAFB; }
+
+.highlight-val { color: #16A34A; font-weight: 700; }
+
+/* ── Per-game breakdown ── */
+.game-section { margin-bottom: 1.25rem; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.game-cards { display: flex; flex-direction: column; gap: 8px; }
+.game-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.game-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #FAFAFA;
+  border-bottom: 1px solid #F3F4F6;
+}
+.game-card-title { font-size: 13px; font-weight: 700; }
+.game-card-meta { font-size: 11px; color: #9CA3AF; }
+.game-summary-strip {
+  display: flex; gap: 16px; padding: 7px 14px;
+  background: #F0FDF4; border-bottom: 1px solid #F3F4F6;
+  font-size: 12px;
+}
+.gss-item { display: flex; flex-direction: column; align-items: center; }
+.gss-val { font-weight: 700; color: #0F766E; font-size: 15px; line-height: 1; }
+.gss-val.red   { color: #DC2626; }
+.gss-val.amber { color: #D97706; }
+.gss-val.green { color: #16A34A; }
+.gss-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.gss-div { width: 1px; background: #E5E7EB; align-self: stretch; margin: 2px 0; }
+
+.game-dot-rows { padding: 6px 0; }
+.gdr-header {
+  display: flex; align-items: center;
+  padding: 2px 14px 5px; border-bottom: 1px solid #F3F4F6;
+}
+.gdr-header-name { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; }
+.gdr-header-spacer { flex: 1; margin: 0 10px; }
+.gdr-header-cols { display: flex; gap: 0; }
+.gdr-header-col { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; text-align: right; width: 44px; }
+.gdr {
+  display: flex; align-items: center;
+  padding: 5px 14px;
+}
+.gdr-name { font-size: 13px; color: #374151; }
+.gdr-bar-wrap { flex: 1; margin: 0 10px; }
+.gdr-bar-track { background: #F3F4F6; border-radius: 4px; height: 6px; overflow: hidden; }
+.gdr-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #4ADE80, #15803D); }
+.gdr-cols { display: flex; gap: 0; }
+.gdr-col { font-size: 13px; color: #6B7280; text-align: right; width: 44px; }
+.gdr-col.catch-hi  { font-weight: 700; color: #16A34A; }
+.gdr-col.catch-mid { font-weight: 700; color: #D97706; }
+.gdr-col.catch-lo  { font-weight: 700; color: #DC2626; }
+
+.loading { text-align: center; color: #9CA3AF; font-size: 14px; padding: 3rem; }
+.no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🧤 Catch Efficiency Dashboard</h2>
+    <p>Fielding stats per player — Lions &amp; Tigers</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="tabs">
+    <div class="tab lions active" onclick="switchTab('lions')">🦁 Madison Lions</div>
+    <div class="tab tigers" onclick="switchTab('tigers')">🐯 Madison Tigers</div>
+  </div>
+
+  <div id="loadingMsg" class="loading">Loading&hellip;</div>
+
+  <div id="lionsView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="l-totalAtt" style="color:#1A56B0">—</div><div class="sl">Total Attempted</div></div>
+      <div class="sc"><div class="sn" id="l-totalTak" style="color:#16A34A">—</div><div class="sl">Catches Taken</div></div>
+      <div class="sc"><div class="sn" id="l-eff" style="color:#1A56B0">—</div><div class="sl">Team Efficiency</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🦁 Lions — Catch Totals</div>
+      </div>
+      <table class="stats-table" id="lionsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('lions','name')">Player</th>
+            <th onclick="sortTable('lions','games')">Games</th>
+            <th onclick="sortTable('lions','att')">Att</th>
+            <th onclick="sortTable('lions','tak')">Taken</th>
+            <th onclick="sortTable('lions','drop')">Dropped</th>
+            <th onclick="sortTable('lions','eff')">Eff %</th>
+          </tr>
+        </thead>
+        <tbody id="lionsTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="lionsGames"></div>
+    </div>
+  </div>
+
+  <div id="tigersView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="t-totalAtt" style="color:#C05000">—</div><div class="sl">Total Attempted</div></div>
+      <div class="sc"><div class="sn" id="t-totalTak" style="color:#16A34A">—</div><div class="sl">Catches Taken</div></div>
+      <div class="sc"><div class="sn" id="t-eff" style="color:#C05000">—</div><div class="sl">Team Efficiency</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🐯 Tigers — Catch Totals</div>
+      </div>
+      <table class="stats-table" id="tigersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('tigers','name')">Player</th>
+            <th onclick="sortTable('tigers','games')">Games</th>
+            <th onclick="sortTable('tigers','att')">Att</th>
+            <th onclick="sortTable('tigers','tak')">Taken</th>
+            <th onclick="sortTable('tigers','drop')">Dropped</th>
+            <th onclick="sortTable('tigers','eff')">Eff %</th>
+          </tr>
+        </thead>
+        <tbody id="tigersTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="tigersGames"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var activeTab = 'lions';
+
+var _sort = {
+  lions:  { key: 'eff', dir: -1 },
+  tigers: { key: 'eff', dir: -1 }
+};
+
+// _data[team] = [{opponent, gameName, players: [{name, att, tak}]}]
+var _data   = { lions: null, tigers: null };
+var _loaded = { lions: false, tigers: false };
+
+function fetchTeam(team, teamLabel, games) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var pastGames = games.filter(function(g) {
+    var parts = g.gameDate.split('-');
+    var gd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    gd.setHours(0,0,0,0);
+    return today > gd;
+  });
+
+  if (!pastGames.length) {
+    _data[team] = [];
+    onTeamLoaded(team);
+    return;
+  }
+
+  var results = [];
+  var pending = pastGames.length;
+
+  pastGames.forEach(function(g) {
+    fetch(SCRIPT_URL + '?type=catches&team=' + teamLabel + '&game=' + encodeURIComponent(g.name))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var players = (d.status === 'ok' && d.data) ? d.data : [];
+        var totalAtt = players.reduce(function(s, p) { return s + (p.att || p.attempted || 0); }, 0);
+        if (totalAtt > 0) {
+          results.push({ opponent: g.opponent, gameName: g.name, players: players });
+        }
+        if (--pending === 0) { finishTeam(team, pastGames, results); }
+      })
+      .catch(function() {
+        if (--pending === 0) { finishTeam(team, pastGames, results); }
+      });
+  });
+}
+
+function finishTeam(team, pastGames, results) {
+  // Sort results by original game order
+  results.sort(function(a, b) {
+    var ai = 999, bi = 999;
+    for (var i = 0; i < pastGames.length; i++) {
+      if (pastGames[i].gameName === a.gameName) ai = i;
+      if (pastGames[i].gameName === b.gameName) bi = i;
+    }
+    return ai - bi;
+  });
+  _data[team] = results;
+  onTeamLoaded(team);
+}
+
+function onTeamLoaded(team) {
+  _loaded[team] = true;
+  if (_loaded.lions && _loaded.tigers) {
+    document.getElementById('loadingMsg').style.display = 'none';
+    renderTeam('lions');
+    renderTeam('tigers');
+    showTab(activeTab);
+  }
+}
+
+function buildPlayerSummary(games) {
+  var map = {};
+  (games || []).forEach(function(g) {
+    (g.players || []).forEach(function(p) {
+      var att = p.att || p.attempted || 0;
+      var tak = p.tak || p.taken    || 0;
+      if (!map[p.name]) map[p.name] = { name: p.name, att: 0, tak: 0, games: 0 };
+      map[p.name].att  += att;
+      map[p.name].tak  += tak;
+      if (att > 0) map[p.name].games++;
+    });
+  });
+  return Object.values(map).filter(function(p) { return p.att > 0; });
+}
+
+function sortTable(team, key) {
+  var s = _sort[team];
+  if (s.key === key) s.dir *= -1; else { s.key = key; s.dir = key === 'name' ? 1 : -1; }
+  renderTeam(team);
+}
+
+function renderTeam(team) {
+  var games   = _data[team] || [];
+  var players = buildPlayerSummary(games);
+  var s       = _sort[team];
+
+  // Update sort indicators
+  var table = document.getElementById(team + 'Table');
+  table.querySelectorAll('th').forEach(function(th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    var col = th.getAttribute('onclick') || '';
+    var m = col.match(/'([^']+)'\)$/);
+    if (m && m[1] === s.key) th.classList.add(s.dir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+
+  // Sort players
+  players.sort(function(a, b) {
+    var va, vb;
+    if (s.key === 'eff') {
+      va = a.att ? a.tak / a.att : 0;
+      vb = b.att ? b.tak / b.att : 0;
+    } else if (s.key === 'drop') {
+      va = a.att - a.tak;
+      vb = b.att - b.tak;
+    } else if (s.key === 'name') {
+      return s.dir * a.name.localeCompare(b.name);
+    } else {
+      va = a[s.key] || 0;
+      vb = b[s.key] || 0;
+    }
+    return s.dir * ((vb || 0) - (va || 0));
+  });
+
+  // Summary tiles
+  var totalAtt = players.reduce(function(sum, p) { return sum + p.att; }, 0);
+  var totalTak = players.reduce(function(sum, p) { return sum + p.tak; }, 0);
+  var teamEff  = totalAtt ? Math.round(totalTak / totalAtt * 100) + '%' : '—';
+
+  var prefix = team === 'lions' ? 'l' : 't';
+  document.getElementById(prefix + '-totalAtt').textContent = totalAtt || '—';
+  document.getElementById(prefix + '-totalTak').textContent = totalTak || '—';
+  document.getElementById(prefix + '-eff').textContent      = teamEff;
+
+  // Table rows
+  var tbody = document.getElementById(team + 'Tbody');
+  if (!players.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:2rem">No catch data recorded yet.</td></tr>';
+  } else {
+    tbody.innerHTML = players.map(function(p, i) {
+      var eff  = p.att ? Math.round(p.tak / p.att * 100) : 0;
+      var drop = p.att - p.tak;
+      return '<tr>'
+        + '<td>' + (i+1) + '</td>'
+        + '<td>' + p.name + '</td>'
+        + '<td>' + p.games + '</td>'
+        + '<td>' + p.att + '</td>'
+        + '<td class="highlight-val">' + p.tak + '</td>'
+        + '<td>' + drop + '</td>'
+        + '<td>' + eff + '%</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  // Game-by-game breakdown
+  var container = document.getElementById(team + 'Games');
+  if (!games.length) {
+    container.innerHTML = '<div class="no-data">No catch data recorded yet.</div>';
+    return;
+  }
+
+  container.innerHTML = games.map(function(g) {
+    var gPlayers = (g.players || []).filter(function(p) {
+      return (p.att || p.attempted || 0) > 0;
+    }).sort(function(a, b) {
+      return (b.att || b.attempted || 0) - (a.att || a.attempted || 0);
+    });
+
+    var totalAtt = gPlayers.reduce(function(s, p) { return s + (p.att || p.attempted || 0); }, 0);
+    var totalTak = gPlayers.reduce(function(s, p) { return s + (p.tak || p.taken    || 0); }, 0);
+    var gameEff  = totalAtt > 0 ? Math.round(totalTak / totalAtt * 100) : 0;
+    var effCls   = gameEff >= 80 ? 'green' : (gameEff >= 50 ? 'amber' : 'red');
+
+    var colHeader = '<div class="gdr-header">'
+      + '<span class="gdr-header-name">Player</span>'
+      + '<div class="gdr-header-spacer"></div>'
+      + '<div class="gdr-header-cols">'
+      + '<span class="gdr-header-col">Att</span>'
+      + '<span class="gdr-header-col">Taken</span>'
+      + '<span class="gdr-header-col">Eff%</span>'
+      + '</div></div>';
+
+    var rowsHtml = gPlayers.length
+      ? gPlayers.map(function(p) {
+          var att = p.att || p.attempted || 0;
+          var tak = p.tak || p.taken    || 0;
+          var eff = att > 0 ? Math.round(tak / att * 100) : 0;
+          var barPct = att > 0 ? eff : 0;
+          var effCls = eff >= 80 ? 'catch-hi' : (eff >= 50 ? 'catch-mid' : 'catch-lo');
+          return '<div class="gdr">'
+            + '<span class="gdr-name">' + p.name + '</span>'
+            + '<div class="gdr-bar-wrap"><div class="gdr-bar-track"><div class="gdr-bar-fill" style="width:' + barPct + '%"></div></div></div>'
+            + '<div class="gdr-cols">'
+            + '<span class="gdr-col">' + att + '</span>'
+            + '<span class="gdr-col">' + tak + '</span>'
+            + '<span class="gdr-col ' + effCls + '">' + eff + '%</span>'
+            + '</div>'
+            + '</div>';
+        }).join('')
+      : '<div class="no-data" style="padding:0.75rem 1rem">No data recorded for this game.</div>';
+
+    return '<div class="game-card">'
+      + '<div class="game-card-header">'
+      + '<span class="game-card-title">vs ' + g.opponent + '</span>'
+      + '<span class="game-card-meta">' + totalTak + ' of ' + totalAtt + ' taken</span>'
+      + '</div>'
+      + '<div class="game-summary-strip">'
+      + '<div class="gss-item"><span class="gss-val">' + totalAtt + '</span><span class="gss-lbl">Attempted</span></div>'
+      + '<div class="gss-div"></div>'
+      + '<div class="gss-item"><span class="gss-val green">' + totalTak + '</span><span class="gss-lbl">Taken</span></div>'
+      + '<div class="gss-div"></div>'
+      + '<div class="gss-item"><span class="gss-val ' + effCls + '">' + gameEff + '%</span><span class="gss-lbl">Efficiency</span></div>'
+      + '</div>'
+      + '<div class="game-dot-rows">' + colHeader + rowsHtml + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function switchTab(team) {
+  activeTab = team;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.tab.' + team).classList.add('active');
+  showTab(team);
+}
+
+function showTab(team) {
+  document.getElementById('lionsView').style.display  = team === 'lions'  ? 'block' : 'none';
+  document.getElementById('tigersView').style.display = team === 'tigers' ? 'block' : 'none';
+}
+
+fetchTeam('lions',  'Lions',  MCC_CONFIG.lions.games);
+fetchTeam('tigers', 'Tigers', MCC_CONFIG.tigers.games);
+</script>
+</body>
+</html>
