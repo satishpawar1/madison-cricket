@@ -9,7 +9,8 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
-    "tossText": "Madison Tigers won the toss and elected to bat"
+    "tossText": "Madison Tigers won the toss and elected to bat",
+    "playerOfMatch": "Kiran Reddy"
   },
   {
     "matchId": "1798",
@@ -19,7 +20,8 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
-    "tossText": "Mumbai Risers won the toss and elected to bat"
+    "tossText": "Mumbai Risers won the toss and elected to bat",
+    "playerOfMatch": "Mohinuddin Monu"
   },
   {
     "matchId": "1797",
@@ -29,7 +31,8 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Star Strikers",
     "electedTo": "bat",
-    "tossText": "Star Strikers won the toss and elected to bat"
+    "tossText": "Star Strikers won the toss and elected to bat",
+    "playerOfMatch": "Mitesh Patel"
   },
   {
     "matchId": "1796",
@@ -39,7 +42,8 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
-    "tossText": "Madison Lions won the toss and elected to bat"
+    "tossText": "Madison Lions won the toss and elected to bat",
+    "playerOfMatch": "Chinmay Deval"
   },
   {
     "matchId": "1792",
@@ -49,7 +53,8 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
-    "tossText": "Game Swingers won the toss and elected to bat"
+    "tossText": "Game Swingers won the toss and elected to bat",
+    "playerOfMatch": "Parwiz Hotak"
   },
   {
     "matchId": "1791",
@@ -59,446 +64,491 @@ var TOSS_DATA = [
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
-    "tossText": "Fearless Raiders won the toss and elected to bat"
+    "tossText": "Fearless Raiders won the toss and elected to bat",
+    "playerOfMatch": "Chandra Uppaluru"
   },
   {
     "matchId": "1785",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "FSC Raptors",
     "team2": "Rockvale Risers",
     "resultText": null,
     "tossWinner": null,
     "electedTo": null,
-    "tossText": null
+    "tossText": null,
+    "playerOfMatch": null
   },
   {
     "matchId": "1784",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "Game Swingers",
     "team2": "Shoals Strikers",
     "resultText": null,
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
-    "tossText": "Game Swingers won the toss and elected to bat"
+    "tossText": "Game Swingers won the toss and elected to bat",
+    "playerOfMatch": "Bhabani Senapati"
   },
   {
     "matchId": "1783",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "Madison Tigers",
     "team2": "Afghan Eagles",
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
-    "tossText": "Madison Tigers won the toss and elected to bat"
+    "tossText": "Madison Tigers won the toss and elected to bat",
+    "playerOfMatch": "Sharath Chandra"
   },
   {
     "matchId": "1782",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "Fearless Fighters",
     "team2": "Mumbai Risers",
     "resultText": null,
     "tossWinner": "Fearless Fighters",
     "electedTo": "bat",
-    "tossText": "Fearless Fighters won the toss and elected to bat"
+    "tossText": "Fearless Fighters won the toss and elected to bat",
+    "playerOfMatch": "Mohinuddin Monu"
   },
   {
     "matchId": "1777",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "Nashville Underdogs",
     "team2": "Cool Springs Titans",
     "resultText": null,
     "tossWinner": "Cool Springs Titans",
     "electedTo": "field",
-    "tossText": "Cool Springs Titans won the toss and elected to bowl"
+    "tossText": "Cool Springs Titans won the toss and elected to bowl",
+    "playerOfMatch": null
   },
   {
     "matchId": "1776",
-    "date": "04/26/2026",
+    "date": "2026-04-26",
     "team1": "Fearless Raiders",
     "team2": "Great Marathas",
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
-    "tossText": "Fearless Raiders won the toss and elected to bat"
+    "tossText": "Fearless Raiders won the toss and elected to bat",
+    "playerOfMatch": "Anup Karde"
   },
   {
     "matchId": "1770",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Franklin Falcons",
     "team2": "Shoals Strikers",
     "resultText": null,
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
-    "tossText": "Franklin Falcons won the toss and elected to bat"
+    "tossText": "Franklin Falcons won the toss and elected to bat",
+    "playerOfMatch": "Harsh Patel"
   },
   {
     "matchId": "1769",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Game Swingers",
     "team2": "Mumbai Risers",
     "resultText": null,
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
-    "tossText": "Game Swingers won the toss and elected to bat"
+    "tossText": "Game Swingers won the toss and elected to bat",
+    "playerOfMatch": "Money Jose"
   },
   {
     "matchId": "1768",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Madison Tigers",
     "team2": "Fearless Fighters",
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
-    "tossText": "Madison Tigers won the toss and elected to bat"
+    "tossText": "Madison Tigers won the toss and elected to bat",
+    "playerOfMatch": "Sharath Chandra"
   },
   {
     "matchId": "1767",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Great Marathas",
     "team2": "Rockvale Risers",
     "resultText": null,
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
-    "tossText": "Great Marathas won the toss and elected to bat"
+    "tossText": "Great Marathas won the toss and elected to bat",
+    "playerOfMatch": "Swapnil Kulkarni"
   },
   {
     "matchId": "1763",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Fearless Raiders",
     "team2": "Afghan Eagles",
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
-    "tossText": "Fearless Raiders won the toss and elected to bat"
+    "tossText": "Fearless Raiders won the toss and elected to bat",
+    "playerOfMatch": "Shashanka Donikeni"
   },
   {
     "matchId": "1762",
-    "date": "04/19/2026",
+    "date": "2026-04-19",
     "team1": "Cool Springs Titans",
     "team2": "FSC Raptors",
     "resultText": null,
     "tossWinner": "FSC Raptors",
     "electedTo": "field",
-    "tossText": "FSC Raptors won the toss and elected to bowl"
+    "tossText": "FSC Raptors won the toss and elected to bowl",
+    "playerOfMatch": "Subhalesh Polavarapu"
   },
   {
     "matchId": "1771",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "Fearless Fighters",
     "team2": "Madison Lions",
     "resultText": null,
     "tossWinner": null,
     "electedTo": null,
-    "tossText": null
+    "tossText": null,
+    "playerOfMatch": null
   },
   {
     "matchId": "1756",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "Afghan Eagles",
     "team2": "Mumbai Risers",
     "resultText": null,
     "tossWinner": "Afghan Eagles",
     "electedTo": "bat",
-    "tossText": "Afghan Eagles won the toss and elected to bat"
+    "tossText": "Afghan Eagles won the toss and elected to bat",
+    "playerOfMatch": null
   },
   {
     "matchId": "1755",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "Madison Tigers",
     "team2": "Great Marathas",
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
-    "tossText": "Madison Tigers won the toss and elected to bat"
+    "tossText": "Madison Tigers won the toss and elected to bat",
+    "playerOfMatch": "Kiran Reddy"
   },
   {
     "matchId": "1754",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "MCA",
     "team2": "Shoals Strikers",
     "resultText": null,
     "tossWinner": "MCA",
     "electedTo": "bat",
-    "tossText": "MCA won the toss and elected to bat"
+    "tossText": "MCA won the toss and elected to bat",
+    "playerOfMatch": "Safiullah Lodhi"
   },
   {
     "matchId": "1753",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "Franklin Falcons",
     "team2": "Nashville Underdogs",
     "resultText": null,
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
-    "tossText": "Franklin Falcons won the toss and elected to bat"
+    "tossText": "Franklin Falcons won the toss and elected to bat",
+    "playerOfMatch": "Lokesh Borana"
   },
   {
     "matchId": "1748",
-    "date": "04/12/2026",
+    "date": "2026-04-12",
     "team1": "Fearless Raiders",
     "team2": "Rockvale Risers",
     "resultText": null,
     "tossWinner": "Rockvale Risers",
     "electedTo": "field",
-    "tossText": "Rockvale Risers won the toss and elected to bowl"
+    "tossText": "Rockvale Risers won the toss and elected to bowl",
+    "playerOfMatch": "Shashanka Donikeni"
   },
   {
     "matchId": "1742",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "Madison Lions",
     "team2": "Rockvale Risers",
     "resultText": null,
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
-    "tossText": "Madison Lions won the toss and elected to bat"
+    "tossText": "Madison Lions won the toss and elected to bat",
+    "playerOfMatch": "Hardik Patel"
   },
   {
     "matchId": "1741",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "MCA",
     "team2": "Cool Springs Titans",
     "resultText": null,
     "tossWinner": "MCA",
     "electedTo": "bat",
-    "tossText": "MCA won the toss and elected to bat"
+    "tossText": "MCA won the toss and elected to bat",
+    "playerOfMatch": "Safiullah Lodhi"
   },
   {
     "matchId": "1740",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "Great Marathas",
     "team2": "Nashville Underdogs",
     "resultText": null,
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
-    "tossText": "Great Marathas won the toss and elected to bat"
+    "tossText": "Great Marathas won the toss and elected to bat",
+    "playerOfMatch": "Sahil Patil"
   },
   {
     "matchId": "1739",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "Afghan Eagles",
     "team2": "Fearless Fighters",
     "resultText": null,
     "tossWinner": "Afghan Eagles",
     "electedTo": "bat",
-    "tossText": "Afghan Eagles won the toss and elected to bat"
+    "tossText": "Afghan Eagles won the toss and elected to bat",
+    "playerOfMatch": "Amirkhan Zadran"
   },
   {
     "matchId": "1735",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "Star Strikers",
     "team2": "Fearless Raiders",
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "field",
-    "tossText": "Fearless Raiders won the toss and elected to bowl"
+    "tossText": "Fearless Raiders won the toss and elected to bowl",
+    "playerOfMatch": "Sudarsan Kumar Kalla"
   },
   {
     "matchId": "1734",
-    "date": "04/05/2026",
+    "date": "2026-04-05",
     "team1": "FSC Raptors",
     "team2": "Madison Tigers",
     "resultText": null,
     "tossWinner": "FSC Raptors",
     "electedTo": "bat",
-    "tossText": "FSC Raptors won the toss and elected to bat"
+    "tossText": "FSC Raptors won the toss and elected to bat",
+    "playerOfMatch": "Suresh Baipu"
   },
   {
     "matchId": "1728",
-    "date": "03/29/2026",
+    "date": "2026-03-29",
     "team1": "Mumbai Risers",
     "team2": "Shoals Strikers",
     "resultText": null,
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
-    "tossText": "Mumbai Risers won the toss and elected to bat"
+    "tossText": "Mumbai Risers won the toss and elected to bat",
+    "playerOfMatch": "Anjun Baddipudi"
   },
   {
     "matchId": "1727",
-    "date": "03/29/2026",
+    "date": "2026-03-29",
     "team1": "Madison Lions",
     "team2": "Nashville Underdogs",
     "resultText": null,
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
-    "tossText": "Madison Lions won the toss and elected to bat"
+    "tossText": "Madison Lions won the toss and elected to bat",
+    "playerOfMatch": "Chinmay Deval"
   },
   {
     "matchId": "1723",
-    "date": "03/29/2026",
+    "date": "2026-03-29",
     "team1": "Fearless Fighters",
     "team2": "Rockvale Risers",
     "resultText": null,
     "tossWinner": "Fearless Fighters",
     "electedTo": "bat",
-    "tossText": "Fearless Fighters won the toss and elected to bat"
+    "tossText": "Fearless Fighters won the toss and elected to bat",
+    "playerOfMatch": "Sai Kiran Pulishetti"
   },
   {
     "matchId": "1722",
-    "date": "03/29/2026",
+    "date": "2026-03-29",
     "team1": "Franklin Falcons",
     "team2": "Cool Springs Titans",
     "resultText": null,
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
-    "tossText": "Franklin Falcons won the toss and elected to bat"
+    "tossText": "Franklin Falcons won the toss and elected to bat",
+    "playerOfMatch": "Abhilash Reddy Kallepu"
   },
   {
     "matchId": "1716",
-    "date": "03/22/2026",
+    "date": "2026-03-22",
     "team1": "Madison Tigers",
     "team2": "Franklin Falcons",
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
-    "tossText": "Madison Tigers won the toss and elected to bat"
+    "tossText": "Madison Tigers won the toss and elected to bat",
+    "playerOfMatch": "Kiran Reddy"
   },
   {
     "matchId": "1715",
-    "date": "03/22/2026",
+    "date": "2026-03-22",
     "team1": "Cool Springs Titans",
     "team2": "Great Marathas",
     "resultText": null,
     "tossWinner": "Cool Springs Titans",
     "electedTo": "bat",
-    "tossText": "Cool Springs Titans won the toss and elected to bat"
+    "tossText": "Cool Springs Titans won the toss and elected to bat",
+    "playerOfMatch": "Vignesh Vimal Kanth"
   },
   {
     "matchId": "1710",
-    "date": "03/22/2026",
+    "date": "2026-03-22",
     "team1": "Nashville Underdogs",
     "team2": "Star Strikers",
     "resultText": null,
     "tossWinner": "Star Strikers",
     "electedTo": "field",
-    "tossText": "Star Strikers won the toss and elected to bowl"
+    "tossText": "Star Strikers won the toss and elected to bowl",
+    "playerOfMatch": "Manoj Desai"
   },
   {
     "matchId": "1709",
-    "date": "03/22/2026",
+    "date": "2026-03-22",
     "team1": "FSC Raptors",
     "team2": "Afghan Eagles",
     "resultText": null,
     "tossWinner": "Afghan Eagles",
     "electedTo": "field",
-    "tossText": "Afghan Eagles won the toss and elected to bowl"
+    "tossText": "Afghan Eagles won the toss and elected to bowl",
+    "playerOfMatch": "Baz Momand"
   },
   {
     "matchId": "1704",
-    "date": "03/15/2026",
+    "date": "2026-03-15",
     "team1": "Franklin Falcons",
     "team2": "Game Swingers",
     "resultText": null,
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
-    "tossText": "Franklin Falcons won the toss and elected to bat"
+    "tossText": "Franklin Falcons won the toss and elected to bat",
+    "playerOfMatch": "Mohit Dora"
   },
   {
     "matchId": "1703",
-    "date": "03/15/2026",
+    "date": "2026-03-15",
     "team1": "Great Marathas",
     "team2": "Madison Lions",
     "resultText": null,
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
-    "tossText": "Great Marathas won the toss and elected to bat"
+    "tossText": "Great Marathas won the toss and elected to bat",
+    "playerOfMatch": "Chinmay Deval"
   },
   {
     "matchId": "1698",
-    "date": "03/15/2026",
+    "date": "2026-03-15",
     "team1": "FSC Raptors",
     "team2": "Mumbai Risers",
     "resultText": null,
     "tossWinner": "FSC Raptors",
     "electedTo": "bat",
-    "tossText": "FSC Raptors won the toss and elected to bat"
+    "tossText": "FSC Raptors won the toss and elected to bat",
+    "playerOfMatch": "Mohinuddin Monu"
   },
   {
     "matchId": "1697",
-    "date": "03/15/2026",
+    "date": "2026-03-15",
     "team1": "Fearless Raiders",
     "team2": "MCA",
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
-    "tossText": "Fearless Raiders won the toss and elected to bat"
+    "tossText": "Fearless Raiders won the toss and elected to bat",
+    "playerOfMatch": "Mitul Bhakta"
   },
   {
     "matchId": "1692",
-    "date": "03/08/2026",
+    "date": "2026-03-08",
     "team1": "Game Swingers",
     "team2": "Cool Springs Titans",
     "resultText": null,
     "tossWinner": null,
     "electedTo": null,
-    "tossText": null
+    "tossText": null,
+    "playerOfMatch": null
   },
   {
     "matchId": "1691",
-    "date": "03/08/2026",
+    "date": "2026-03-08",
     "team1": "Star Strikers",
     "team2": "MCA",
     "resultText": null,
     "tossWinner": null,
     "electedTo": null,
-    "tossText": null
+    "tossText": null,
+    "playerOfMatch": null
   },
   {
     "matchId": "1686",
-    "date": "03/07/2026",
+    "date": "2026-03-07",
     "team1": "Rockvale Risers",
     "team2": "Nashville Underdogs",
     "resultText": null,
     "tossWinner": "Rockvale Risers",
     "electedTo": "bat",
-    "tossText": "Rockvale Risers won the toss and elected to bat"
+    "tossText": "Rockvale Risers won the toss and elected to bat",
+    "playerOfMatch": null
   },
   {
     "matchId": "1681",
-    "date": "03/07/2026",
+    "date": "2026-03-07",
     "team1": "Fearless Raiders",
     "team2": "FSC Raptors",
     "resultText": null,
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
-    "tossText": "Fearless Raiders won the toss and elected to bat"
+    "tossText": "Fearless Raiders won the toss and elected to bat",
+    "playerOfMatch": "Chandra Uppaluru"
   },
   {
     "matchId": "1680",
-    "date": "03/01/2026",
+    "date": "2026-03-01",
     "team1": "Game Swingers",
     "team2": "Fearless Fighters",
     "resultText": null,
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
-    "tossText": "Game Swingers won the toss and elected to bat"
+    "tossText": "Game Swingers won the toss and elected to bat",
+    "playerOfMatch": "Arun Mantripragada"
   },
   {
     "matchId": "1675",
-    "date": "03/01/2026",
+    "date": "2026-03-01",
     "team1": "FSC Raptors",
     "team2": "Madison Lions",
     "resultText": null,
     "tossWinner": "FSC",
     "electedTo": "bat",
-    "tossText": "FSC won the toss and elected to bat"
+    "tossText": "FSC won the toss and elected to bat",
+    "playerOfMatch": "Chinmay Deval"
   },
   {
     "matchId": "1674",
-    "date": "02/28/2026",
+    "date": "2026-02-28",
     "team1": "Mumbai Risers",
     "team2": "MCA",
     "resultText": null,
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
-    "tossText": "Mumbai Risers won the toss and elected to bat"
+    "tossText": "Mumbai Risers won the toss and elected to bat",
+    "playerOfMatch": "Ahmed Khan"
   },
   {
     "matchId": "1669",
-    "date": "02/28/2026",
+    "date": "2026-02-28",
     "team1": "Star Strikers",
     "team2": "Madison Tigers",
     "resultText": null,
     "tossWinner": "Madison Tigers",
     "electedTo": "field",
-    "tossText": "Madison Tigers won the toss and elected to bowl"
+    "tossText": "Madison Tigers won the toss and elected to bowl",
+    "playerOfMatch": "Sharath Chandra"
   }
 ];

@@ -1,17 +1,18 @@
 /**
  * fetch-toss.js
  *
- * Scrapes toss results for all 2026 completed matches.
+ * Scrapes toss results and Player of the Match for all 2026 completed matches.
  * Approach: the toss text is embedded as JSON inside the viewScorecard.do HTML,
  * in a ball-by-ball "comment" field at over 0 ball 0.
  * Pattern: "comment":"<strong>TeamX won the toss  and elected to bat/field</strong>"
+ * Player of the Match appears in the scorecard page DOM below the toss.
  *
  * Usage:
  *   cd scraper && node fetch-toss.js
  *
  * Output: scraper/toss-results.json
  *   [
- *     { matchId, date, team1, team2, tossWinner, electedTo, tossText },
+ *     { matchId, date, team1, team2, tossWinner, electedTo, tossText, playerOfMatch },
  *     ...
  *   ]
  */
@@ -56,10 +57,9 @@ async function fetchToss() {
       console.log('Could not parse existing toss-results.json, starting fresh');
     }
   }
-  // Skip any matchId already in the file (with or without toss — abandoned matches
-  // won't gain a toss after the fact, so no need to re-check them)
-  const alreadyDone = new Set(existing.map(e => e.matchId));
-  console.log(`Existing records: ${existing.length} (${alreadyDone.size} matchIds cached)`);
+  // Skip matchIds that already have playerOfMatch scraped (undefined = not yet attempted)
+  const alreadyDone = new Set(existing.filter(e => e.playerOfMatch !== undefined).map(e => e.matchId));
+  console.log(`Existing records: ${existing.length} (${alreadyDone.size} fully scraped, rest will re-scrape for POTM)`);
 
   // ── Step 1: Get all match IDs and team names from the results page ──
   console.log('\nLoading results page...');
@@ -119,7 +119,7 @@ async function fetchToss() {
     process.stdout.write(`\r[${i + 1}/${matchIds.length}] matchId=${matchId}  `);
 
     let tossWinner = null, electedTo = null, tossText = null;
-    let team1 = null, team2 = null, date = null, resultText = null;
+    let team1 = null, team2 = null, date = null, resultText = null, playerOfMatch = null;
 
     try {
       try {
@@ -135,7 +135,15 @@ async function fetchToss() {
         ({ tossWinner, electedTo, tossText } = toss);
       }
 
-      // Extract team names and date from the DOM
+      // Click the Info tab to trigger AJAX load of match details (toss, POTM, etc.)
+      await page.evaluate(() => {
+        const tabs = Array.from(document.querySelectorAll('a[data-toggle="tab"]'));
+        const info = tabs.find(t => /info/i.test(t.textContent));
+        if (info) info.click();
+      });
+      await sleep(3000);
+
+      // Extract team names, date, and Player of the Match from the DOM
       const info = await page.evaluate(() => {
         const text = document.body.innerText || '';
         // Date: MM/DD/YYYY format
@@ -166,10 +174,20 @@ async function fetchToss() {
           }
         }
 
+        // Player of the Match — in the Info tab panel (#tab0default)
+        let playerOfMatch = null;
+        const infoPanel = document.getElementById('tab0default');
+        if (infoPanel) {
+          const infoText = infoPanel.innerText || '';
+          const potmM = infoText.match(/player of the match[:\t\s]+([^\n]+)/i);
+          if (potmM) playerOfMatch = potmM[1].trim().replace(/\s+/g, ' ') || null;
+        }
+
         return {
           date:  dateM ? dateM[0] : null,
           team1: t1,
           team2: t2,
+          playerOfMatch,
         };
       });
 
@@ -180,13 +198,14 @@ async function fetchToss() {
       }
       team1 = info.team1;
       team2 = info.team2;
+      playerOfMatch = info.playerOfMatch || null;
       resultText = context ? context.replace(/Scorecard.*$/, '').trim() : null;
 
     } catch(e) {
       process.stdout.write(` ERROR: ${e.message.split('\n')[0]}`);
     }
 
-    results.push({ matchId, date, team1, team2, resultText, tossWinner, electedTo, tossText });
+    results.push({ matchId, date, team1, team2, resultText, tossWinner, electedTo, tossText, playerOfMatch });
   }
 
   console.log('\n');

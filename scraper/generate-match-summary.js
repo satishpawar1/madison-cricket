@@ -29,11 +29,6 @@ function findToss(date, teamName) {
     (t.team1.includes(teamName) || t.team2.includes(teamName)));
 }
 
-function pct(num, denom) {
-  if (!denom) return '—';
-  return Math.round((num / denom) * 100) + '%';
-}
-
 function fmtScore(runs, wickets, overs) {
   const w = (wickets != null && wickets < 10) ? `/${wickets}` : '';
   const o = overs ? ` (${overs} ov)` : '';
@@ -71,7 +66,7 @@ function getTeamData(teamKey, cricclubsName) {
     .find(bg => bg.date === latestGame.date ||
                 bg.game.toLowerCase() === latestGame.opponent.toLowerCase());
 
-  // Toss
+  // Toss + Player of the Match
   const shortName = teamKey === 'lions' ? 'Madison Lions' : 'Madison Tigers';
   const toss = findToss(latestGame.date, shortName);
 
@@ -138,19 +133,20 @@ function renderTeamSection(label, emoji, color, data) {
   if (toss) {
     const winner = toss.tossWinner.replace('Madison Lions', 'Lions').replace('Madison Tigers', 'Tigers');
     tossLine = `<div class="info-row"><span class="info-label">Toss</span><span>${winner} won, elected to ${capitalize(toss.electedTo)}</span></div>`;
+    if (toss.playerOfMatch) {
+      tossLine += `<div class="info-row"><span class="info-label">POTM</span><span><strong>${toss.playerOfMatch}</strong></span></div>`;
+    }
   }
 
   let bowlingSection = '';
   if (bowlingHighlights) {
-    const { best, totalBalls, totalDots, totalWides, totalNB } = bowlingHighlights;
-    const dotPct = pct(totalDots, totalBalls);
+    const { best, totalWides, totalNB } = bowlingHighlights;
     const bestLine = best
       ? `<strong>${best.name}</strong> — ${best.wickets}/${best.runs} (${best.overs} ov), Econ ${(best.economy || 0).toFixed(1)}`
       : '—';
     bowlingSection = `
       <div class="section-title">Bowling Highlights</div>
       <div class="info-row"><span class="info-label">Best</span><span>${bestLine}</span></div>
-      <div class="info-row"><span class="info-label">Dot ball %</span><span>${dotPct} (${totalDots}/${totalBalls} balls)</span></div>
       <div class="info-row"><span class="info-label">Extras</span><span>${totalWides}w ${totalNB}nb</span></div>`;
   } else {
     bowlingSection = `<div class="muted" style="margin-top:0.5rem">Bowling breakdown pending scorecard upload.</div>`;
