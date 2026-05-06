@@ -1,7 +1,15 @@
 name: Update Cricket Stats
 
 on:
-  workflow_dispatch:   # Manual trigger only — run from GitHub Actions tab
+  workflow_dispatch:   # Manual trigger — run from GitHub Actions tab
+  schedule:
+    # Sunday games: 7 PM CDT = 00:00 UTC Monday (early finishers)
+    - cron: '0 0 * * 1'
+    # Sunday games: 10 PM CDT = 03:00 UTC Monday (late finishers)
+    - cron: '0 3 * * 1'
+    # Saturday games (e.g. May 30): same window, Saturday night
+    - cron: '0 0 * * 0'
+    - cron: '0 3 * * 0'
 
 jobs:
   update-stats:
@@ -58,4 +66,14 @@ jobs:
           git add cricclubs-stats.js toss-data.js scraper/toss-results.json
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Auto-update cricket stats $(date +'%Y-%m-%d') [skip ci]"
+          git push
+
+      - name: Generate match summary page
+        run: node scraper/generate-match-summary.js
+
+      - name: Commit match summary if changed
+        run: |
+          git add latest-match-summary.html
+          git diff --staged --quiet && echo "No summary changes" && exit 0
+          git commit -m "Auto-generate match summary $(date +'%Y-%m-%d') [skip ci]"
           git push

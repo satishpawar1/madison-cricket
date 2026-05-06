@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="MCC Match Summary">
+<meta property="og:description" content="Latest Lions &amp; Tigers match results and stats">
+<title>MCC Match Summary</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F3F4F6; color: #111827; }
+  .container { max-width: 640px; margin: 0 auto; padding: 1rem; }
+  header { background: #0C3A7A; color: #fff; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center; }
+  header h1 { font-size: 1.25rem; font-weight: 700; }
+  header p  { font-size: 0.8rem; opacity: 0.75; margin-top: 0.25rem; }
+  .team-section { background: #fff; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  h2 { font-size: 1.1rem; font-weight: 700; display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+  .vs-label { font-size: 0.85rem; font-weight: 400; color: #6B7280; }
+  .date-line { font-size: 0.8rem; color: #6B7280; margin: 0.25rem 0 0.75rem; }
+  .result-badge { display: inline-block; padding: 0.2rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .result-won  { background: #E2F5EE; color: #0F5C43; }
+  .result-lost { background: #FEE2E2; color: #991B1B; }
+  .result-nr   { background: #FEF3C7; color: #92400E; }
+  .scores { margin-bottom: 0.75rem; }
+  .score-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #F3F4F6; font-size: 0.9rem; }
+  .score-team { color: #374151; }
+  .score-num  { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #9CA3AF; margin: 0.75rem 0 0.4rem; }
+  .info-row { display: flex; gap: 0.5rem; font-size: 0.85rem; padding: 0.2rem 0; align-items: baseline; }
+  .info-label { flex-shrink: 0; width: 80px; font-size: 0.75rem; color: #9CA3AF; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .muted { font-size: 0.8rem; color: #9CA3AF; }
+  .standings-section { background: #fff; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .standings-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.5rem; }
+  .standings-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF; padding: 0.25rem 0.4rem; }
+  .standings-table td { padding: 0.35rem 0.4rem; border-top: 1px solid #F3F4F6; }
+  .dashboard-link { display: block; text-align: center; background: #0C3A7A; color: #fff; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem; }
+  .dashboard-link:hover { background: #1A56B0; }
+  footer { text-align: center; font-size: 0.75rem; color: #9CA3AF; padding-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Madison Cricket Club</h1>
+    <p>Match Summary · Stats updated May 4, 1:30 PM CDT</p>
+  </header>
+
+  
+    <div class="team-section">
+      <h2 style="color:#1A56B0">🦁 Lions <span class="vs-label">vs Cool Springs Titans</span></h2>
+      <div class="date-line">May 3, 2026</div>
+
+      <div class="result-badge result-won">Won</div>
+
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-team">Lions</span>
+          <span class="score-num">191/2 (20.0 ov)</span>
+        </div>
+        <div class="score-row">
+          <span class="score-team">Cool Springs Titans</span>
+          <span class="score-num">125 (18.5 ov)</span>
+        </div>
+      </div>
+
+      <div class="info-row"><span class="info-label">Toss</span><span>Lions won, elected to Bat</span></div>
+
+      
+      <div class="section-title">Bowling Highlights</div>
+      <div class="info-row"><span class="info-label">Best</span><span><strong>Mahesh Vaigunde</strong> — 3/17 (4.0 ov), Econ 4.3</span></div>
+      <div class="info-row"><span class="info-label">Dot ball %</span><span>50% (57/113 balls)</span></div>
+      <div class="info-row"><span class="info-label">Extras</span><span>13w 1nb</span></div>
+
+      <div class="section-title" style="margin-top:1rem">Season Leaders</div>
+      <div class="info-row"><span class="info-label">Batting</span><span><strong>Chinmay Deval</strong> — 180 runs | Avg 60 | SR 136.36 | HS 103</span></div>
+      <div class="info-row"><span class="info-label">Bowling</span><span><strong>Chinmay Deval</strong> — 13 wkts | Econ 4.29 | Best 4/16</span></div>
+    </div>
+  
+    <div class="team-section">
+      <h2 style="color:#C05000">🐯 Tigers <span class="vs-label">vs Rockvale Risers</span></h2>
+      <div class="date-line">May 3, 2026</div>
+
+      <div class="result-badge result-won">Won</div>
+
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-team">Tigers</span>
+          <span class="score-num">241/7 (20.0 ov)</span>
+        </div>
+        <div class="score-row">
+          <span class="score-team">Rockvale Risers</span>
+          <span class="score-num">127 (20.0 ov)</span>
+        </div>
+      </div>
+
+      <div class="info-row"><span class="info-label">Toss</span><span>Tigers won, elected to Bat</span></div>
+
+      
+      <div class="section-title">Bowling Highlights</div>
+      <div class="info-row"><span class="info-label">Best</span><span><strong>Sai Patel</strong> — 3/22 (3.0 ov), Econ 7.3</span></div>
+      <div class="info-row"><span class="info-label">Dot ball %</span><span>50% (60/120 balls)</span></div>
+      <div class="info-row"><span class="info-label">Extras</span><span>16w 1nb</span></div>
+
+      <div class="section-title" style="margin-top:1rem">Season Leaders</div>
+      <div class="info-row"><span class="info-label">Batting</span><span><strong>Kiran Reddy</strong> — 273 runs | Avg 68.25 | SR 199.27 | HS 113</span></div>
+      <div class="info-row"><span class="info-label">Bowling</span><span><strong>Tiru Chowdary Pendyala</strong> — 10 wkts | Econ 3.47 | Best 2/4</span></div>
+    </div>
+  
+    <div class="standings-section">
+      <div class="section-title">League Standings</div>
+      <table class="standings-table">
+        <thead><tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th><th>NRR</th></tr></thead>
+        <tbody>
+          <tr>
+      <td style="color:#1A56B0;font-weight:700">🦁 Lions</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>12</td>
+      <td>+5.323</td>
+    </tr>
+          <tr>
+      <td style="color:#C05000;font-weight:700">🐯 Tigers</td>
+      <td>7</td>
+      <td>7</td>
+      <td>0</td>
+      <td>14</td>
+      <td>+5.043</td>
+    </tr>
+        </tbody>
+      </table>
+    </div>
+
+  <a class="dashboard-link" href="https://satishpawar1.github.io/madison-cricket/">Full Stats Dashboard &rarr;</a>
+
+  <footer>Auto-generated · Madison Cricket Club 2026</footer>
+</div>
+</body>
+</html>
