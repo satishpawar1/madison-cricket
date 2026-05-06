@@ -10,7 +10,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
     "tossText": "Madison Tigers won the toss and elected to bat",
-    "playerOfMatch": "Kiran Reddy"
+    "playerOfMatch": "Kiran Reddy",
+    "topScorer": {
+      "name": "Kiran Reddy",
+      "runs": 102,
+      "balls": 46,
+      "fours": 14,
+      "sixes": 4,
+      "strikeRate": "221.74",
+      "howOut": "c †Sai Bharath Reddy L b Sumanth Gupta A"
+    }
   },
   {
     "matchId": "1798",
@@ -21,7 +30,8 @@ var TOSS_DATA = [
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
     "tossText": "Mumbai Risers won the toss and elected to bat",
-    "playerOfMatch": "Mohinuddin Monu"
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1797",
@@ -32,7 +42,8 @@ var TOSS_DATA = [
     "tossWinner": "Star Strikers",
     "electedTo": "bat",
     "tossText": "Star Strikers won the toss and elected to bat",
-    "playerOfMatch": "Mitesh Patel"
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1796",
@@ -43,7 +54,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
     "tossText": "Madison Lions won the toss and elected to bat",
-    "playerOfMatch": "Chinmay Deval"
+    "playerOfMatch": "Chinmay Deval",
+    "topScorer": {
+      "name": "Chinmay Deval",
+      "runs": 103,
+      "balls": 67,
+      "fours": 8,
+      "sixes": 2,
+      "strikeRate": "153.73",
+      "howOut": "not out"
+    }
   },
   {
     "matchId": "1792",
@@ -54,7 +74,8 @@ var TOSS_DATA = [
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
     "tossText": "Game Swingers won the toss and elected to bat",
-    "playerOfMatch": "Parwiz Hotak"
+    "playerOfMatch": "Parwiz Hotak",
+    "topScorer": null
   },
   {
     "matchId": "1791",
@@ -65,7 +86,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
     "tossText": "Fearless Raiders won the toss and elected to bat",
-    "playerOfMatch": "Chandra Uppaluru"
+    "playerOfMatch": "Chandra Uppaluru",
+    "topScorer": null
   },
   {
     "matchId": "1785",
@@ -76,7 +98,8 @@ var TOSS_DATA = [
     "tossWinner": null,
     "electedTo": null,
     "tossText": null,
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1784",
@@ -87,7 +110,8 @@ var TOSS_DATA = [
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
     "tossText": "Game Swingers won the toss and elected to bat",
-    "playerOfMatch": "Bhabani Senapati"
+    "playerOfMatch": "Bhabani Senapati",
+    "topScorer": null
   },
   {
     "matchId": "1783",
@@ -98,7 +122,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
     "tossText": "Madison Tigers won the toss and elected to bat",
-    "playerOfMatch": "Sharath Chandra"
+    "playerOfMatch": "Sharath Chandra",
+    "topScorer": {
+      "name": "Sharath Chandra",
+      "runs": 67,
+      "balls": 40,
+      "fours": 10,
+      "sixes": 0,
+      "strikeRate": "167.50",
+      "howOut": "c Ezatullah A b Abdullah Q"
+    }
   },
   {
     "matchId": "1782",
@@ -109,7 +142,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Fighters",
     "electedTo": "bat",
     "tossText": "Fearless Fighters won the toss and elected to bat",
-    "playerOfMatch": "Mohinuddin Monu"
+    "playerOfMatch": "Mohinuddin Monu",
+    "topScorer": null
   },
   {
     "matchId": "1777",
@@ -120,7 +154,8 @@ var TOSS_DATA = [
     "tossWinner": "Cool Springs Titans",
     "electedTo": "field",
     "tossText": "Cool Springs Titans won the toss and elected to bowl",
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1776",
@@ -131,7 +166,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
     "tossText": "Fearless Raiders won the toss and elected to bat",
-    "playerOfMatch": "Anup Karde"
+    "playerOfMatch": "Anup Karde",
+    "topScorer": null
   },
   {
     "matchId": "1770",
@@ -142,7 +178,8 @@ var TOSS_DATA = [
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
     "tossText": "Franklin Falcons won the toss and elected to bat",
-    "playerOfMatch": "Harsh Patel"
+    "playerOfMatch": "Harsh Patel",
+    "topScorer": null
   },
   {
     "matchId": "1769",
@@ -153,7 +190,8 @@ var TOSS_DATA = [
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
     "tossText": "Game Swingers won the toss and elected to bat",
-    "playerOfMatch": "Money Jose"
+    "playerOfMatch": "Money Jose",
+    "topScorer": null
   },
   {
     "matchId": "1768",
@@ -164,7 +202,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
     "tossText": "Madison Tigers won the toss and elected to bat",
-    "playerOfMatch": "Sharath Chandra"
+    "playerOfMatch": "Sharath Chandra",
+    "topScorer": {
+      "name": "Surya L",
+      "runs": 56,
+      "balls": 23,
+      "fours": 5,
+      "sixes": 4,
+      "strikeRate": "243.48",
+      "howOut": "c †Nirav P b Himanshu P"
+    }
   },
   {
     "matchId": "1767",
@@ -175,7 +222,8 @@ var TOSS_DATA = [
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
     "tossText": "Great Marathas won the toss and elected to bat",
-    "playerOfMatch": "Swapnil Kulkarni"
+    "playerOfMatch": "Swapnil Kulkarni",
+    "topScorer": null
   },
   {
     "matchId": "1763",
@@ -186,7 +234,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
     "tossText": "Fearless Raiders won the toss and elected to bat",
-    "playerOfMatch": "Shashanka Donikeni"
+    "playerOfMatch": "Shashanka Donikeni",
+    "topScorer": null
   },
   {
     "matchId": "1762",
@@ -197,7 +246,8 @@ var TOSS_DATA = [
     "tossWinner": "FSC Raptors",
     "electedTo": "field",
     "tossText": "FSC Raptors won the toss and elected to bowl",
-    "playerOfMatch": "Subhalesh Polavarapu"
+    "playerOfMatch": "Subhalesh Polavarapu",
+    "topScorer": null
   },
   {
     "matchId": "1771",
@@ -208,7 +258,8 @@ var TOSS_DATA = [
     "tossWinner": null,
     "electedTo": null,
     "tossText": null,
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1756",
@@ -219,7 +270,8 @@ var TOSS_DATA = [
     "tossWinner": "Afghan Eagles",
     "electedTo": "bat",
     "tossText": "Afghan Eagles won the toss and elected to bat",
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1755",
@@ -230,7 +282,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
     "tossText": "Madison Tigers won the toss and elected to bat",
-    "playerOfMatch": "Kiran Reddy"
+    "playerOfMatch": "Kiran Reddy",
+    "topScorer": {
+      "name": "Kiran Reddy",
+      "runs": 51,
+      "balls": 18,
+      "fours": 6,
+      "sixes": 3,
+      "strikeRate": "283.33",
+      "howOut": "not out"
+    }
   },
   {
     "matchId": "1754",
@@ -241,7 +302,8 @@ var TOSS_DATA = [
     "tossWinner": "MCA",
     "electedTo": "bat",
     "tossText": "MCA won the toss and elected to bat",
-    "playerOfMatch": "Safiullah Lodhi"
+    "playerOfMatch": "Safiullah Lodhi",
+    "topScorer": null
   },
   {
     "matchId": "1753",
@@ -252,7 +314,8 @@ var TOSS_DATA = [
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
     "tossText": "Franklin Falcons won the toss and elected to bat",
-    "playerOfMatch": "Lokesh Borana"
+    "playerOfMatch": "Lokesh Borana",
+    "topScorer": null
   },
   {
     "matchId": "1748",
@@ -263,7 +326,8 @@ var TOSS_DATA = [
     "tossWinner": "Rockvale Risers",
     "electedTo": "field",
     "tossText": "Rockvale Risers won the toss and elected to bowl",
-    "playerOfMatch": "Shashanka Donikeni"
+    "playerOfMatch": "Shashanka Donikeni",
+    "topScorer": null
   },
   {
     "matchId": "1742",
@@ -274,7 +338,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
     "tossText": "Madison Lions won the toss and elected to bat",
-    "playerOfMatch": "Hardik Patel"
+    "playerOfMatch": "Hardik Patel",
+    "topScorer": {
+      "name": "Hardik Patel",
+      "runs": 72,
+      "balls": 39,
+      "fours": 14,
+      "sixes": 1,
+      "strikeRate": "184.62",
+      "howOut": "c Naveen D b Sumanth Gupta A"
+    }
   },
   {
     "matchId": "1741",
@@ -285,7 +358,8 @@ var TOSS_DATA = [
     "tossWinner": "MCA",
     "electedTo": "bat",
     "tossText": "MCA won the toss and elected to bat",
-    "playerOfMatch": "Safiullah Lodhi"
+    "playerOfMatch": "Safiullah Lodhi",
+    "topScorer": null
   },
   {
     "matchId": "1740",
@@ -296,7 +370,8 @@ var TOSS_DATA = [
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
     "tossText": "Great Marathas won the toss and elected to bat",
-    "playerOfMatch": "Sahil Patil"
+    "playerOfMatch": "Sahil Patil",
+    "topScorer": null
   },
   {
     "matchId": "1739",
@@ -307,7 +382,8 @@ var TOSS_DATA = [
     "tossWinner": "Afghan Eagles",
     "electedTo": "bat",
     "tossText": "Afghan Eagles won the toss and elected to bat",
-    "playerOfMatch": "Amirkhan Zadran"
+    "playerOfMatch": "Amirkhan Zadran",
+    "topScorer": null
   },
   {
     "matchId": "1735",
@@ -318,7 +394,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "field",
     "tossText": "Fearless Raiders won the toss and elected to bowl",
-    "playerOfMatch": "Sudarsan Kumar Kalla"
+    "playerOfMatch": "Sudarsan Kumar Kalla",
+    "topScorer": null
   },
   {
     "matchId": "1734",
@@ -329,7 +406,16 @@ var TOSS_DATA = [
     "tossWinner": "FSC Raptors",
     "electedTo": "bat",
     "tossText": "FSC Raptors won the toss and elected to bat",
-    "playerOfMatch": "Suresh Baipu"
+    "playerOfMatch": "Suresh Baipu",
+    "topScorer": {
+      "name": "Vamshi Pagidimarri",
+      "runs": 31,
+      "balls": 19,
+      "fours": 1,
+      "sixes": 0,
+      "strikeRate": "163.16",
+      "howOut": "not out"
+    }
   },
   {
     "matchId": "1728",
@@ -340,7 +426,8 @@ var TOSS_DATA = [
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
     "tossText": "Mumbai Risers won the toss and elected to bat",
-    "playerOfMatch": "Anjun Baddipudi"
+    "playerOfMatch": "Anjun Baddipudi",
+    "topScorer": null
   },
   {
     "matchId": "1727",
@@ -351,7 +438,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Lions",
     "electedTo": "bat",
     "tossText": "Madison Lions won the toss and elected to bat",
-    "playerOfMatch": "Chinmay Deval"
+    "playerOfMatch": "Chinmay Deval",
+    "topScorer": {
+      "name": "Chinmay Deval",
+      "runs": 28,
+      "balls": 26,
+      "fours": 3,
+      "sixes": 1,
+      "strikeRate": "107.69",
+      "howOut": "c Rohan S b Gaurav M"
+    }
   },
   {
     "matchId": "1723",
@@ -362,7 +458,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Fighters",
     "electedTo": "bat",
     "tossText": "Fearless Fighters won the toss and elected to bat",
-    "playerOfMatch": "Sai Kiran Pulishetti"
+    "playerOfMatch": "Sai Kiran Pulishetti",
+    "topScorer": null
   },
   {
     "matchId": "1722",
@@ -373,7 +470,8 @@ var TOSS_DATA = [
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
     "tossText": "Franklin Falcons won the toss and elected to bat",
-    "playerOfMatch": "Abhilash Reddy Kallepu"
+    "playerOfMatch": "Abhilash Reddy Kallepu",
+    "topScorer": null
   },
   {
     "matchId": "1716",
@@ -384,7 +482,16 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "bat",
     "tossText": "Madison Tigers won the toss and elected to bat",
-    "playerOfMatch": "Kiran Reddy"
+    "playerOfMatch": "Kiran Reddy",
+    "topScorer": {
+      "name": "Kiran Reddy",
+      "runs": 113,
+      "balls": 57,
+      "fours": 14,
+      "sixes": 5,
+      "strikeRate": "198.25",
+      "howOut": "St Deepak P b Nithin P"
+    }
   },
   {
     "matchId": "1715",
@@ -395,7 +502,8 @@ var TOSS_DATA = [
     "tossWinner": "Cool Springs Titans",
     "electedTo": "bat",
     "tossText": "Cool Springs Titans won the toss and elected to bat",
-    "playerOfMatch": "Vignesh Vimal Kanth"
+    "playerOfMatch": "Vignesh Vimal Kanth",
+    "topScorer": null
   },
   {
     "matchId": "1710",
@@ -406,7 +514,8 @@ var TOSS_DATA = [
     "tossWinner": "Star Strikers",
     "electedTo": "field",
     "tossText": "Star Strikers won the toss and elected to bowl",
-    "playerOfMatch": "Manoj Desai"
+    "playerOfMatch": "Manoj Desai",
+    "topScorer": null
   },
   {
     "matchId": "1709",
@@ -417,7 +526,8 @@ var TOSS_DATA = [
     "tossWinner": "Afghan Eagles",
     "electedTo": "field",
     "tossText": "Afghan Eagles won the toss and elected to bowl",
-    "playerOfMatch": "Baz Momand"
+    "playerOfMatch": "Baz Momand",
+    "topScorer": null
   },
   {
     "matchId": "1704",
@@ -428,7 +538,8 @@ var TOSS_DATA = [
     "tossWinner": "Franklin Falcons",
     "electedTo": "bat",
     "tossText": "Franklin Falcons won the toss and elected to bat",
-    "playerOfMatch": "Mohit Dora"
+    "playerOfMatch": "Mohit Dora",
+    "topScorer": null
   },
   {
     "matchId": "1703",
@@ -439,7 +550,16 @@ var TOSS_DATA = [
     "tossWinner": "Great Marathas",
     "electedTo": "bat",
     "tossText": "Great Marathas won the toss and elected to bat",
-    "playerOfMatch": "Chinmay Deval"
+    "playerOfMatch": "Chinmay Deval",
+    "topScorer": {
+      "name": "Mayur Patel",
+      "runs": 18,
+      "balls": 24,
+      "fours": 1,
+      "sixes": 0,
+      "strikeRate": "75.00",
+      "howOut": "b Dhiraj C"
+    }
   },
   {
     "matchId": "1698",
@@ -450,7 +570,8 @@ var TOSS_DATA = [
     "tossWinner": "FSC Raptors",
     "electedTo": "bat",
     "tossText": "FSC Raptors won the toss and elected to bat",
-    "playerOfMatch": "Mohinuddin Monu"
+    "playerOfMatch": "Mohinuddin Monu",
+    "topScorer": null
   },
   {
     "matchId": "1697",
@@ -461,7 +582,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
     "tossText": "Fearless Raiders won the toss and elected to bat",
-    "playerOfMatch": "Mitul Bhakta"
+    "playerOfMatch": "Mitul Bhakta",
+    "topScorer": null
   },
   {
     "matchId": "1692",
@@ -472,7 +594,8 @@ var TOSS_DATA = [
     "tossWinner": null,
     "electedTo": null,
     "tossText": null,
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1691",
@@ -483,7 +606,8 @@ var TOSS_DATA = [
     "tossWinner": null,
     "electedTo": null,
     "tossText": null,
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1686",
@@ -494,7 +618,8 @@ var TOSS_DATA = [
     "tossWinner": "Rockvale Risers",
     "electedTo": "bat",
     "tossText": "Rockvale Risers won the toss and elected to bat",
-    "playerOfMatch": null
+    "playerOfMatch": null,
+    "topScorer": null
   },
   {
     "matchId": "1681",
@@ -505,7 +630,8 @@ var TOSS_DATA = [
     "tossWinner": "Fearless Raiders",
     "electedTo": "bat",
     "tossText": "Fearless Raiders won the toss and elected to bat",
-    "playerOfMatch": "Chandra Uppaluru"
+    "playerOfMatch": "Chandra Uppaluru",
+    "topScorer": null
   },
   {
     "matchId": "1680",
@@ -516,7 +642,8 @@ var TOSS_DATA = [
     "tossWinner": "Game Swingers",
     "electedTo": "bat",
     "tossText": "Game Swingers won the toss and elected to bat",
-    "playerOfMatch": "Arun Mantripragada"
+    "playerOfMatch": "Arun Mantripragada",
+    "topScorer": null
   },
   {
     "matchId": "1675",
@@ -527,7 +654,16 @@ var TOSS_DATA = [
     "tossWinner": "FSC",
     "electedTo": "bat",
     "tossText": "FSC won the toss and elected to bat",
-    "playerOfMatch": "Chinmay Deval"
+    "playerOfMatch": "Chinmay Deval",
+    "topScorer": {
+      "name": "Chinmay Deval",
+      "runs": 23,
+      "balls": 14,
+      "fours": 3,
+      "sixes": 0,
+      "strikeRate": "164.29",
+      "howOut": "not out"
+    }
   },
   {
     "matchId": "1674",
@@ -538,7 +674,8 @@ var TOSS_DATA = [
     "tossWinner": "Mumbai Risers",
     "electedTo": "bat",
     "tossText": "Mumbai Risers won the toss and elected to bat",
-    "playerOfMatch": "Ahmed Khan"
+    "playerOfMatch": "Ahmed Khan",
+    "topScorer": null
   },
   {
     "matchId": "1669",
@@ -549,6 +686,15 @@ var TOSS_DATA = [
     "tossWinner": "Madison Tigers",
     "electedTo": "field",
     "tossText": "Madison Tigers won the toss and elected to bowl",
-    "playerOfMatch": "Sharath Chandra"
+    "playerOfMatch": "Sharath Chandra",
+    "topScorer": {
+      "name": "Vamshi Pagidimarri",
+      "runs": 31,
+      "balls": 27,
+      "fours": 3,
+      "sixes": 1,
+      "strikeRate": "114.81",
+      "howOut": "run out Upendra T/Murugan R"
+    }
   }
 ];

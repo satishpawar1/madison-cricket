@@ -138,6 +138,12 @@ function renderTeamSection(label, emoji, color, data) {
     }
   }
 
+  // Batting highlight from toss data
+  const ts = toss && toss.topScorer;
+  const battingLine = ts
+    ? `<strong>${ts.name}</strong> — ${ts.runs}(${ts.balls}) ${ts.fours ? ts.fours + '×4 ' : ''}${ts.sixes ? ts.sixes + '×6' : ''}`.trim()
+    : null;
+
   let bowlingSection = '';
   if (bowlingHighlights) {
     const { best, totalWides, totalNB } = bowlingHighlights;
@@ -145,11 +151,17 @@ function renderTeamSection(label, emoji, color, data) {
       ? `<strong>${best.name}</strong> — ${best.wickets}/${best.runs} (${best.overs} ov), Econ ${(best.economy || 0).toFixed(1)}`
       : '—';
     bowlingSection = `
-      <div class="section-title">Bowling Highlights</div>
-      <div class="info-row"><span class="info-label">Best</span><span>${bestLine}</span></div>
-      <div class="info-row"><span class="info-label">Extras</span><span>${totalWides}w ${totalNB}nb</span></div>`;
+      <div class="section-title">Match Highlights</div>
+      ${battingLine ? `<div class="info-row"><span class="info-label">Best bat</span><span>${battingLine}</span></div>` : ''}
+      <div class="info-row"><span class="info-label">Best bowl</span><span>${bestLine}</span></div>
+      <div class="info-row"><span class="info-label">Total Extras</span><span>${totalWides}w ${totalNB}nb</span></div>`;
+  } else if (battingLine) {
+    bowlingSection = `
+      <div class="section-title">Match Highlights</div>
+      <div class="info-row"><span class="info-label">Best bat</span><span>${battingLine}</span></div>
+      <div class="muted" style="margin-top:0.25rem">Bowling breakdown pending scorecard upload.</div>`;
   } else {
-    bowlingSection = `<div class="muted" style="margin-top:0.5rem">Bowling breakdown pending scorecard upload.</div>`;
+    bowlingSection = `<div class="muted" style="margin-top:0.5rem">Match highlights pending scorecard upload.</div>`;
   }
 
   const batterLine = topBatter

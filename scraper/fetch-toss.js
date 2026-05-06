@@ -119,7 +119,7 @@ async function fetchToss() {
     process.stdout.write(`\r[${i + 1}/${matchIds.length}] matchId=${matchId}  `);
 
     let tossWinner = null, electedTo = null, tossText = null;
-    let team1 = null, team2 = null, date = null, resultText = null, playerOfMatch = null;
+    let team1 = null, team2 = null, date = null, resultText = null, playerOfMatch = null, topScorer = null;
 
     try {
       try {
@@ -135,7 +135,79 @@ async function fetchToss() {
         ({ tossWinner, electedTo, tossText } = toss);
       }
 
-      // Click the Info tab to trigger AJAX load of match details (toss, POTM, etc.)
+      // Extract team names and date from the header (before clicking any tabs)
+      const headerInfo = await page.evaluate(() => {
+        const text = document.body.innerText || '';
+        const dateM = text.match(/\d{2}\/\d{2}\/\d{4}/);
+        const vsIdx = text.indexOf('\nVS\n');
+        let t1 = null, t2 = null;
+        if (vsIdx !== -1) {
+          const before = text.substring(0, vsIdx).trimEnd().split('\n');
+          for (let i = before.length - 1; i >= 0; i--) {
+            const line = before[i].trim();
+            if (line && !/^\d/.test(line) && line.length > 2 && line.length < 60) { t1 = line; break; }
+          }
+          const after = text.substring(vsIdx + 4).trimStart().split('\n');
+          for (const line of after) {
+            const l = line.trim();
+            if (l && !/^\d/.test(l) && l.length > 2 && l.length < 60) { t2 = l; break; }
+          }
+        }
+        return { date: dateM ? dateM[0] : null, team1: t1, team2: t2 };
+      });
+
+      // Click the MCC team's batting tab to load their innings
+      const mccTeamName = (headerInfo.team1 && /madison/i.test(headerInfo.team1)) ? headerInfo.team1
+                        : (headerInfo.team2 && /madison/i.test(headerInfo.team2)) ? headerInfo.team2
+                        : null;
+
+      if (mccTeamName) {
+        await page.evaluate((teamName) => {
+          const childTabs = document.querySelectorAll('.child-tabs a');
+          const mccTab = Array.from(childTabs).find(a => a.textContent.trim().toLowerCase() === teamName.toLowerCase());
+          if (mccTab) mccTab.click();
+        }, mccTeamName);
+        await sleep(2000);
+
+        // Parse MCC team batting from the innings section
+        topScorer = await page.evaluate((teamName) => {
+          const text = document.body.innerText || '';
+          const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+          const inningsLabel = teamName + ' innings';
+          const start = lines.findIndex(l => l.toLowerCase() === inningsLabel.toLowerCase());
+          if (start === -1) return null;
+
+          // Lines after header "R\tB\t4s\t6s\tSR" until "Extras"
+          let headerIdx = -1;
+          for (let i = start; i < Math.min(start + 5, lines.length); i++) {
+            if (/^R\s/.test(lines[i]) || lines[i].startsWith('R\t')) { headerIdx = i; break; }
+          }
+          if (headerIdx === -1) return null;
+
+          const batters = [];
+          let i = headerIdx + 1;
+          while (i < lines.length) {
+            const nameLine = lines[i];
+            if (/^extras$/i.test(nameLine) || /^bowling/i.test(nameLine)) break;
+            const howOut  = lines[i + 1] || '';
+            const stats   = lines[i + 2] || '';
+            const parts   = stats.split('\t');
+            if (parts.length >= 5 && /^\d+$/.test(parts[0])) {
+              // Strip trailing number (jersey number) from player name
+              const name = nameLine.replace(/\s+\d+$/, '').trim();
+              const runs = parseInt(parts[0], 10);
+              batters.push({ name, runs, balls: parseInt(parts[1], 10) || 0, fours: parseInt(parts[2], 10) || 0, sixes: parseInt(parts[3], 10) || 0, strikeRate: parts[4], howOut: howOut.replace(/[()]/g, '').trim() });
+              i += 3;
+            } else {
+              i++;
+            }
+          }
+          if (!batters.length) return null;
+          return batters.sort((a, b) => b.runs - a.runs)[0];
+        }, mccTeamName);
+      }
+
+      // Click the Info tab to load POTM and match details via AJAX
       await page.evaluate(() => {
         const tabs = Array.from(document.querySelectorAll('a[data-toggle="tab"]'));
         const info = tabs.find(t => /info/i.test(t.textContent));
@@ -143,38 +215,8 @@ async function fetchToss() {
       });
       await sleep(3000);
 
-      // Extract team names, date, and Player of the Match from the DOM
+      // Extract POTM from the Info tab panel (#tab0default)
       const info = await page.evaluate(() => {
-        const text = document.body.innerText || '';
-        // Date: MM/DD/YYYY format
-        const dateM = text.match(/\d{2}\/\d{2}\/\d{4}/);
-
-        // The scorecard header has: TeamA \n score \n VS \n TeamB \n score
-        // Find the two team name headings that surround "VS"
-        const allText = text;
-        const vsIdx = allText.indexOf('\nVS\n');
-        let t1 = null, t2 = null;
-        if (vsIdx !== -1) {
-          // Text before VS: last non-empty line before VS
-          const before = allText.substring(0, vsIdx).trimEnd().split('\n');
-          // Walk backward to find the team name (skip score lines like "199/6" and blank lines)
-          for (let i = before.length - 1; i >= 0; i--) {
-            const line = before[i].trim();
-            if (line && !/^\d/.test(line) && line.length > 2 && line.length < 60) {
-              t1 = line; break;
-            }
-          }
-          // Text after VS: first non-empty, non-score line
-          const after = allText.substring(vsIdx + 4).trimStart().split('\n');
-          for (const line of after) {
-            const l = line.trim();
-            if (l && !/^\d/.test(l) && l.length > 2 && l.length < 60) {
-              t2 = l; break;
-            }
-          }
-        }
-
-        // Player of the Match — in the Info tab panel (#tab0default)
         let playerOfMatch = null;
         const infoPanel = document.getElementById('tab0default');
         if (infoPanel) {
@@ -182,22 +224,16 @@ async function fetchToss() {
           const potmM = infoText.match(/player of the match[:\t\s]+([^\n]+)/i);
           if (potmM) playerOfMatch = potmM[1].trim().replace(/\s+/g, ' ') || null;
         }
-
-        return {
-          date:  dateM ? dateM[0] : null,
-          team1: t1,
-          team2: t2,
-          playerOfMatch,
-        };
+        return { playerOfMatch };
       });
 
       // Normalize date to ISO YYYY-MM-DD
-      if (info.date) {
-        const [mm, dd, yyyy] = info.date.split('/');
+      if (headerInfo.date) {
+        const [mm, dd, yyyy] = headerInfo.date.split('/');
         date = `${yyyy}-${mm}-${dd}`;
       }
-      team1 = info.team1;
-      team2 = info.team2;
+      team1 = headerInfo.team1;
+      team2 = headerInfo.team2;
       playerOfMatch = info.playerOfMatch || null;
       resultText = context ? context.replace(/Scorecard.*$/, '').trim() : null;
 
@@ -205,7 +241,7 @@ async function fetchToss() {
       process.stdout.write(` ERROR: ${e.message.split('\n')[0]}`);
     }
 
-    results.push({ matchId, date, team1, team2, resultText, tossWinner, electedTo, tossText, playerOfMatch });
+    results.push({ matchId, date, team1, team2, resultText, tossWinner, electedTo, tossText, playerOfMatch, topScorer });
   }
 
   console.log('\n');
