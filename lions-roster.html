@@ -150,12 +150,20 @@ function saveToSheets(onSuccess, onError) {
     method: 'POST',
     body: JSON.stringify({ action: 'saveExtraPlayers', team: TEAM, players: extraPlayers })
   })
-    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      return r.text().then(function(text) {
+        try { return JSON.parse(text); }
+        catch(e) { throw new Error(text.substring(0, 200)); }
+      });
+    })
     .then(function(d) {
       if (d.status === 'ok') { onSuccess(); }
       else { showMsg('Save failed: ' + (d.message || 'unknown error'), 'err'); if (onError) onError(); }
     })
-    .catch(function() { showMsg('Network error — could not save.', 'err'); if (onError) onError(); });
+    .catch(function(err) {
+      showMsg('Error: ' + (err.message || 'network error'), 'err');
+      if (onError) onError();
+    });
 }
 
 function renderCore() {
