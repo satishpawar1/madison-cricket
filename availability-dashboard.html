@@ -284,11 +284,19 @@ function fetchTeam(team, teamLabel) {
       .filter(function(p){return removed.indexOf(p) < 0;})
       .concat(extra.filter(function(p){return CFG.players.indexOf(p) < 0;}));
 
+    // Deduplicate activePlayers (trim whitespace)
+    activePlayers = activePlayers.filter(function(name, idx) {
+      return activePlayers.indexOf(name.trim()) === idx;
+    }).map(function(n) { return n.trim(); });
+
     // Absorb any players returned by GAS (e.g. from ExtraAvail sheet) not already in activePlayers
+    var activeSet = {};
+    activePlayers.forEach(function(p) { activeSet[p] = true; });
     gameResults.forEach(function(res) {
       if (!res.data) return;
       res.data.forEach(function(pd) {
-        if (activePlayers.indexOf(pd.name) < 0) activePlayers.push(pd.name);
+        var name = pd.name.trim();
+        if (!activeSet[name]) { activeSet[name] = true; activePlayers.push(name); }
       });
     });
 
