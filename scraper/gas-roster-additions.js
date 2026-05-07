@@ -78,5 +78,41 @@ function handleSaveRemovedPlayers(data) {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STEP 4: Deploy → Manage deployments → Edit → New version → Deploy
+// STEP 4: In handlePostAvailability — add this block just before the
+//         updateGamesPlayed(...) call to save extra players' availability
+// ─────────────────────────────────────────────────────────────────────────────
+
+  var extras = players.filter(function(p) { return playerList.indexOf(p.name) === -1; });
+  if (extras.length > 0) {
+    var extraAvailSheet = ss.getSheetByName('ExtraAvail_' + team)
+      || ss.insertSheet('ExtraAvail_' + team);
+    if (extraAvailSheet.getLastRow() === 0)
+      extraAvailSheet.getRange(1,1,1,4).setValues([['Game','Player','Available','Selected']]);
+    var ead = extraAvailSheet.getDataRange().getValues();
+    for (var ei = ead.length - 1; ei >= 1; ei--) {
+      if (ead[ei][0] === sheetGame) extraAvailSheet.deleteRow(ei + 1);
+    }
+    extras.forEach(function(p) {
+      extraAvailSheet.appendRow([sheetGame, p.name, p.available, p.selected]);
+    });
+  }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STEP 5: In handleGetAvailability — add this block just before the final
+//         return jsonResponse(...) to also return extra players' availability
+// ─────────────────────────────────────────────────────────────────────────────
+
+  var extraAvailSheet = ss.getSheetByName('ExtraAvail_' + team);
+  if (extraAvailSheet && extraAvailSheet.getLastRow() > 1) {
+    var ead = extraAvailSheet.getRange(2, 1, extraAvailSheet.getLastRow() - 1, 4).getValues();
+    ead.forEach(function(row) {
+      if (row[0] === sheetGame)
+        result.push({ name: row[1], available: row[2] || 0, selected: row[3] || 0 });
+    });
+  }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STEP 6: Deploy → Manage deployments → Edit → New version → Deploy
 // ─────────────────────────────────────────────────────────────────────────────

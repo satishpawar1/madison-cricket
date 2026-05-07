@@ -165,17 +165,29 @@ function buildFromPreloaded() {
 
 function fetchLive() {
   document.getElementById('liveTag').textContent = 'updating...';
-  var promises = GAMES.map(function(g) {
+  var rosterPromises = [
+    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=Tigers').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};}),
+    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=Tigers').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};})
+  ];
+  var gamePromises = GAMES.map(function(g) {
     return fetch(SCRIPT_URL + '?team=Tigers&game=' + encodeURIComponent(g))
       .then(function(r){return r.json();})
       .catch(function(){return {status:'ok',data:[]};});
   });
-  Promise.all(promises).then(function(results) {
+  Promise.all(rosterPromises.concat(gamePromises)).then(function(results) {
+    var extra   = (results[0].status==='ok'&&results[0].players) ? results[0].players : [];
+    var removed = (results[1].status==='ok'&&results[1].players) ? results[1].players : [];
+    var gameResults = results.slice(2);
+
+    PLAYERS = CFG.players
+      .filter(function(p){return removed.indexOf(p)<0;})
+      .concat(extra.filter(function(p){return CFG.players.indexOf(p)<0;}));
+
     var ld = {};
     PLAYERS.forEach(function(p){ld[p]={avail:0,sel:0,games:{}};});
     var lc = [];
     var hasData = false;
-    results.forEach(function(res,gi) {
+    gameResults.forEach(function(res,gi) {
       var game = GAMES[gi];
       if (!res.data||!res.data.length) return;
       if (!res.data.some(function(p){return p.available>0||p.selected>0;})) return;
@@ -192,17 +204,22 @@ function fetchLive() {
       completedGames = lc;
       gamesPlayed = completedGames.length;
       playerData = PLAYERS.map(function(name) {
-        var d=ld[name];
+        var d=ld[name]||{avail:0,sel:0,games:{}};
         return {name:name,avail:d.avail,sel:d.sel,
           avPct:gamesPlayed?d.avail/gamesPlayed:0,
           selPct:d.avail?d.sel/d.avail:0,games:d.games};
       });
-      renderAll();
       document.getElementById('liveTag').textContent = 'live';
       document.getElementById('liveTag').className = 'live ok';
     } else {
+      PLAYERS.forEach(function(name) {
+        if (!playerData.some(function(pd){return pd.name===name;}))
+          playerData.push({name:name,avail:0,sel:0,avPct:0,selPct:0,games:{}});
+      });
+      playerData = playerData.filter(function(pd){return PLAYERS.indexOf(pd.name)>=0;});
       document.getElementById('liveTag').textContent = 'cached';
     }
+    renderAll();
   }).catch(function(){
     document.getElementById('liveTag').textContent = 'cached';
   });
