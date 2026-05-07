@@ -37,22 +37,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .player-card {
   background: #FFF8F5; border: 1.5px solid #FDE8D8; border-radius: 12px;
-  padding: 12px; display: flex; align-items: center; justify-content: space-between;
-  gap: 8px;
+  padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-.player-card.added { background: #FFFBEB; border-color: #FDE68A; }
+.player-card.added   { background: #FFFBEB; border-color: #FDE68A; }
+.player-card.inactive { background: #F9FAFB; border-color: #E5E7EB; }
+.player-card.inactive .player-name { color: #9CA3AF; text-decoration: line-through; }
 
 .player-name { font-size: 13px; font-weight: 600; color: #111827; flex: 1; min-width: 0; word-break: break-word; }
 
-.remove-btn {
-  width: 22px; height: 22px; border-radius: 50%; border: none;
-  background: #FEE2E2; color: #991B1B; font-size: 14px; line-height: 1;
-  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  font-weight: 700; transition: background 0.15s;
+.action-btn {
+  width: 26px; height: 26px; border-radius: 50%; border: none;
+  font-size: 13px; line-height: 1; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+  transition: background 0.15s;
 }
-.remove-btn:active { background: #FECACA; }
+.action-btn:active { opacity: 0.7; }
+.btn-remove  { background: #FEE2E2; color: #991B1B; }
+.btn-restore { background: #E2F5EE; color: #0F5C43; font-size: 15px; }
 
-.empty-note { font-size: 13px; color: #9CA3AF; font-style: italic; padding: 4px 0; }
+.empty-note   { font-size: 13px; color: #9CA3AF; font-style: italic; padding: 4px 0; }
 .loading-note { font-size: 13px; color: #9CA3AF; padding: 4px 0; }
 
 .add-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -75,8 +78,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-primary { background: #C05000; color: #fff; }
 
 .msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
-.msg.ok  { background: #E2F5EE; color: #0F5C43; display: block; }
-.msg.err { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.ok   { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err  { background: #FEE2E2; color: #991B1B; display: block; }
 .msg.info { background: #E8F1FC; color: #1A56B0; display: block; }
 </style>
 </head>
@@ -94,13 +97,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <div class="card">
     <div class="section-label">Core Roster</div>
+    <div class="loading-note" id="loadingNote">Loading…</div>
     <div class="player-grid" id="coreGrid"></div>
+  </div>
+
+  <div class="card" id="inactiveCard" style="display:none">
+    <div class="section-label">Inactive Players</div>
+    <div class="player-grid" id="inactiveGrid"></div>
   </div>
 
   <div class="card">
     <div class="section-label">Added Players</div>
-    <div id="addedGrid" class="player-grid"></div>
-    <div class="loading-note" id="loadingNote">Loading…</div>
+    <div class="player-grid" id="addedGrid"></div>
     <div class="empty-note" id="emptyNote" style="display:none">No players added yet.</div>
   </div>
 
@@ -121,51 +129,71 @@ var CFG = MCC_CONFIG.tigers;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var TEAM = 'Tigers';
 var extraPlayers = [];
+var removedPlayers = [];
 
 function loadFromSheets() {
-  fetch(SCRIPT_URL + '?action=getExtraPlayers&team=' + TEAM)
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      document.getElementById('loadingNote').style.display = 'none';
-      document.getElementById('nameInput').disabled = false;
-      document.getElementById('addBtn').disabled = false;
-      if (d.status === 'ok') {
-        extraPlayers = d.players || [];
-        renderAdded();
-      } else {
-        showMsg('Could not load roster data.', 'err');
-      }
-    })
-    .catch(function() {
-      document.getElementById('loadingNote').style.display = 'none';
-      document.getElementById('nameInput').disabled = false;
-      document.getElementById('addBtn').disabled = false;
-      showMsg('Could not connect to server. Changes will not be shared.', 'err');
-    });
+  Promise.all([
+    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=' + TEAM).then(function(r) { return r.json(); }).catch(function() { return { status: 'ok', players: [] }; }),
+    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=' + TEAM).then(function(r) { return r.json(); }).catch(function() { return { status: 'ok', players: [] }; })
+  ]).then(function(results) {
+    extraPlayers   = (results[0].status === 'ok' && results[0].players) ? results[0].players : [];
+    removedPlayers = (results[1].status === 'ok' && results[1].players) ? results[1].players : [];
+    document.getElementById('loadingNote').style.display = 'none';
+    document.getElementById('nameInput').disabled = false;
+    document.getElementById('addBtn').disabled = false;
+    renderAll();
+  });
 }
 
-function saveToSheets(onSuccess, onError) {
+function saveExtra(onSuccess, onError) {
+  save('saveExtraPlayers', extraPlayers, onSuccess, onError);
+}
+function saveRemoved(onSuccess, onError) {
+  save('saveRemovedPlayers', removedPlayers, onSuccess, onError);
+}
+function save(action, players, onSuccess, onError) {
   showMsg('Saving…', 'info');
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'saveExtraPlayers', team: TEAM, players: extraPlayers })
-  })
-    .then(function(r) { return r.json(); })
+  fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: action, team: TEAM, players: players }) })
+    .then(function(r) { return r.text().then(function(t) { try { return JSON.parse(t); } catch(e) { throw new Error(t.substring(0, 200)); } }); })
     .then(function(d) {
       if (d.status === 'ok') { onSuccess(); }
       else { showMsg('Save failed: ' + (d.message || 'unknown error'), 'err'); if (onError) onError(); }
     })
-    .catch(function() { showMsg('Network error — could not save.', 'err'); if (onError) onError(); });
+    .catch(function(err) { showMsg('Error: ' + (err.message || 'network error'), 'err'); if (onError) onError(); });
+}
+
+function renderAll() {
+  renderCore();
+  renderInactive();
+  renderAdded();
+  updateSubtitle();
 }
 
 function renderCore() {
   var grid = document.getElementById('coreGrid');
   grid.innerHTML = '';
   CFG.players.forEach(function(p) {
+    if (removedPlayers.indexOf(p) >= 0) return;
     var card = document.createElement('div');
     card.className = 'player-card';
-    card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>';
+    card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
+      + '<button class="action-btn btn-remove" onclick="removeCore(' + JSON.stringify(p) + ')" title="Mark inactive">×</button>';
     grid.appendChild(card);
+  });
+}
+
+function renderInactive() {
+  var grid = document.getElementById('inactiveGrid');
+  var card = document.getElementById('inactiveCard');
+  grid.innerHTML = '';
+  var inactive = CFG.players.filter(function(p) { return removedPlayers.indexOf(p) >= 0; });
+  card.style.display = inactive.length ? '' : 'none';
+  inactive.forEach(function(p) {
+    var el = document.createElement('div');
+    el.className = 'player-card inactive';
+    el.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
+      + '<button class="action-btn btn-restore" onclick="restoreCore(' + JSON.stringify(p) + ')" title="Restore">↩</button>';
+    grid.appendChild(el);
   });
 }
 
@@ -181,12 +209,27 @@ function renderAdded() {
       var card = document.createElement('div');
       card.className = 'player-card added';
       card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-        + '<button class="remove-btn" onclick="removePlayer(' + JSON.stringify(p) + ')">×</button>';
+        + '<button class="action-btn btn-remove" onclick="removeAdded(' + JSON.stringify(p) + ')" title="Remove">×</button>';
       grid.appendChild(card);
     });
   }
-  var total = CFG.players.length + extraPlayers.length;
-  document.getElementById('rosterSubtitle').textContent = total + ' players · Tape T20 2026';
+}
+
+function updateSubtitle() {
+  var active = CFG.players.filter(function(p) { return removedPlayers.indexOf(p) < 0; }).length + extraPlayers.length;
+  document.getElementById('rosterSubtitle').textContent = active + ' active players · Tape T20 2026';
+}
+
+function removeCore(name) {
+  removedPlayers.push(name);
+  saveRemoved(function() { renderAll(); showMsg('"' + escHtml(name) + '" marked inactive.', 'ok'); },
+              function() { removedPlayers = removedPlayers.filter(function(p) { return p !== name; }); });
+}
+
+function restoreCore(name) {
+  removedPlayers = removedPlayers.filter(function(p) { return p !== name; });
+  saveRemoved(function() { renderAll(); showMsg('"' + escHtml(name) + '" restored to roster.', 'ok'); },
+              function() { removedPlayers.push(name); });
 }
 
 function addPlayer() {
@@ -201,34 +244,26 @@ function addPlayer() {
   input.disabled = true;
   document.getElementById('addBtn').disabled = true;
   extraPlayers.push(name);
-  saveToSheets(function() {
-    input.value = '';
-    input.disabled = false;
-    document.getElementById('addBtn').disabled = false;
-    renderAdded();
-    showMsg('"' + escHtml(name) + '" added to the roster.', 'ok');
+  saveExtra(function() {
+    input.value = ''; input.disabled = false; document.getElementById('addBtn').disabled = false;
+    renderAll(); showMsg('"' + escHtml(name) + '" added.', 'ok');
   }, function() {
     extraPlayers = extraPlayers.filter(function(p) { return p !== name; });
-    input.disabled = false;
-    document.getElementById('addBtn').disabled = false;
+    input.disabled = false; document.getElementById('addBtn').disabled = false;
   });
 }
 
-function removePlayer(name) {
+function removeAdded(name) {
   extraPlayers = extraPlayers.filter(function(p) { return p !== name; });
-  saveToSheets(function() {
-    renderAdded();
-    showMsg('"' + escHtml(name) + '" removed.', 'ok');
-  });
+  saveExtra(function() { renderAll(); showMsg('"' + escHtml(name) + '" removed.', 'ok'); },
+            function() { extraPlayers.push(name); });
 }
 
 function showMsg(text, type) {
   var el = document.getElementById('msg');
-  el.innerHTML = text;
-  el.className = 'msg ' + type;
+  el.innerHTML = text; el.className = 'msg ' + type;
   setTimeout(function() { el.className = 'msg'; }, 4000);
 }
-
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -237,10 +272,7 @@ document.getElementById('nameInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') addPlayer();
 });
 
-window.addEventListener('DOMContentLoaded', function() {
-  renderCore();
-  loadFromSheets();
-});
+window.addEventListener('DOMContentLoaded', loadFromSheets);
 </script>
 </body>
 </html>
