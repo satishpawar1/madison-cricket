@@ -289,6 +289,8 @@ function fetchTeam(team, teamLabel) {
       .map(function(n) { return n.trim(); })
       .filter(function(name, idx, arr) { return arr.indexOf(name) === idx; });
 
+    function normName(n) { return (n || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+
     var liveGames = [];
     var hasData = false;
     gameResults.forEach(function(res, gi) {
@@ -300,7 +302,8 @@ function fetchTeam(team, teamLabel) {
         game: g.name,
         dateStr: makeDate(g.gameDate),
         players: activePlayers.map(function(pname) {
-          var pd = res.data.filter(function(d){return d.name === pname;})[0];
+          var pnorm = normName(pname);
+          var pd = res.data.filter(function(d){ return normName(d.name) === pnorm; })[0];
           return { name: pname, available: pd ? pd.available : 0, selected: pd ? pd.selected : 0 };
         })
       });
