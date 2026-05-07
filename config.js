@@ -178,7 +178,8 @@ const MCC_CONFIG = {
     ],
     preloaded: {
       'Star Strikers':    { av: ['Naren \u00a9','Kiran','Vamsi','Sharath','Tiru','Surya','Murali (Wk)','Suresh','GP','Mayur L','Siva','Sahith'],    sel: ['Naren \u00a9','Kiran','Vamsi','Sharath','Tiru','Surya','Murali (Wk)','Suresh','GP','Mayur L','Siva','Sahith'] },
-      'Franklin Falcons': { av: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'], sel: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'] }
+      'Franklin Falcons': { av: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'], sel: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'] },
+      'Great Maratha':    { av: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Siva','Sahith','Prapul'], sel: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Siva','Sahith','Prapul'] }
     }
   }
 };
