@@ -53,6 +53,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .remove-btn:active { background: #FECACA; }
 
 .empty-note { font-size: 13px; color: #9CA3AF; font-style: italic; padding: 4px 0; }
+.loading-note { font-size: 13px; color: #9CA3AF; padding: 4px 0; }
 
 .add-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .add-input {
@@ -62,6 +63,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .add-input:focus { outline: none; border-color: #1A56B0; }
 .add-input::placeholder { color: #9CA3AF; }
+.add-input:disabled { background: #F3F4F6; color: #9CA3AF; }
 
 .btn {
   font-size: 14px; padding: 11px 18px; border-radius: 10px;
@@ -69,16 +71,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   transition: opacity 0.15s; white-space: nowrap;
 }
 .btn:active { opacity: 0.8; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary { background: #1A56B0; color: #fff; }
 
 .msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
 .msg.ok  { background: #E2F5EE; color: #0F5C43; display: block; }
 .msg.err { background: #FEE2E2; color: #991B1B; display: block; }
-
-.note {
-  font-size: 12px; color: #6B7280; background: #F3F4F6;
-  border-radius: 10px; padding: 10px 13px; margin-top: 8px; line-height: 1.5;
-}
+.msg.info { background: #E8F1FC; color: #1A56B0; display: block; }
 </style>
 </head>
 <body>
@@ -101,29 +100,63 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="card">
     <div class="section-label">Added Players</div>
     <div id="addedGrid" class="player-grid"></div>
+    <div class="loading-note" id="loadingNote">Loading…</div>
     <div class="empty-note" id="emptyNote" style="display:none">No players added yet.</div>
   </div>
 
   <div class="card">
     <div class="section-label">Add a Player</div>
     <div class="add-form">
-      <input class="add-input" id="nameInput" type="text" placeholder="Player name" maxlength="40" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="btn btn-primary" onclick="addPlayer()">Add</button>
+      <input class="add-input" id="nameInput" type="text" placeholder="Player name" maxlength="40"
+             autocomplete="off" autocorrect="off" spellcheck="false" disabled>
+      <button class="btn btn-primary" id="addBtn" onclick="addPlayer()" disabled>Add</button>
     </div>
     <div class="msg" id="msg"></div>
-    <div class="note">Added players are stored on this device and will appear in the Log Availability page. To permanently add a player for all devices, edit config.js.</div>
   </div>
 
 </div>
 
 <script>
 var CFG = MCC_CONFIG.lions;
-var STORAGE_KEY = 'mcc_lions_extra_players';
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var TEAM = 'Lions';
+var extraPlayers = [];
 
-function loadExtra() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+function loadFromSheets() {
+  fetch(SCRIPT_URL + '?action=getExtraPlayers&team=' + TEAM)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      document.getElementById('loadingNote').style.display = 'none';
+      document.getElementById('nameInput').disabled = false;
+      document.getElementById('addBtn').disabled = false;
+      if (d.status === 'ok') {
+        extraPlayers = d.players || [];
+        renderAdded();
+      } else {
+        showMsg('Could not load roster data.', 'err');
+      }
+    })
+    .catch(function() {
+      document.getElementById('loadingNote').style.display = 'none';
+      document.getElementById('nameInput').disabled = false;
+      document.getElementById('addBtn').disabled = false;
+      showMsg('Could not connect to server. Changes will not be shared.', 'err');
+    });
 }
-function saveExtra(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+function saveToSheets(onSuccess) {
+  showMsg('Saving…', 'info');
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'saveExtraPlayers', team: TEAM, players: extraPlayers })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.status === 'ok') { onSuccess(); }
+      else { showMsg('Save failed: ' + (d.message || 'unknown error'), 'err'); }
+    })
+    .catch(function() { showMsg('Network error — could not save.', 'err'); });
+}
 
 function renderCore() {
   var grid = document.getElementById('coreGrid');
@@ -137,15 +170,14 @@ function renderCore() {
 }
 
 function renderAdded() {
-  var extra = loadExtra();
   var grid = document.getElementById('addedGrid');
   var emptyNote = document.getElementById('emptyNote');
   grid.innerHTML = '';
-  if (extra.length === 0) {
+  if (extraPlayers.length === 0) {
     emptyNote.style.display = '';
   } else {
     emptyNote.style.display = 'none';
-    extra.forEach(function(p) {
+    extraPlayers.forEach(function(p) {
       var card = document.createElement('div');
       card.className = 'player-card added';
       card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
@@ -153,11 +185,7 @@ function renderAdded() {
       grid.appendChild(card);
     });
   }
-  updateSubtitle(extra);
-}
-
-function updateSubtitle(extra) {
-  var total = CFG.players.length + extra.length;
+  var total = CFG.players.length + extraPlayers.length;
   document.getElementById('rosterSubtitle').textContent = total + ' players · Tape T20 2026';
 }
 
@@ -165,29 +193,34 @@ function addPlayer() {
   var input = document.getElementById('nameInput');
   var name = input.value.trim();
   if (!name) { showMsg('Enter a player name.', 'err'); return; }
-  var allNames = CFG.players.map(function(p) { return p.toLowerCase(); });
-  var extra = loadExtra();
-  extra.forEach(function(p) { allNames.push(p.toLowerCase()); });
+  var allNames = CFG.players.map(function(p) { return p.toLowerCase(); })
+    .concat(extraPlayers.map(function(p) { return p.toLowerCase(); }));
   if (allNames.indexOf(name.toLowerCase()) >= 0) {
-    showMsg('"' + name + '" is already on the roster.', 'err'); return;
+    showMsg('"' + escHtml(name) + '" is already on the roster.', 'err'); return;
   }
-  extra.push(name);
-  saveExtra(extra);
-  input.value = '';
-  renderAdded();
-  showMsg('"' + name + '" added to the roster.', 'ok');
+  input.disabled = true;
+  document.getElementById('addBtn').disabled = true;
+  extraPlayers.push(name);
+  saveToSheets(function() {
+    input.value = '';
+    input.disabled = false;
+    document.getElementById('addBtn').disabled = false;
+    renderAdded();
+    showMsg('"' + escHtml(name) + '" added to the roster.', 'ok');
+  });
 }
 
 function removePlayer(name) {
-  var extra = loadExtra().filter(function(p) { return p !== name; });
-  saveExtra(extra);
-  renderAdded();
-  showMsg('"' + name + '" removed.', 'ok');
+  extraPlayers = extraPlayers.filter(function(p) { return p !== name; });
+  saveToSheets(function() {
+    renderAdded();
+    showMsg('"' + escHtml(name) + '" removed.', 'ok');
+  });
 }
 
 function showMsg(text, type) {
   var el = document.getElementById('msg');
-  el.textContent = text;
+  el.innerHTML = text;
   el.className = 'msg ' + type;
   setTimeout(function() { el.className = 'msg'; }, 4000);
 }
@@ -202,7 +235,7 @@ document.getElementById('nameInput').addEventListener('keydown', function(e) {
 
 window.addEventListener('DOMContentLoaded', function() {
   renderCore();
-  renderAdded();
+  loadFromSheets();
 });
 </script>
 </body>

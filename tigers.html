@@ -167,8 +167,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 var CFG = MCC_CONFIG.tigers;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var TEAM = 'Tigers';
-var extra = (function() { try { return JSON.parse(localStorage.getItem('mcc_tigers_extra_players') || '[]'); } catch(e) { return []; } })();
-var PL = CFG.players.concat(extra.filter(function(p) { return CFG.players.indexOf(p) < 0; }));
+var PL = CFG.players.slice();
 var state = {};
 
 // Build state from preloaded data
@@ -349,7 +348,31 @@ function resetGame() {
 }
 function show(t, type) { var e=document.getElementById('msg'); e.textContent=t; e.className='msg '+type; setTimeout(function(){e.className='msg';},4000); }
 
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', function() {
+  init();
+  fetch(SCRIPT_URL + '?action=getExtraPlayers&team=Tigers')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.status !== 'ok' || !d.players || !d.players.length) return;
+      d.players.forEach(function(p) {
+        if (PL.indexOf(p) >= 0) return;
+        PL.push(p);
+        CFG.games.forEach(function(g) {
+          if (state[g.name][p] === undefined) state[g.name][p] = 0;
+        });
+        var grid = document.getElementById('pg');
+        var c = document.createElement('div');
+        c.className = 'pc'; c.id = 'pc-' + p;
+        c.innerHTML = '<div class="pn">' + p + '</div><div class="tags" id="tg-' + p + '"></div>';
+        c.addEventListener('click', (function(name) {
+          return function(e) { e.preventDefault(); cycle(name); };
+        })(p));
+        grid.appendChild(c);
+      });
+      if (cur) { PL.forEach(function(p) { renderCard(p); }); updateStats(); }
+    })
+    .catch(function() {});
+});
 </script>
 </body>
 </html>
