@@ -144,7 +144,7 @@ function loadFromSheets() {
     });
 }
 
-function saveToSheets(onSuccess) {
+function saveToSheets(onSuccess, onError) {
   showMsg('Saving…', 'info');
   fetch(SCRIPT_URL, {
     method: 'POST',
@@ -153,9 +153,9 @@ function saveToSheets(onSuccess) {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.status === 'ok') { onSuccess(); }
-      else { showMsg('Save failed: ' + (d.message || 'unknown error'), 'err'); }
+      else { showMsg('Save failed: ' + (d.message || 'unknown error'), 'err'); if (onError) onError(); }
     })
-    .catch(function() { showMsg('Network error — could not save.', 'err'); });
+    .catch(function() { showMsg('Network error — could not save.', 'err'); if (onError) onError(); });
 }
 
 function renderCore() {
@@ -207,6 +207,10 @@ function addPlayer() {
     document.getElementById('addBtn').disabled = false;
     renderAdded();
     showMsg('"' + escHtml(name) + '" added to the roster.', 'ok');
+  }, function() {
+    extraPlayers = extraPlayers.filter(function(p) { return p !== name; });
+    input.disabled = false;
+    document.getElementById('addBtn').disabled = false;
   });
 }
 
