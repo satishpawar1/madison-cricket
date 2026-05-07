@@ -289,7 +289,7 @@ function fetchTeam(team, teamLabel) {
       .map(function(n) { return n.trim(); })
       .filter(function(name, idx, arr) { return arr.indexOf(name) === idx; });
 
-    function normName(n) { return (n || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+    function normName(n) { return (n || '').replace(/[\u00ad\u00a0\u200b\u200c\u200d\u200e\u200f\ufeff]/g, '').trim().replace(/\s+/g, ' ').toLowerCase(); }
 
     var liveGames = [];
     var hasData = false;
