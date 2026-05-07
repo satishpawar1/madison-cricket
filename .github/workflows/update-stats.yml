@@ -68,6 +68,10 @@ jobs:
           git commit -m "Auto-update cricket stats $(date +'%Y-%m-%d') [skip ci]"
           git push
 
+      - name: Export stats to Google Sheets for Claude.ai
+        working-directory: scraper
+        run: node export-to-sheets.js
+
       - name: Generate match summary page
         run: node scraper/generate-match-summary.js
 
