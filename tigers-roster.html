@@ -169,31 +169,43 @@ function renderAll() {
   updateSubtitle();
 }
 
+function makeCard(p, cssClass, btnClass, btnText, btnTitle, handler) {
+  var card = document.createElement('div');
+  card.className = 'player-card' + (cssClass ? ' ' + cssClass : '');
+  var name = document.createElement('span');
+  name.className = 'player-name';
+  name.textContent = p;
+  var btn = document.createElement('button');
+  btn.className = 'action-btn ' + btnClass;
+  btn.textContent = btnText;
+  btn.title = btnTitle;
+  btn.addEventListener('click', handler);
+  card.appendChild(name);
+  card.appendChild(btn);
+  return card;
+}
+
 function renderCore() {
   var grid = document.getElementById('coreGrid');
   grid.innerHTML = '';
   CFG.players.forEach(function(p) {
     if (removedPlayers.indexOf(p) >= 0) return;
-    var card = document.createElement('div');
-    card.className = 'player-card';
-    card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-      + '<button class="action-btn btn-remove" onclick=\'removeCore(' + JSON.stringify(p) + ')\' title="Mark inactive">×</button>';
-    grid.appendChild(card);
+    grid.appendChild(makeCard(p, '', 'btn-remove', '×', 'Mark inactive', (function(name) {
+      return function() { removeCore(name); };
+    })(p)));
   });
 }
 
 function renderInactive() {
   var grid = document.getElementById('inactiveGrid');
-  var card = document.getElementById('inactiveCard');
+  var inactiveCard = document.getElementById('inactiveCard');
   grid.innerHTML = '';
   var inactive = CFG.players.filter(function(p) { return removedPlayers.indexOf(p) >= 0; });
-  card.style.display = inactive.length ? '' : 'none';
+  inactiveCard.style.display = inactive.length ? '' : 'none';
   inactive.forEach(function(p) {
-    var el = document.createElement('div');
-    el.className = 'player-card inactive';
-    el.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-      + '<button class="action-btn btn-restore" onclick=\'restoreCore(' + JSON.stringify(p) + ')\' title="Restore">↩</button>';
-    grid.appendChild(el);
+    grid.appendChild(makeCard(p, 'inactive', 'btn-restore', '↩', 'Restore', (function(name) {
+      return function() { restoreCore(name); };
+    })(p)));
   });
 }
 
@@ -206,11 +218,9 @@ function renderAdded() {
   } else {
     emptyNote.style.display = 'none';
     extraPlayers.forEach(function(p) {
-      var card = document.createElement('div');
-      card.className = 'player-card added';
-      card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-        + '<button class="action-btn btn-remove" onclick=\'removeAdded(' + JSON.stringify(p) + ')\' title="Remove">×</button>';
-      grid.appendChild(card);
+      grid.appendChild(makeCard(p, 'added', 'btn-remove', '×', 'Remove', (function(name) {
+        return function() { removeAdded(name); };
+      })(p)));
     });
   }
 }
