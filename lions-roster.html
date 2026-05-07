@@ -177,7 +177,7 @@ function renderCore() {
     var card = document.createElement('div');
     card.className = 'player-card';
     card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-      + '<button class="action-btn btn-remove" onclick="removeCore(' + JSON.stringify(p) + ')" title="Mark inactive">×</button>';
+      + '<button class="action-btn btn-remove" onclick=\'removeCore(' + JSON.stringify(p) + ')\' title="Mark inactive">×</button>';
     grid.appendChild(card);
   });
 }
@@ -192,7 +192,7 @@ function renderInactive() {
     var el = document.createElement('div');
     el.className = 'player-card inactive';
     el.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-      + '<button class="action-btn btn-restore" onclick="restoreCore(' + JSON.stringify(p) + ')" title="Restore">↩</button>';
+      + '<button class="action-btn btn-restore" onclick=\'restoreCore(' + JSON.stringify(p) + ')\' title="Restore">↩</button>';
     grid.appendChild(el);
   });
 }
@@ -209,7 +209,7 @@ function renderAdded() {
       var card = document.createElement('div');
       card.className = 'player-card added';
       card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
-        + '<button class="action-btn btn-remove" onclick="removeAdded(' + JSON.stringify(p) + ')" title="Remove">×</button>';
+        + '<button class="action-btn btn-remove" onclick=\'removeAdded(' + JSON.stringify(p) + ')\' title="Remove">×</button>';
       grid.appendChild(card);
     });
   }
