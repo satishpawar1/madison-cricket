@@ -7,7 +7,9 @@ const { postToSheets } = require('./utils');
 const ROOT = path.join(__dirname, '..');
 
 function loadJS(filename, varName) {
-  const code = fs.readFileSync(path.join(ROOT, filename), 'utf8');
+  // const/let are not exposed to the vm sandbox — replace the specific declaration
+  const code = fs.readFileSync(path.join(ROOT, filename), 'utf8')
+    .replace(new RegExp(`(const|let)\\s+${varName}\\b`), `var ${varName}`);
   const ctx  = {};
   vm.runInNewContext(code, ctx);
   return ctx[varName];
@@ -19,7 +21,12 @@ async function writeTable(sheetName, headers, rows) {
   console.log(`    ${JSON.stringify(result)}`);
 }
 
-const safe = (val, fallback = '') => val == null ? fallback : val;
+// Sheets rejects undefined, null, and NaN — coerce all to safe primitives
+const safe = (val, fallback = '') => {
+  if (val == null) return fallback;
+  if (typeof val === 'number' && isNaN(val)) return fallback;
+  return val;
+};
 
 async function main() {
   console.log('Loading data...');
