@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Madison Tigers — Team Roster</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #C05000 0%, #7A3200 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.page-header a:active { color: #fff; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
+}
+
+.section-label {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px;
+}
+
+.player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 8px; }
+@media(max-width:480px) { .player-grid { grid-template-columns: repeat(2,1fr); } }
+
+.player-card {
+  background: #FFF8F5; border: 1.5px solid #FDE8D8; border-radius: 12px;
+  padding: 12px; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+}
+.player-card.added { background: #FFFBEB; border-color: #FDE68A; }
+
+.player-name { font-size: 13px; font-weight: 600; color: #111827; flex: 1; min-width: 0; word-break: break-word; }
+
+.remove-btn {
+  width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: #FEE2E2; color: #991B1B; font-size: 14px; line-height: 1;
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; transition: background 0.15s;
+}
+.remove-btn:active { background: #FECACA; }
+
+.empty-note { font-size: 13px; color: #9CA3AF; font-style: italic; padding: 4px 0; }
+
+.add-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.add-input {
+  flex: 1; min-width: 180px; font-size: 14px; padding: 11px 13px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; color: #111827; -webkit-appearance: none; appearance: none;
+}
+.add-input:focus { outline: none; border-color: #C05000; }
+.add-input::placeholder { color: #9CA3AF; }
+
+.btn {
+  font-size: 14px; padding: 11px 18px; border-radius: 10px;
+  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
+  transition: opacity 0.15s; white-space: nowrap;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: #C05000; color: #fff; }
+
+.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
+.msg.ok  { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err { background: #FEE2E2; color: #991B1B; display: block; }
+
+.note {
+  font-size: 12px; color: #6B7280; background: #F3F4F6;
+  border-radius: 10px; padding: 10px 13px; margin-top: 8px; line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🐯 Madison Tigers</h2>
+    <p id="rosterSubtitle">Team Roster · Tape T20 2026</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="section-label">Core Roster</div>
+    <div class="player-grid" id="coreGrid"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Added Players</div>
+    <div id="addedGrid" class="player-grid"></div>
+    <div class="empty-note" id="emptyNote" style="display:none">No players added yet.</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Add a Player</div>
+    <div class="add-form">
+      <input class="add-input" id="nameInput" type="text" placeholder="Player name" maxlength="40" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="btn btn-primary" onclick="addPlayer()">Add</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="note">Added players are stored on this device and will appear in the Log Availability page. To permanently add a player for all devices, edit config.js.</div>
+  </div>
+
+</div>
+
+<script>
+var CFG = MCC_CONFIG.tigers;
+var STORAGE_KEY = 'mcc_tigers_extra_players';
+
+function loadExtra() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveExtra(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+function renderCore() {
+  var grid = document.getElementById('coreGrid');
+  grid.innerHTML = '';
+  CFG.players.forEach(function(p) {
+    var card = document.createElement('div');
+    card.className = 'player-card';
+    card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>';
+    grid.appendChild(card);
+  });
+}
+
+function renderAdded() {
+  var extra = loadExtra();
+  var grid = document.getElementById('addedGrid');
+  var emptyNote = document.getElementById('emptyNote');
+  grid.innerHTML = '';
+  if (extra.length === 0) {
+    emptyNote.style.display = '';
+  } else {
+    emptyNote.style.display = 'none';
+    extra.forEach(function(p) {
+      var card = document.createElement('div');
+      card.className = 'player-card added';
+      card.innerHTML = '<span class="player-name">' + escHtml(p) + '</span>'
+        + '<button class="remove-btn" onclick="removePlayer(' + JSON.stringify(p) + ')">×</button>';
+      grid.appendChild(card);
+    });
+  }
+  updateSubtitle(extra);
+}
+
+function updateSubtitle(extra) {
+  var total = CFG.players.length + extra.length;
+  document.getElementById('rosterSubtitle').textContent = total + ' players · Tape T20 2026';
+}
+
+function addPlayer() {
+  var input = document.getElementById('nameInput');
+  var name = input.value.trim();
+  if (!name) { showMsg('Enter a player name.', 'err'); return; }
+  var allNames = CFG.players.map(function(p) { return p.toLowerCase(); });
+  var extra = loadExtra();
+  extra.forEach(function(p) { allNames.push(p.toLowerCase()); });
+  if (allNames.indexOf(name.toLowerCase()) >= 0) {
+    showMsg('"' + name + '" is already on the roster.', 'err'); return;
+  }
+  extra.push(name);
+  saveExtra(extra);
+  input.value = '';
+  renderAdded();
+  showMsg('"' + name + '" added to the roster.', 'ok');
+}
+
+function removePlayer(name) {
+  var extra = loadExtra().filter(function(p) { return p !== name; });
+  saveExtra(extra);
+  renderAdded();
+  showMsg('"' + name + '" removed.', 'ok');
+}
+
+function showMsg(text, type) {
+  var el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+  setTimeout(function() { el.className = 'msg'; }, 4000);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('nameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addPlayer();
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  renderCore();
+  renderAdded();
+});
+</script>
+</body>
+</html>

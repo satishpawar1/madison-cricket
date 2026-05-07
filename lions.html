@@ -168,7 +168,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 var CFG = MCC_CONFIG.lions;
 var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 var TEAM = 'Lions';
-var PL = CFG.players;
+var extra = (function() { try { return JSON.parse(localStorage.getItem('mcc_lions_extra_players') || '[]'); } catch(e) { return []; } })();
+var PL = CFG.players.concat(extra.filter(function(p) { return CFG.players.indexOf(p) < 0; }));
 var state = {};
 
 // Build state from preloaded data
