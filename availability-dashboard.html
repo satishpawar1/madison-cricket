@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Availability Dashboard — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #1A56B0 0%, #0C3A7A 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+/* ── Team tabs ── */
+.tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.tab {
+  flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: all 0.15s;
+}
+.tab.lions  { color: #1A56B0; }
+.tab.tigers { color: #C05000; }
+.tab.active.lions  { background: #E8F1FC; border-color: #1A56B0; }
+.tab.active.tigers { background: #FEF0E6; border-color: #C05000; }
+
+/* ── Summary tiles ── */
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc {
+  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sn { font-size: 26px; font-weight: 700; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Table card ── */
+.lb-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem; overflow-x: auto;
+}
+.lb-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 12px; border-bottom: 1.5px solid #F3F4F6;
+  flex-wrap: wrap; gap: 8px;
+}
+.lb-title { font-size: 13px; font-weight: 700; color: #111827; }
+
+.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 360px; }
+.stats-table th {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 10px; text-align: right;
+  border-bottom: 1.5px solid #F3F4F6;
+  white-space: nowrap; cursor: pointer; user-select: none;
+  background: #FAFAFA;
+}
+.stats-table th:first-child  { text-align: left; padding-left: 16px; }
+.stats-table th:nth-child(2) { text-align: left; }
+.stats-table th.sort-asc::after  { content: ' ↑'; color: #1A56B0; }
+.stats-table th.sort-desc::after { content: ' ↓'; color: #1A56B0; }
+.stats-table td {
+  padding: 9px 10px; text-align: right;
+  border-bottom: 1px solid #F9FAFB;
+  color: #111827; white-space: nowrap;
+}
+.stats-table td:first-child  { text-align: left; padding-left: 16px; color: #9CA3AF; font-size: 12px; }
+.stats-table td:nth-child(2) { text-align: left; font-weight: 600; }
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: #F9FAFB; }
+
+/* ── Per-game breakdown ── */
+.game-section { margin-bottom: 1.25rem; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.game-cards { display: flex; flex-direction: column; gap: 8px; }
+.game-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.game-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #FAFAFA;
+  border-bottom: 1px solid #F3F4F6;
+}
+.game-card-title { font-size: 13px; font-weight: 700; }
+.game-card-meta { font-size: 11px; color: #9CA3AF; }
+.game-summary-strip {
+  display: flex; gap: 16px; padding: 7px 14px;
+  background: #F8FAFF; border-bottom: 1px solid #F3F4F6;
+}
+.gss-item { display: flex; flex-direction: column; align-items: center; }
+.gss-val { font-weight: 700; font-size: 15px; line-height: 1; }
+.gss-val.green { color: #16A34A; }
+.gss-val.blue  { color: #1A56B0; }
+.gss-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.gss-div { width: 1px; background: #E5E7EB; align-self: stretch; margin: 2px 0; }
+
+.game-player-rows { padding: 4px 0; }
+.gpr {
+  display: flex; align-items: center;
+  padding: 5px 14px; gap: 10px;
+}
+.gpr-name { font-size: 13px; color: #374151; flex: 1; }
+.gpr-name.unavail { color: #C4C9D4; }
+.gpr-tags { display: flex; gap: 5px; }
+.gpr-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.tag-avail { background: #C6F0E0; color: #0F5C43; }
+.tag-sel   { background: #BDD5F5; color: #1A56B0; }
+.tag-none  { font-size: 12px; color: #D1D5DB; }
+
+.loading { text-align: center; color: #9CA3AF; font-size: 14px; padding: 3rem; }
+.no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; background: #fff; border-radius: 12px; }
+.live-tag { font-size: 11px; font-weight: 500; color: #9CA3AF; }
+.live-tag.ok { color: #6EE7B7; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>📋 Availability Dashboard</h2>
+    <p>Availability &amp; selection — Lions &amp; Tigers</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="tabs">
+    <div class="tab lions active" onclick="switchTab('lions')">🦁 Madison Lions</div>
+    <div class="tab tigers" onclick="switchTab('tigers')">🐯 Madison Tigers</div>
+  </div>
+
+  <div id="loadingMsg" class="loading">Loading&hellip;</div>
+
+  <div id="lionsView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="l-games" style="color:#1A56B0">—</div><div class="sl">Games</div></div>
+      <div class="sc"><div class="sn" id="l-avail" style="color:#1A8F6A">—</div><div class="sl">Avg Availability</div></div>
+      <div class="sc"><div class="sn" id="l-sel"   style="color:#1A56B0">—</div><div class="sl">Avg Selection</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🦁 Lions — Player Summary</div>
+        <span class="live-tag" id="l-liveTag"></span>
+      </div>
+      <table class="stats-table" id="lionsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('lions','name')">Player</th>
+            <th onclick="sortTable('lions','avail')">Avail</th>
+            <th onclick="sortTable('lions','sel')">Sel</th>
+            <th onclick="sortTable('lions','avPct')">Avail %</th>
+            <th onclick="sortTable('lions','selPct')">Sel %</th>
+          </tr>
+        </thead>
+        <tbody id="lionsTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="lionsGames"></div>
+    </div>
+  </div>
+
+  <div id="tigersView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="t-games" style="color:#C05000">—</div><div class="sl">Games</div></div>
+      <div class="sc"><div class="sn" id="t-avail" style="color:#1A8F6A">—</div><div class="sl">Avg Availability</div></div>
+      <div class="sc"><div class="sn" id="t-sel"   style="color:#C05000">—</div><div class="sl">Avg Selection</div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🐯 Tigers — Player Summary</div>
+        <span class="live-tag" id="t-liveTag"></span>
+      </div>
+      <table class="stats-table" id="tigersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('tigers','name')">Player</th>
+            <th onclick="sortTable('tigers','avail')">Avail</th>
+            <th onclick="sortTable('tigers','sel')">Sel</th>
+            <th onclick="sortTable('tigers','avPct')">Avail %</th>
+            <th onclick="sortTable('tigers','selPct')">Sel %</th>
+          </tr>
+        </thead>
+        <tbody id="tigersTbody"></tbody>
+      </table>
+    </div>
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="tigersGames"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var activeTab = 'lions';
+
+var _sort = {
+  lions:  { key: 'avPct', dir: -1 },
+  tigers: { key: 'avPct', dir: -1 }
+};
+
+// { players: [name,...], games: [{game, dateStr, players:[{name,available,selected}]}] }
+var _data = { lions: null, tigers: null };
+var _pending = 2;
+
+function onLoaded() {
+  _pending--;
+  if (_pending > 0) return;
+  document.getElementById('loadingMsg').style.display = 'none';
+  renderTeam('lions');
+  renderTeam('tigers');
+  showTab(activeTab);
+}
+
+function fetchTeam(team, teamLabel) {
+  var CFG = MCC_CONFIG[team];
+  var PLAYERS = CFG.players.slice();
+  var GAMES = CFG.games;
+
+  var gameDateMap = {};
+  GAMES.forEach(function(g) { gameDateMap[g.name] = g.gameDate; });
+
+  function makeDate(gameDate) {
+    if (!gameDate) return '';
+    var dp = gameDate.split('-');
+    return new Date(parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]))
+      .toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  }
+
+  // Seed from preloaded data
+  var preGames = [];
+  var preloaded = CFG.preloaded || {};
+  Object.keys(preloaded).forEach(function(gameName) {
+    var pre = preloaded[gameName];
+    if (!(pre.av && pre.av.length) && !(pre.sel && pre.sel.length)) return;
+    preGames.push({
+      game: gameName,
+      dateStr: makeDate(gameDateMap[gameName]),
+      players: PLAYERS.map(function(p) {
+        return { name: p, available: pre.av.indexOf(p) >= 0 ? 1 : 0, selected: pre.sel.indexOf(p) >= 0 ? 1 : 0 };
+      })
+    });
+  });
+  _data[team] = { players: PLAYERS, games: preGames };
+  onLoaded();
+
+  // Fetch live data
+  var rosterPromises = [
+    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=' + teamLabel).then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};}),
+    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=' + teamLabel).then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};})
+  ];
+  var gamePromises = GAMES.map(function(g) {
+    return fetch(SCRIPT_URL + '?team=' + teamLabel + '&game=' + encodeURIComponent(g.name))
+      .then(function(r){return r.json();})
+      .catch(function(){return {status:'ok',data:[]};});
+  });
+
+  Promise.all(rosterPromises.concat(gamePromises)).then(function(results) {
+    var extra   = (results[0].status==='ok' && results[0].players) ? results[0].players : [];
+    var removed = (results[1].status==='ok' && results[1].players) ? results[1].players : [];
+    var gameResults = results.slice(2);
+
+    var activePlayers = CFG.players
+      .filter(function(p){return removed.indexOf(p) < 0;})
+      .concat(extra.filter(function(p){return CFG.players.indexOf(p) < 0;}));
+
+    var liveGames = [];
+    var hasData = false;
+    gameResults.forEach(function(res, gi) {
+      var g = GAMES[gi];
+      if (!res.data || !res.data.length) return;
+      if (!res.data.some(function(p){return p.available > 0 || p.selected > 0;})) return;
+      hasData = true;
+      liveGames.push({
+        game: g.name,
+        dateStr: makeDate(g.gameDate),
+        players: activePlayers.map(function(pname) {
+          var pd = res.data.filter(function(d){return d.name === pname;})[0];
+          return { name: pname, available: pd ? pd.available : 0, selected: pd ? pd.selected : 0 };
+        })
+      });
+    });
+
+    var pfx = team === 'lions' ? 'l' : 't';
+    if (hasData) {
+      _data[team] = { players: activePlayers, games: liveGames };
+      document.getElementById(pfx + '-liveTag').textContent = 'live';
+      document.getElementById(pfx + '-liveTag').className = 'live-tag ok';
+    } else {
+      document.getElementById(pfx + '-liveTag').textContent = 'cached';
+    }
+    renderTeam(team);
+  }).catch(function() {
+    var pfx = team === 'lions' ? 'l' : 't';
+    document.getElementById(pfx + '-liveTag').textContent = 'cached';
+  });
+}
+
+function buildPlayerSummary(data) {
+  var gamesPlayed = data.games.length;
+  return data.players.map(function(pname) {
+    var avail = 0, sel = 0;
+    data.games.forEach(function(g) {
+      var pd = g.players.filter(function(p){return p.name === pname;})[0];
+      if (pd) { avail += pd.available || 0; sel += pd.selected || 0; }
+    });
+    return { name: pname, avail: avail, sel: sel,
+      avPct: gamesPlayed ? avail / gamesPlayed : 0,
+      selPct: avail ? sel / avail : 0 };
+  });
+}
+
+function sortTable(team, key) {
+  var s = _sort[team];
+  if (s.key === key) s.dir *= -1; else { s.key = key; s.dir = key === 'name' ? 1 : -1; }
+  renderTeam(team);
+}
+
+function renderTeam(team) {
+  var data = _data[team];
+  if (!data) return;
+  var gamesPlayed = data.games.length;
+  var players = buildPlayerSummary(data);
+  var s = _sort[team];
+  var pfx = team === 'lions' ? 'l' : 't';
+
+  players.sort(function(a, b) {
+    if (s.key === 'name') return s.dir * a.name.localeCompare(b.name);
+    return s.dir * ((b[s.key] || 0) - (a[s.key] || 0));
+  });
+
+  // Update sort header indicators
+  document.getElementById(team + 'Table').querySelectorAll('th').forEach(function(th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    var m = (th.getAttribute('onclick') || '').match(/'([^']+)'\)$/);
+    if (m && m[1] === s.key) th.classList.add(s.dir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+
+  // Summary tiles
+  var rosterSize = data.players.length || 1;
+  var totalAvailPct = 0, totalSelPct = 0;
+  data.games.forEach(function(g) {
+    var av  = g.players.reduce(function(sum, p){return sum + (p.available||0);}, 0);
+    var sel = g.players.reduce(function(sum, p){return sum + (p.selected||0);}, 0);
+    totalAvailPct += av / rosterSize * 100;
+    totalSelPct   += sel / rosterSize * 100;
+  });
+  var ng = gamesPlayed || 1;
+  document.getElementById(pfx + '-games').textContent = gamesPlayed || '—';
+  document.getElementById(pfx + '-avail').textContent = gamesPlayed ? Math.round(totalAvailPct / ng) + '%' : '—';
+  document.getElementById(pfx + '-sel').textContent   = gamesPlayed ? Math.round(totalSelPct   / ng) + '%' : '—';
+
+  // Player summary table
+  var tbody = document.getElementById(team + 'Tbody');
+  if (!players.length || !gamesPlayed) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:2rem">No data recorded yet.</td></tr>';
+  } else {
+    tbody.innerHTML = players.map(function(p, i) {
+      return '<tr>'
+        + '<td>' + (i+1) + '</td>'
+        + '<td>' + p.name + '</td>'
+        + '<td>' + p.avail + '/' + gamesPlayed + '</td>'
+        + '<td>' + p.sel + '/' + (p.avail || 0) + '</td>'
+        + '<td style="color:#1A8F6A;font-weight:700">' + Math.round(p.avPct * 100) + '%</td>'
+        + '<td style="color:#1A56B0;font-weight:700">' + Math.round(p.selPct * 100) + '%</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  // Game-by-game breakdown cards
+  var container = document.getElementById(team + 'Games');
+  if (!data.games.length) {
+    container.innerHTML = '<div class="no-data">No games recorded yet.</div>';
+    return;
+  }
+  container.innerHTML = data.games.map(function(g) {
+    var availPlayers = g.players.filter(function(p){return p.available;});
+    var unavailPlayers = g.players.filter(function(p){return !p.available;});
+    var selCount = g.players.filter(function(p){return p.selected;}).length;
+
+    var rows = availPlayers.map(function(p) {
+      var tags = '<span class="gpr-tag tag-avail">Available</span>';
+      if (p.selected) tags += '<span class="gpr-tag tag-sel">Selected</span>';
+      return '<div class="gpr"><span class="gpr-name">' + p.name + '</span><div class="gpr-tags">' + tags + '</div></div>';
+    }).join('');
+    rows += unavailPlayers.map(function(p) {
+      return '<div class="gpr"><span class="gpr-name unavail">' + p.name + '</span><div class="gpr-tags"><span class="tag-none">&mdash;</span></div></div>';
+    }).join('');
+
+    return '<div class="game-card">'
+      + '<div class="game-card-header">'
+      +   '<span class="game-card-title">' + g.game + '</span>'
+      +   '<span class="game-card-meta">' + g.dateStr + '</span>'
+      + '</div>'
+      + '<div class="game-summary-strip">'
+      +   '<div class="gss-item"><div class="gss-val green">' + availPlayers.length + '</div><div class="gss-lbl">Available</div></div>'
+      +   '<div class="gss-div"></div>'
+      +   '<div class="gss-item"><div class="gss-val blue">' + selCount + '</div><div class="gss-lbl">Selected</div></div>'
+      +   '<div class="gss-div"></div>'
+      +   '<div class="gss-item"><div class="gss-val" style="color:#6B7280">' + g.players.length + '</div><div class="gss-lbl">Roster</div></div>'
+      + '</div>'
+      + '<div class="game-player-rows">' + rows + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function switchTab(team) {
+  activeTab = team;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelector('.tab.' + team).classList.add('active');
+  showTab(team);
+}
+
+function showTab(team) {
+  document.getElementById('lionsView').style.display  = team === 'lions'  ? '' : 'none';
+  document.getElementById('tigersView').style.display = team === 'tigers' ? '' : 'none';
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  fetchTeam('lions',  'Lions');
+  fetchTeam('tigers', 'Tigers');
+});
+</script>
+</body>
+</html>

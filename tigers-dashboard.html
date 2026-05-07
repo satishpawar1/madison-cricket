@@ -5,7 +5,7 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Madison Tigers — Dashboard</title>
+<title>Madison Tigers — Cricket Stats</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
@@ -18,62 +18,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
 .hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
 .hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
-.live { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-left: 6px; }
-.live.ok { color: #6EE7B7; }
 
 .content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
 
-.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
-.sc {
-  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.sn { font-size: 26px; font-weight: 700; }
-.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
-
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .slbl { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: .06em; }
-.sort-row { display: flex; gap: 8px; align-items: center; }
-.sort-row label { font-size: 12px; color: #9CA3AF; }
-.sort-row select {
-  font-size: 13px; padding: 6px 10px; border: 1.5px solid #E5E7EB;
-  border-radius: 8px; background: #fff; color: #111827;
-}
-
-.plist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
-.prow {
-  background: #fff; border-radius: 12px; padding: 14px 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-.ptop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.pname { font-size: 14px; font-weight: 600; }
-.badges { display: flex; gap: 6px; }
-.bdg { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
-.bdg-av { background: #FEF3C7; color: #92400E; }
-.bdg-sel { background: #FEF0E6; color: #7A3200; }
-
-.bars { display: flex; flex-direction: column; gap: 6px; }
-.bar-row { display: flex; align-items: center; gap: 8px; }
-.bar-lbl { font-size: 11px; color: #9CA3AF; width: 65px; flex-shrink: 0; font-weight: 500; }
-.bar-track { flex: 1; background: #F3F4F6; border-radius: 6px; height: 8px; overflow: hidden; }
-.bfav { height: 100%; background: linear-gradient(90deg, #D97706, #FCD34D); border-radius: 6px; transition: width 0.3s; }
-.bfsel { height: 100%; background: linear-gradient(90deg, #C05000, #F97316); border-radius: 6px; transition: width 0.3s; }
-.bar-pct { font-size: 11px; font-weight: 700; width: 36px; text-align: right; flex-shrink: 0; }
-
-.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.5rem 0; }
 
 .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
 table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; background: #fff; }
 th { background: #FFFBF5; padding: 9px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #FEE9D8; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
-th.pcol { text-align: left; position: sticky; left: 0; background: #FFFBF5; z-index: 1; }
+th.pcol { text-align: left; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #F9FAFB; }
-td.pcol { text-align: left; font-weight: 600; position: sticky; left: 0; background: #fff; z-index: 1; }
+td.pcol { text-align: left; font-weight: 600; }
 tr:last-child td { border-bottom: none; }
-tr:nth-child(even) td { background: #FFFCF8; }
-tr:nth-child(even) td.pcol { background: #FFFCF8; }
 .ca { color: #92400E; font-weight: 700; }
 .cs { color: #7A3200; font-weight: 700; }
-.cn { color: #D1D5DB; }
+.hl { font-weight: 700; color: #111827; }
 
 .tab-nav { display: flex; gap: 4px; }
 .tab-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer; font-weight: 500; }
@@ -87,36 +47,12 @@ tr:nth-child(even) td.pcol { background: #FFFCF8; }
 <div class="page-header">
   <a href="index.html">&#8249;</a>
   <div class="hdr-text">
-    <h2>🐯 Tigers Dashboard <span class="live" id="liveTag"></span></h2>
-    <p>Availability &amp; selection across completed games</p>
+    <h2>🐯 Tigers — Cricket Stats</h2>
+    <p>Batting &amp; bowling statistics · Tape T20 2026</p>
   </div>
 </div>
 
 <div class="content">
-  <div class="stat-cards">
-    <div class="sc"><div class="sn" id="sumG" style="color:#C05000">0</div><div class="sl">Games played</div></div>
-    <div class="sc"><div class="sn" id="sumA" style="color:#D97706">0</div><div class="sl">Avg available</div></div>
-    <div class="sc"><div class="sn" id="sumS" style="color:#C05000">0</div><div class="sl">Avg selected</div></div>
-  </div>
-
-  <div class="section-header">
-    <div class="slbl">Player availability &amp; selection</div>
-    <div class="sort-row">
-      <label>Sort by</label>
-      <select id="sortBy" onchange="renderPlayers()">
-        <option value="avail">Availability %</option>
-        <option value="sel">Selection %</option>
-        <option value="name">Name</option>
-      </select>
-    </div>
-  </div>
-  <div class="plist" id="plist"></div>
-
-  <hr class="sep">
-  <div class="slbl" style="margin-bottom:12px">Game-by-game breakdown</div>
-  <div class="tbl-wrap"><table id="gtbl"></table></div>
-
-  <hr class="sep">
   <div class="section-header">
     <div class="slbl">Cricket Stats</div>
     <div class="tab-nav">
@@ -130,149 +66,6 @@ tr:nth-child(even) td.pcol { background: #FFFCF8; }
 </div>
 
 <script>
-var CFG = MCC_CONFIG.tigers;
-var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
-var PLAYERS = CFG.players;
-var GAMES = CFG.games.map(function(g){return g.name;});
-var playerData = [];
-var gamesPlayed = 0;
-var completedGames = [];
-
-function buildFromPreloaded() {
-  var ld = {};
-  PLAYERS.forEach(function(p) { ld[p] = {avail:0,sel:0,games:{}}; });
-  completedGames = [];
-  var pre = CFG.preloaded;
-  Object.keys(pre).forEach(function(game) {
-    completedGames.push(game);
-    PLAYERS.forEach(function(p) {
-      var av  = pre[game].av.indexOf(p)  >= 0 ? 1 : 0;
-      var sel = pre[game].sel.indexOf(p) >= 0 ? 1 : 0;
-      ld[p].avail += av;
-      ld[p].sel   += sel;
-      ld[p].games[game] = [av, sel];
-    });
-  });
-  gamesPlayed = completedGames.length;
-  playerData = PLAYERS.map(function(name) {
-    var d = ld[name];
-    return {name:name,avail:d.avail,sel:d.sel,
-      avPct: gamesPlayed ? d.avail/gamesPlayed : 0,
-      selPct: d.avail ? d.sel/d.avail : 0,
-      games: d.games};
-  });
-}
-
-function fetchLive() {
-  document.getElementById('liveTag').textContent = 'updating...';
-  var rosterPromises = [
-    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=Tigers').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};}),
-    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=Tigers').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};})
-  ];
-  var gamePromises = GAMES.map(function(g) {
-    return fetch(SCRIPT_URL + '?team=Tigers&game=' + encodeURIComponent(g))
-      .then(function(r){return r.json();})
-      .catch(function(){return {status:'ok',data:[]};});
-  });
-  Promise.all(rosterPromises.concat(gamePromises)).then(function(results) {
-    var extra   = (results[0].status==='ok'&&results[0].players) ? results[0].players : [];
-    var removed = (results[1].status==='ok'&&results[1].players) ? results[1].players : [];
-    var gameResults = results.slice(2);
-
-    PLAYERS = CFG.players
-      .filter(function(p){return removed.indexOf(p)<0;})
-      .concat(extra.filter(function(p){return CFG.players.indexOf(p)<0;}));
-
-    var ld = {};
-    PLAYERS.forEach(function(p){ld[p]={avail:0,sel:0,games:{}};});
-    var lc = [];
-    var hasData = false;
-    gameResults.forEach(function(res,gi) {
-      var game = GAMES[gi];
-      if (!res.data||!res.data.length) return;
-      if (!res.data.some(function(p){return p.available>0||p.selected>0;})) return;
-      hasData = true;
-      lc.push(game);
-      res.data.forEach(function(p) {
-        if (!ld[p.name]) return;
-        ld[p.name].avail += p.available;
-        ld[p.name].sel   += p.selected;
-        ld[p.name].games[game] = [p.available, p.selected];
-      });
-    });
-    if (hasData) {
-      completedGames = lc;
-      gamesPlayed = completedGames.length;
-      playerData = PLAYERS.map(function(name) {
-        var d=ld[name]||{avail:0,sel:0,games:{}};
-        return {name:name,avail:d.avail,sel:d.sel,
-          avPct:gamesPlayed?d.avail/gamesPlayed:0,
-          selPct:d.avail?d.sel/d.avail:0,games:d.games};
-      });
-      document.getElementById('liveTag').textContent = 'live';
-      document.getElementById('liveTag').className = 'live ok';
-    } else {
-      PLAYERS.forEach(function(name) {
-        if (!playerData.some(function(pd){return pd.name===name;}))
-          playerData.push({name:name,avail:0,sel:0,avPct:0,selPct:0,games:{}});
-      });
-      playerData = playerData.filter(function(pd){return PLAYERS.indexOf(pd.name)>=0;});
-      document.getElementById('liveTag').textContent = 'cached';
-    }
-    renderAll();
-  }).catch(function(){
-    document.getElementById('liveTag').textContent = 'cached';
-  });
-}
-
-function renderAll() {
-  document.getElementById('sumG').textContent = gamesPlayed;
-  var n = playerData.length || 1;
-  document.getElementById('sumA').textContent = (playerData.reduce(function(s,p){return s+p.avail;},0)/n).toFixed(1);
-  document.getElementById('sumS').textContent = (playerData.reduce(function(s,p){return s+p.sel;},0)/n).toFixed(1);
-  renderPlayers();
-  renderTable();
-}
-
-function renderPlayers() {
-  var sort = document.getElementById('sortBy').value;
-  var sorted = playerData.slice().sort(function(a,b) {
-    if(sort==='avail') return b.avPct-a.avPct;
-    if(sort==='sel')   return b.selPct-a.selPct;
-    return a.name.localeCompare(b.name);
-  });
-  document.getElementById('plist').innerHTML = sorted.map(function(p,i) {
-    var ap = Math.round(p.avPct*100), sp = Math.round(p.selPct*100);
-    return '<div class="prow"><div class="ptop"><span class="pname">'+(i+1)+'. '+p.name+'</span>'
-      +'<div class="badges"><span class="bdg bdg-av">'+p.avail+'/'+gamesPlayed+' avail</span>'
-      +'<span class="bdg bdg-sel">'+p.sel+'/'+(p.avail||0)+' sel</span></div></div>'
-      +'<div class="bars">'
-      +'<div class="bar-row"><span class="bar-lbl">Availability</span><div class="bar-track"><div class="bfav" style="width:'+ap+'%"></div></div><span class="bar-pct" style="color:#D97706">'+ap+'%</span></div>'
-      +'<div class="bar-row"><span class="bar-lbl">Selection</span><div class="bar-track"><div class="bfsel" style="width:'+sp+'%"></div></div><span class="bar-pct" style="color:#C05000">'+sp+'%</span></div>'
-      +'</div></div>';
-  }).join('');
-}
-
-function renderTable() {
-  if (!completedGames.length) return;
-  var h = '<thead><tr><th class="pcol">Player</th>';
-  completedGames.forEach(function(g){h+='<th colspan="2">'+(g.length>10?g.slice(0,9)+'&hellip;':g)+'</th>';});
-  h+='</tr><tr><th class="pcol"></th>';
-  completedGames.forEach(function(){h+='<th>Av</th><th>Sel</th>';});
-  h+='</tr></thead><tbody>';
-  PLAYERS.forEach(function(p) {
-    h+='<tr><td class="pcol">'+p+'</td>';
-    var pd=playerData.filter(function(x){return x.name===p;})[0];
-    completedGames.forEach(function(g) {
-      var gd=pd&&pd.games[g],av=gd?gd[0]:null,sel=gd?gd[1]:null;
-      if(av===null){h+='<td class="cn">&mdash;</td><td class="cn">&mdash;</td>';}
-      else{h+='<td class="'+(av?'ca':'cn')+'">'+(av?'&#10003;':'&#10007;')+'</td><td class="'+(sel?'cs':'cn')+'">'+(sel?'&#10003;':'&mdash;')+'</td>';}
-    });
-    h+='</tr>';
-  });
-  document.getElementById('gtbl').innerHTML = h+'</tbody>';
-}
-
 function showStatsTab(tab, btn) {
   document.getElementById('battingStats').style.display = tab === 'batting' ? '' : 'none';
   document.getElementById('bowlingStats').style.display = tab === 'bowling' ? '' : 'none';
@@ -288,7 +81,6 @@ function renderCricStats() {
   }
   var data = CRICCLUBS_STATS.tigers;
 
-  // Batting table
   var bh = '<table><thead><tr>'
     + '<th class="pcol">Player</th><th>M</th><th>Inn</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>'
     + '</tr></thead><tbody>';
@@ -307,7 +99,6 @@ function renderCricStats() {
   }
   document.getElementById('battingStats').innerHTML = bh + '</tbody></table>';
 
-  // Bowling table
   var bwh = '<table><thead><tr>'
     + '<th class="pcol">Player</th><th>M</th><th>Ov</th><th>Wkts</th><th>Runs</th><th>Best</th><th>Avg</th><th>Econ</th><th>SR</th>'
     + '</tr></thead><tbody>';
@@ -329,9 +120,6 @@ function renderCricStats() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  buildFromPreloaded();
-  renderAll();
-  fetchLive();
   renderCricStats();
 });
 </script>
