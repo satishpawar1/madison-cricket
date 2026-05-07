@@ -284,6 +284,14 @@ function fetchTeam(team, teamLabel) {
       .filter(function(p){return removed.indexOf(p) < 0;})
       .concat(extra.filter(function(p){return CFG.players.indexOf(p) < 0;}));
 
+    // Absorb any players returned by GAS (e.g. from ExtraAvail sheet) not already in activePlayers
+    gameResults.forEach(function(res) {
+      if (!res.data) return;
+      res.data.forEach(function(pd) {
+        if (activePlayers.indexOf(pd.name) < 0) activePlayers.push(pd.name);
+      });
+    });
+
     var liveGames = [];
     var hasData = false;
     gameResults.forEach(function(res, gi) {
