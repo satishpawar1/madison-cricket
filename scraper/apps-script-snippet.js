@@ -46,50 +46,61 @@ function handleWriteTable(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// PLAYING XI LOG — writes a clean tab that Claude can read
+// PLAYING XI LOG
 //
-// Paste writePlayingXILog() into your Apps Script.
-// Then call it inside your existing doPost() handler, right after
-// you successfully write the availability/selection grid, e.g.:
+// STEP 1: Replace any existing writePlayingXILog() in your script
+//         with the function below.
 //
-//   writePlayingXILog(data.team, data.game, data.players);
+// STEP 2: In handlePostAvailability(), replace the call line with:
 //
-// "data.players" is the array of { name, available, selected } objects
-// already sent by tigers.html / lions.html.
+//   try { writePlayingXILog(ss, team, sheetGame); } catch(err) { Logger.log('PlayingXI error: ' + err); }
+//
+// NOTE: This version reads selected players directly from the sheet
+// (not from the payload) to avoid serialization issues.
 // ─────────────────────────────────────────────────────────────────
 
-function writePlayingXILog(team, game, players) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName('Playing XI Log') || ss.insertSheet('Playing XI Log');
+function writePlayingXILog(ss, team, sheetGame) {
+  var games      = team === 'Lions' ? LIONS_GAMES   : TIGERS_GAMES;
+  var playerList = team === 'Lions' ? LIONS_PLAYERS : TIGERS_PLAYERS;
+  var sheet      = ss.getSheetByName(team === 'Lions' ? LIONS_TAB : TIGERS_TAB);
+  var gameIdx    = games.indexOf(sheetGame);
+  if (!sheet || gameIdx === -1) return;
 
-  // Write header row if sheet is empty
-  if (sh.getLastRow() === 0) {
-    sh.getRange(1, 1, 1, 4).setValues([['Timestamp', 'Team', 'Game', 'Playing XI']]);
-    sh.getRange(1, 1, 1, 4).setFontWeight('bold');
+  var selCol = 2 + gameIdx * 2 + 1;
+  var selectedNames = [];
+  for (var i = 0; i < playerList.length; i++) {
+    if (Number(sheet.getRange(i + 6, selCol).getValue()) === 1) {
+      selectedNames.push(playerList[i]);
+    }
   }
 
-  var selected = players.filter(function(p) { return p.selected === 1; }).map(function(p) { return p.name; });
+  // Include selected extra players
+  var extraSheet = ss.getSheetByName('ExtraAvail_' + team);
+  if (extraSheet && extraSheet.getLastRow() > 1) {
+    var extraData = extraSheet.getRange(2, 1, extraSheet.getLastRow() - 1, 4).getValues();
+    for (var j = 0; j < extraData.length; j++) {
+      if (extraData[j][0] === sheetGame && Number(extraData[j][3]) === 1) {
+        selectedNames.push(String(extraData[j][1]));
+      }
+    }
+  }
+
+  var sh = ss.getSheetByName('Playing XI Log');
+  if (!sh) {
+    sh = ss.insertSheet('Playing XI Log');
+    sh.appendRow(['Timestamp', 'Team', 'Game', 'Playing XI']);
+  }
+
   var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
-
-  // Update existing row for this team+game, or append a new one
-  var data = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues() : [];
-  var rowIndex = -1;
-  for (var i = 0; i < data.length; i++) {
-    if (data[i][1] === team && data[i][2] === game) { rowIndex = i + 2; break; }
+  var lastRow = sh.getLastRow();
+  if (lastRow > 1) {
+    var rows = sh.getRange(2, 1, lastRow - 1, 4).getValues();
+    for (var k = 0; k < rows.length; k++) {
+      if (rows[k][1] === team && rows[k][2] === sheetGame) {
+        sh.getRange(k + 2, 1, 1, 4).setValues([[timestamp, team, sheetGame, selectedNames.join(', ')]]);
+        return;
+      }
+    }
   }
-  var row = [timestamp, team, game, selected.join(', ')];
-  if (rowIndex > 0) {
-    sh.getRange(rowIndex, 1, 1, 4).setValues([row]);
-  } else {
-    sh.appendRow(row);
-  }
+  sh.appendRow([timestamp, team, sheetGame, selectedNames.join(', ')]);
 }
-
-// ─────────────────────────────────────────────────────────────────
-// ALSO ADD these lines inside your existing doPost() function,
-// right after the line where `data` is parsed from e.postData.contents
-// ─────────────────────────────────────────────────────────────────
-
-// if (data.action === 'writeTable') return handleWriteTable(data);
-// After writing availability/selection grid, also call:
-// writePlayingXILog(data.team, data.game, data.players);
