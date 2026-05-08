@@ -27,7 +27,9 @@ function handleRegisterMember(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// WRITE TABLE UTILITY
+// WRITE TABLE UTILITY  (used by push-stats-to-sheets.js)
+// Add this routing line inside your existing doPost(), after data is parsed:
+//   if (data.action === 'writeTable') return handleWriteTable(data);
 // ─────────────────────────────────────────────────────────────────
 
 function handleWriteTable(data) {
