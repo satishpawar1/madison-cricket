@@ -95,7 +95,7 @@ const MCC_CONFIG = {
       {name:'Satish', att:0, tak:0},
       {name:'Ravi', att:1, tak:0},
       {name:'Prakrut', att:0, tak:0},
-      {name:'Saurabh', att:0, tak:0},
+      {name:'Siddharth', att:0, tak:0},
       {name:'Amit', att:1, tak:1},
       {name:'KP', att:0, tak:0},
       {name:'Dyan (N)', att:1, tak:0},

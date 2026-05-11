@@ -87,11 +87,21 @@ var CRICCLUBS_STATS = {
       {
         "name": "Saurabh Sheth",
         "team": "Madison Lions",
-        "matches": 4,
+        "matches": 3,
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 8,
+        "total": 8,
+        "mom": 0
+      },
+      {
+        "name": "Siddharth Chaudhary",
+        "team": "Madison Lions",
+        "matches": 1,
         "batting": 0,
         "bowling": 50,
-        "fielding": 8,
-        "total": 58,
+        "fielding": 0,
+        "total": 50,
         "mom": 0
       },
       {
@@ -341,21 +351,40 @@ var CRICCLUBS_STATS = {
       {
         "name": "Saurabh Sheth",
         "team": "Madison Lions",
-        "matches": 4,
-        "innings": 2,
-        "overs": "4.0",
+        "matches": 3,
+        "innings": 1,
+        "overs": "1.0",
+        "wickets": 0,
+        "runs": 9,
+        "maidens": 0,
+        "bestFigures": "0/9",
+        "hattricks": 0,
+        "fourWickets": 0,
+        "fiveWickets": 0,
+        "wides": 3,
+        "noballs": 0,
+        "average": null,
+        "economy": 9,
+        "strikeRate": null
+      },
+      {
+        "name": "Siddharth Chaudhary",
+        "team": "Madison Lions",
+        "matches": 1,
+        "innings": 1,
+        "overs": "3.0",
         "wickets": 2,
-        "runs": 15,
+        "runs": 6,
         "maidens": 0,
         "bestFigures": "2/6",
         "hattricks": 0,
         "fourWickets": 0,
         "fiveWickets": 0,
-        "wides": 6,
+        "wides": 3,
         "noballs": 0,
-        "average": 7.5,
-        "economy": 3.75,
-        "strikeRate": 12
+        "average": 3,
+        "economy": 2,
+        "strikeRate": 9
       },
       {
         "name": "Prakrut Patel",
@@ -1035,7 +1064,7 @@ var CRICCLUBS_STATS = {
             "noballs": 0
           },
           {
-            "name": "Saurabh Sheth",
+            "name": "Siddharth Chaudhary",
             "overs": "3.0",
             "balls": 18,
             "dots": 15,
@@ -3028,11 +3057,21 @@ var CRICCLUBS_STATS = {
       {
         "name": "Saurabh Sheth",
         "team": "Madison Lions",
-        "matches": 4,
+        "matches": 3,
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 8,
+        "total": 8,
+        "mom": 0
+      },
+      {
+        "name": "Siddharth Chaudhary",
+        "team": "Madison Lions",
+        "matches": 1,
         "batting": 0,
         "bowling": 50,
-        "fielding": 8,
-        "total": 58,
+        "fielding": 0,
+        "total": 50,
         "mom": 0
       },
       {

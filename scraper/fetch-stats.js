@@ -11,6 +11,83 @@ setTimeout(() => {
 const BASE = 'https://cricclubs.com/NashvilleCricketLeague';
 const CLUB = '1092658';
 
+// Games where CricClubs has the wrong player registered; correct attribution post-fetch.
+// Each entry transfers bowling stats from `fromName` to `toName` for a specific matchId.
+const BOWLING_GAME_CORRECTIONS = [
+  {
+    matchId:  '1703',
+    fromName: 'Saurabh Sheth',
+    toName:   'Siddharth Chaudhary',
+    team:     'Madison Lions',
+    innings: 1, balls: 18, overs: '3.0', wickets: 2, runs: 6,
+    wides: 3, noballs: 0, maidens: 0
+  }
+];
+
+function applyBowlingCorrections(bowlingArr, rankingsArr) {
+  BOWLING_GAME_CORRECTIONS.forEach(c => {
+    const fromIdx = bowlingArr.findIndex(p => p.name === c.fromName && p.team === c.team);
+    if (fromIdx !== -1) {
+      const p = bowlingArr[fromIdx];
+      const fromParts = (p.overs || '0').split('.');
+      const fromBalls = parseInt(fromParts[0]) * 6 + (parseInt(fromParts[1]) || 0);
+      const newBalls  = fromBalls - c.balls;
+      const newOvers  = Math.floor(newBalls / 6) + '.' + (newBalls % 6);
+      const newWkts   = (p.wickets || 0) - c.wickets;
+      const newRuns   = (p.runs    || 0) - c.runs;
+      p.matches    = Math.max(0, (p.matches  || 0) - 1);
+      p.innings    = Math.max(0, (p.innings  || 0) - c.innings);
+      p.overs      = newOvers;
+      p.wickets    = newWkts;
+      p.runs       = newRuns;
+      p.wides      = Math.max(0, (p.wides   || 0) - c.wides);
+      p.noballs    = Math.max(0, (p.noballs  || 0) - c.noballs);
+      p.maidens    = Math.max(0, (p.maidens  || 0) - c.maidens);
+      p.average    = newWkts > 0 ? newRuns / newWkts : null;
+      p.economy    = newBalls > 0 ? parseFloat((newRuns / (newBalls / 6)).toFixed(2)) : null;
+      p.strikeRate = newWkts > 0 ? parseFloat((newBalls / newWkts).toFixed(2)) : null;
+      if (newWkts === 0) p.bestFigures = '0/' + newRuns;
+    }
+
+    const toExists = bowlingArr.find(p => p.name === c.toName && p.team === c.team);
+    if (!toExists) {
+      bowlingArr.push({
+        name:        c.toName,
+        team:        c.team,
+        matches:     1,
+        innings:     c.innings,
+        overs:       c.overs,
+        wickets:     c.wickets,
+        runs:        c.runs,
+        maidens:     c.maidens,
+        bestFigures: c.wickets + '/' + c.runs,
+        hattricks:   0, fourWickets: 0, fiveWickets: 0,
+        wides:       c.wides,
+        noballs:     c.noballs,
+        average:     c.wickets > 0 ? c.runs / c.wickets : null,
+        economy:     parseFloat((c.runs / parseFloat(c.overs)).toFixed(2)),
+        strikeRate:  c.wickets > 0 ? parseFloat((c.balls / c.wickets).toFixed(2)) : null,
+      });
+      bowlingArr.sort((a, b) => (b.wickets || 0) - (a.wickets || 0));
+    }
+
+    const fromRank = rankingsArr.find(r => r.name === c.fromName);
+    const toRankExists = rankingsArr.find(r => r.name === c.toName);
+    if (fromRank) {
+      const bpts = fromRank.bowling || 0;
+      fromRank.bowling = 0;
+      fromRank.matches = Math.max(0, (fromRank.matches || 0) - 1);
+      fromRank.total   = (fromRank.batting || 0) + (fromRank.fielding || 0);
+      if (!toRankExists) {
+        rankingsArr.push({
+          name: c.toName, team: c.team,
+          matches: 1, batting: 0, bowling: bpts, fielding: 0, total: bpts, mom: 0
+        });
+      }
+    }
+  });
+}
+
 // Old JSP interface league IDs:
 const LEAGUE_2026 = '28'; // 2026 - Tape 20
 // 2025 Tape T20 tournament — uses viewLeagueBatting.do / viewLeagueBowling.do with league=17
@@ -687,6 +764,8 @@ async function fetchStats() {
 
   console.log(`\nLions 2025 cross-ref: ${lionsBatting2025.length} batters, ${lionsBowling2025.length} bowlers`);
   console.log(`Tigers 2025 cross-ref: ${tigersBatting2025.length} batters, ${tigersBowling2025.length} bowlers`);
+
+  applyBowlingCorrections(lionsBosters2026, rankings);
 
   const output = {
     lastUpdated: new Date().toISOString(),
