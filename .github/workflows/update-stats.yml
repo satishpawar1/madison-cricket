@@ -66,7 +66,7 @@ jobs:
           git add cricclubs-stats.js toss-data.js scraper/toss-results.json
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Auto-update cricket stats $(date +'%Y-%m-%d') [skip ci]"
-          git push
+          git pull --rebase && git push
 
       - name: Export stats to Google Sheets for Claude.ai
         working-directory: scraper
@@ -80,4 +80,4 @@ jobs:
           git add latest-match-summary.html
           git diff --staged --quiet && echo "No summary changes" && exit 0
           git commit -m "Auto-generate match summary $(date +'%Y-%m-%d') [skip ci]"
-          git push
+          git pull --rebase && git push
