@@ -25,6 +25,7 @@ const TIGERS_MATCHES = [
   { game: 'Fearless Fighters',matchId: 1768, battingTeam: 'Madison Tigers' },
   { game: 'Afghan Eagles',    matchId: 1783, battingTeam: 'Madison Tigers' },
   { game: 'Rockvale Risers',  matchId: 1799, battingTeam: 'Madison Tigers' },
+  { game: 'MCA',              matchId: 1808, battingTeam: 'Madison Tigers' },
 ];
 
 // ── Ball-by-ball abbreviated name → config short name ──────────────────────
