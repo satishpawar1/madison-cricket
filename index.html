@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="cricclubs-stats.js"></script>
-<script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Madison Cricket Club — 2026</title>
@@ -25,107 +23,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .content { padding: 0 1rem 2rem; max-width: 500px; margin: -2rem auto 0; }
 
-/* ── Team nav cards ── */
-.team-card {
+.tournament-tile {
+  display: flex; align-items: center; gap: 16px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  padding: 20px;
+  text-decoration: none; color: #111827;
   margin-bottom: 1rem;
-  overflow: hidden;
-}
-.team-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 18px 14px;
-  border-bottom: 1px solid #F3F4F6;
-}
-.team-icon {
-  width: 42px; height: 42px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-}
-.lions-icon { background: #E8F1FC; }
-.tigers-icon { background: #FEF0E6; }
-.leather-icon { background: #FEE2E2; }
-.team-name { font-size: 16px; font-weight: 700; line-height: 1.2; }
-.team-name.lions { color: #1A56B0; }
-.team-name.tigers { color: #C05000; }
-.team-name.leather { color: #9B1C1C; }
-.team-sub { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
-
-.menu-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; text-decoration: none; color: #111827;
-  border-bottom: 1px solid #F9FAFB;
   transition: background 0.12s;
 }
-.menu-item:last-child { border-bottom: none; }
-.menu-item:active { background: #F9FAFB; }
+.tournament-tile:active { background: #F9FAFB; }
 
-.menu-num {
-  width: 30px; height: 30px; border-radius: 8px;
+.tile-icon {
+  width: 54px; height: 54px; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  font-size: 28px; flex-shrink: 0;
 }
-.num-lions { background: #E8F1FC; color: #1A56B0; }
-.num-tigers { background: #FEF0E6; color: #C05000; }
-.num-leather { background: #FEE2E2; color: #9B1C1C; }
+.tile-tape    { background: #E8F1FC; }
+.tile-leather { background: #FEE2E2; }
 
-.menu-text h3 { font-size: 14px; font-weight: 500; }
-.menu-text p { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
-.arrow { margin-left: auto; color: #D1D5DB; font-size: 20px; font-weight: 300; }
+.tile-body { flex: 1; }
+.tile-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
+.title-tape    { color: #1A56B0; }
+.title-leather { color: #9B1C1C; }
+.tile-sub  { font-size: 12px; color: #6B7280; margin-top: 4px; }
+.tile-desc { font-size: 12px; color: #9CA3AF; margin-top: 5px; }
 
-/* ── Schedule section ── */
-.section-title {
-  font-size: 11px; font-weight: 700; color: #6B7280;
-  text-transform: uppercase; letter-spacing: 0.07em;
-  margin: 1.5rem 0 0.75rem;
-}
-
-.schedule-card {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-  margin-bottom: 1rem;
-  overflow: hidden;
-}
-.schedule-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 18px 12px;
-  border-bottom: 1px solid #F3F4F6;
-}
-.schedule-header .team-icon { width: 36px; height: 36px; font-size: 18px; }
-.schedule-header .team-name { font-size: 14px; }
-.schedule-header .team-sub { font-size: 11px; }
-
-.game-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 18px;
-  border-bottom: 1px solid #F9FAFB;
-}
-.game-row:last-child { border-bottom: none; }
-
-.game-date-block { flex-shrink: 0; width: 38px; text-align: center; }
-.game-date-day { font-size: 16px; font-weight: 800; color: #111827; line-height: 1; }
-.game-date-mon { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; margin-top: 2px; }
-
-.game-divider { width: 1px; height: 32px; background: #F3F4F6; flex-shrink: 0; }
-
-.game-info { flex: 1; min-width: 0; }
-.game-opponent { font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.game-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
-
-.game-badge {
-  flex-shrink: 0; font-size: 10px; font-weight: 700;
-  padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
-}
-.badge-done { background: #E2F5EE; color: #0F5C43; }
-.badge-won  { background: #E2F5EE; color: #0F5C43; }
-.badge-lost { background: #FEE2E2; color: #991B1B; }
-.badge-upcoming-lions { background: #E8F1FC; color: #1A56B0; }
-.badge-upcoming-tigers { background: #FEF0E6; color: #C05000; }
-.badge-today { background: #FEF3C7; color: #92400E; }
+.tile-arrow { font-size: 26px; color: #D1D5DB; font-weight: 300; flex-shrink: 0; }
 
 .footer { text-align: center; padding: 0.5rem 1rem 2rem; font-size: 12px; color: #9CA3AF; }
-
 </style>
 </head>
 <body>
@@ -133,276 +60,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="hero">
   <div class="hero-badge">🏏</div>
   <h1>Madison Cricket Club</h1>
-  <p>Tape T20 · 2026 Season</p>
+  <p>2026 Season</p>
 </div>
 
 <div class="content">
 
-  <!-- ── Team nav cards ── -->
-  <div class="team-card">
-    <div class="team-header">
-      <div class="team-icon lions-icon">🦁</div>
-      <div>
-        <div class="team-name lions">Madison Lions</div>
-        <div class="team-sub">Tape T20 2026</div>
-      </div>
+  <a class="tournament-tile" href="tape-t20.html">
+    <div class="tile-icon tile-tape">🏏</div>
+    <div class="tile-body">
+      <div class="tile-title title-tape">Tape T-20</div>
+      <div class="tile-sub">Lions &amp; Tigers · 2026 Season</div>
+      <div class="tile-desc">Availability, stats &amp; schedules</div>
     </div>
-    <a class="menu-item" href="lions.html">
-      <div class="menu-num num-lions">1</div>
-      <div class="menu-text"><h3>Log Availability &amp; Selection</h3><p>Track who's in, pick the XI</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="lions-dashboard.html">
-      <div class="menu-num num-lions">2</div>
-      <div class="menu-text"><h3>Cricket Stats</h3><p>Batting &amp; bowling statistics</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="lions-catch-log.html">
-      <div class="menu-num num-lions">3</div>
-      <div class="menu-text"><h3>Log Catch Efficiency</h3><p>Record catches per game</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="lions-roster.html">
-      <div class="menu-num num-lions">4</div>
-      <div class="menu-text"><h3>Team Roster</h3><p>View players &amp; add new members</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <!-- Log Dot Balls hidden — data now pulled directly from CricClubs
-    <a class="menu-item" href="lions-dotball-log.html">
-      <div class="menu-num num-lions">5</div>
-      <div class="menu-text"><h3>Log Dot Balls</h3><p>Track dots faced per player per game</p></div>
-      <span class="arrow">›</span>
-    </a>
-    -->
-  </div>
+    <span class="tile-arrow">›</span>
+  </a>
 
-  <div class="team-card">
-    <div class="team-header">
-      <div class="team-icon tigers-icon">🐯</div>
-      <div>
-        <div class="team-name tigers">Madison Tigers</div>
-        <div class="team-sub">Tape T20 2026</div>
-      </div>
+  <a class="tournament-tile" href="leather-t30.html">
+    <div class="tile-icon tile-leather">🔴</div>
+    <div class="tile-body">
+      <div class="tile-title title-leather">Leather T-30</div>
+      <div class="tile-sub">Madison Leather · June 2026</div>
+      <div class="tile-desc">Schedule coming soon</div>
     </div>
-    <a class="menu-item" href="tigers.html">
-      <div class="menu-num num-tigers">1</div>
-      <div class="menu-text"><h3>Log Availability &amp; Selection</h3><p>Track who's in, pick the XI</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="tigers-dashboard.html">
-      <div class="menu-num num-tigers">2</div>
-      <div class="menu-text"><h3>Cricket Stats</h3><p>Batting &amp; bowling statistics</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="tigers-catch-log.html">
-      <div class="menu-num num-tigers">3</div>
-      <div class="menu-text"><h3>Log Catch Efficiency</h3><p>Record catches per game</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="tigers-roster.html">
-      <div class="menu-num num-tigers">4</div>
-      <div class="menu-text"><h3>Team Roster</h3><p>View players &amp; add new members</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <!-- Log Dot Balls hidden — data now pulled directly from CricClubs
-    <a class="menu-item" href="tigers-dotball-log.html">
-      <div class="menu-num num-tigers">5</div>
-      <div class="menu-text"><h3>Log Dot Balls</h3><p>Track dots faced per player per game</p></div>
-      <span class="arrow">›</span>
-    </a>
-    -->
-  </div>
+    <span class="tile-arrow">›</span>
+  </a>
 
-  <!-- ── Madison Leather card ── -->
-  <div class="team-card">
-    <div class="team-header">
-      <div class="team-icon leather-icon">🔴</div>
-      <div>
-        <div class="team-name leather">Madison Leather</div>
-        <div class="team-sub">Leather Cricket · 2026</div>
-      </div>
+  <a class="tournament-tile" href="leather-t20.html">
+    <div class="tile-icon tile-leather">🔴</div>
+    <div class="tile-body">
+      <div class="tile-title title-leather">Leather T-20</div>
+      <div class="tile-sub">Madison Leather · August 2026</div>
+      <div class="tile-desc">Schedule coming soon</div>
     </div>
-    <a class="menu-item" href="leather-t30.html">
-      <div class="menu-num num-leather">1</div>
-      <div class="menu-text"><h3>T-30 Tournament</h3><p>June 2026 · Schedule TBD</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="leather-t20.html">
-      <div class="menu-num num-leather">2</div>
-      <div class="menu-text"><h3>T-20 Tournament</h3><p>August 2026 · Schedule TBD</p></div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="leather-roster.html">
-      <div class="menu-num num-leather">3</div>
-      <div class="menu-text"><h3>Team Roster</h3><p>View players &amp; manage squad</p></div>
-      <span class="arrow">›</span>
-    </a>
-  </div>
-
-  <!-- ── Stats & Analysis links ── -->
-  <div class="section-title">Cricket Stats</div>
-  <div class="team-card" style="margin-bottom:1rem">
-    <a class="menu-item" href="stats-leaderboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#E2F5EE;color:#0F5C43;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🏏</div>
-      <div class="menu-text">
-        <h3>Player Stats Leaderboard</h3>
-        <p>Batting, bowling &amp; points — both teams</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="opponent-analysis.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#F3E8FF;color:#7C3AED;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🔍</div>
-      <div class="menu-text">
-        <h3>Opponent Analysis</h3>
-        <p>Scout the opposition before each game</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="game-results.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#FEF3C7;color:#92400E;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🏆</div>
-      <div class="menu-text">
-        <h3>2026 Game Results</h3>
-        <p>Scorecards for completed games</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="dotball-dashboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#FEE2E2;color:#991B1B;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🔴</div>
-      <div class="menu-text">
-        <h3>Polyplex Red Dot Balls</h3>
-        <p>Dots faced per player — Lions &amp; Tigers</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="bowling-extras-dashboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#F3F4F6;color:#374151;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🎯</div>
-      <div class="menu-text">
-        <h3>Bowling Extras Dashboard</h3>
-        <p>Wides &amp; no-balls per bowler — Lions &amp; Tigers</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="bowling-dots-dashboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#F0FDF4;color:#15803D;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🟢</div>
-      <div class="menu-text">
-        <h3>Tikka Shack Green Dot Balls</h3>
-        <p>Dots bowled per bowler — Lions &amp; Tigers</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="catch-efficiency-dashboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#F0FDF4;color:#0F766E;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🧤</div>
-      <div class="menu-text">
-        <h3>Catch Efficiency Dashboard</h3>
-        <p>Fielding stats per player — Lions &amp; Tigers</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-    <a class="menu-item" href="availability-dashboard.html" style="padding:16px 18px">
-      <div class="menu-num" style="background:#E8F1FC;color:#1A56B0;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">📋</div>
-      <div class="menu-text">
-        <h3>Availability Dashboard</h3>
-        <p>Availability &amp; selection per player — Lions &amp; Tigers</p>
-      </div>
-      <span class="arrow">›</span>
-    </a>
-  </div>
-
-  <!-- ── Schedules ── -->
-  <div class="section-title">2026 Season Schedule</div>
-
-  <!-- Lions Schedule -->
-  <div class="schedule-card" id="lionsSchedule">
-    <div class="schedule-header">
-      <div class="team-icon lions-icon">🦁</div>
-      <div>
-        <div class="team-name lions">Madison Lions</div>
-        <div class="team-sub" id="lionsRecord"></div>
-      </div>
-    </div>
-    <div id="lionsGames"></div>
-  </div>
-
-  <!-- Tigers Schedule -->
-  <div class="schedule-card" id="tigersSchedule">
-    <div class="schedule-header">
-      <div class="team-icon tigers-icon">🐯</div>
-      <div>
-        <div class="team-name tigers">Madison Tigers</div>
-        <div class="team-sub" id="tigersRecord"></div>
-      </div>
-    </div>
-    <div id="tigersGames"></div>
-  </div>
+    <span class="tile-arrow">›</span>
+  </a>
 
 </div>
 
 <div class="footer">Madison Cricket Club &nbsp;·&nbsp; 2026 Season</div>
-
-<script>
-function getGameResult(g, teamResultsKey) {
-  if (typeof CRICCLUBS_STATS === 'undefined') return null;
-  var teamResults = CRICCLUBS_STATS.results && CRICCLUBS_STATS.results[teamResultsKey];
-  if (!teamResults || !teamResults.games) return null;
-  var oppName = g.cricclubsTeam || g.opponent;
-  return teamResults.games.filter(function(r) { return r.opponent === oppName; })[0] || null;
-}
-
-function buildSchedule(games, containerId, recordId, upcomingBadgeClass, teamResultsKey) {
-  var today = new Date(); today.setHours(0,0,0,0);
-  var completed = 0, upcoming = 0;
-  var html = '';
-
-  games.forEach(function(g) {
-    var parts = g.gameDate.split('-');
-    var gd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    gd.setHours(0,0,0,0);
-
-    var isPast = today > gd;
-    var isToday = today.getTime() === gd.getTime();
-
-    var day = gd.getDate();
-    var mon = gd.toLocaleDateString('en-US', {month:'short'});
-
-    var badge, badgeClass;
-    if (isToday) {
-      badge = 'Today'; badgeClass = 'badge-today';
-    } else if (isPast) {
-      var result = getGameResult(g, teamResultsKey);
-      if (result) {
-        badge = result.won ? 'Won' : 'Lost';
-        badgeClass = result.won ? 'badge-won' : 'badge-lost';
-      } else {
-        badge = 'Completed'; badgeClass = 'badge-done';
-      }
-      completed++;
-    } else {
-      badge = 'Upcoming'; badgeClass = upcomingBadgeClass; upcoming++;
-    }
-
-    html += '<div class="game-row">'
-      + '<div class="game-date-block">'
-      +   '<div class="game-date-day">' + day + '</div>'
-      +   '<div class="game-date-mon">' + mon + '</div>'
-      + '</div>'
-      + '<div class="game-divider"></div>'
-      + '<div class="game-info">'
-      +   '<div class="game-opponent">vs ' + g.opponent + '</div>'
-      +   '<div class="game-meta">' + g.day + ' · ' + g.time + ' · ' + g.ground + '</div>'
-      + '</div>'
-      + '<span class="game-badge ' + badgeClass + '">' + badge + '</span>'
-      + '</div>';
-  });
-
-  document.getElementById(containerId).innerHTML = html;
-  document.getElementById(recordId).textContent = completed + ' played · ' + upcoming + ' upcoming';
-}
-
-window.addEventListener('DOMContentLoaded', function() {
-  buildSchedule(MCC_CONFIG.lions.games,  'lionsGames',  'lionsRecord',  'badge-upcoming-lions',  'Madison Lions');
-  buildSchedule(MCC_CONFIG.tigers.games, 'tigersGames', 'tigersRecord', 'badge-upcoming-tigers', 'Madison Tigers');
-});
-</script>
 
 </body>
 </html>
