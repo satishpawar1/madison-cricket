@@ -181,5 +181,13 @@ const MCC_CONFIG = {
       'Franklin Falcons': { av: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'], sel: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Sunny P','Mayur L','Siva','Sahith'] },
       'Great Maratha':    { av: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Siva','Sahith','Prapul'], sel: ['Naren \u00a9','Kiran','Vamsi','Tiru','Surya','Murali (Wk)','Suresh','Siva','Sahith','Prapul'] }
     }
+  },
+
+  // \u2500\u2500 Madison Leather \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  leather: {
+    players: [],     // populated once selections are confirmed
+    t30Games: [],    // T-30 schedule (June 2026, TBD)
+    t20Games: [],    // T-20 schedule (August 2026, TBD)
+    gameNameMap: {}
   }
 };
