@@ -60,13 +60,40 @@ async function pushBowling(teamLabel, bowling) {
   console.log(`${teamLabel} Bowling →`, res);
 }
 
+async function pushBowlingDots(teamLabel, bowlingGames) {
+  const headers = ['MatchId', 'Game', 'Date', 'Player', 'Overs', 'Balls', 'Dots', 'Runs', 'Wickets', 'Economy', 'Wides', 'NoBalls'];
+  const rows = [];
+  for (const g of bowlingGames) {
+    for (const p of g.players) {
+      rows.push([
+        g.matchId,
+        g.game,
+        g.date,
+        p.name,
+        p.overs,
+        p.balls,
+        p.dots,
+        p.runs,
+        p.wickets,
+        p.economy,
+        p.wides,
+        p.noballs
+      ]);
+    }
+  }
+  const res = await postToSheets({ action: 'writeTable', sheetName: `${teamLabel} Bowling Dots`, headers, rows });
+  console.log(`${teamLabel} Bowling Dots →`, res);
+}
+
 async function main() {
   console.log('Stats last updated:', S.lastUpdated);
 
   await pushBatting('Lions', S.lions.batting);
   await pushBowling('Lions', S.lions.bowling);
+  await pushBowlingDots('Lions', S.lions.bowlingGames || []);
   await pushBatting('Tigers', S.tigers.batting);
   await pushBowling('Tigers', S.tigers.bowling);
+  await pushBowlingDots('Tigers', S.tigers.bowlingGames || []);
 
   // Write a timestamp tab so the chat knows when stats were last synced
   await postToSheets({
