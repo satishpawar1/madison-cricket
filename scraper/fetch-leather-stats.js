@@ -2,14 +2,15 @@ const fs   = require('fs');
 const path = require('path');
 const { sleep, createBrowser } = require('./utils');
 
-setTimeout(() => {
-  console.error('Hard timeout reached (6 min) — exiting');
+const hardTimeout = setTimeout(() => {
+  console.error('Hard timeout reached (10 min) — exiting');
   process.exit(1);
 }, 10 * 60 * 1000);
 
 const BASE  = 'https://cricclubs.com/NashvilleCricketLeague';
 const CLUB  = '1092658';
 const LEAGUE_LEATHER_T20_2025 = '20';
+const LEAGUE_LEATHER_T20_2024 = '15';
 
 async function extractTable(page, url, minCols = 4) {
   console.log(`  Loading ${url.split('?')[0].split('/').pop()}...`);
@@ -109,25 +110,35 @@ async function fetchLeatherStats() {
   const { browser, page } = await createBrowser();
 
   console.log('\n=== 2025 Leather T-20 (league=20) ===');
-
-  const battingTable = await extractTable(page,
+  const batting2025Table = await extractTable(page,
     `${BASE}/viewLeagueBatting.do?league=${LEAGUE_LEATHER_T20_2025}&clubId=${CLUB}`, 8);
-  console.log(`  batting: ${battingTable ? battingTable.rows.length : 0} rows`);
-
-  const bowlingTable = await extractTable(page,
+  console.log(`  batting: ${batting2025Table ? batting2025Table.rows.length : 0} rows`);
+  const bowling2025Table = await extractTable(page,
     `${BASE}/viewLeagueBowling.do?league=${LEAGUE_LEATHER_T20_2025}&clubId=${CLUB}`, 8);
-  console.log(`  bowling: ${bowlingTable ? bowlingTable.rows.length : 0} rows`);
+  console.log(`  bowling: ${bowling2025Table ? bowling2025Table.rows.length : 0} rows`);
+
+  console.log('\n=== 2024 Leather T-20 (league=15) ===');
+  const batting2024Table = await extractTable(page,
+    `${BASE}/viewLeagueBatting.do?league=${LEAGUE_LEATHER_T20_2024}&clubId=${CLUB}`, 8);
+  console.log(`  batting: ${batting2024Table ? batting2024Table.rows.length : 0} rows`);
+  const bowling2024Table = await extractTable(page,
+    `${BASE}/viewLeagueBowling.do?league=${LEAGUE_LEATHER_T20_2024}&clubId=${CLUB}`, 8);
+  console.log(`  bowling: ${bowling2024Table ? bowling2024Table.rows.length : 0} rows`);
 
   await browser.close().catch(() => {});
 
-  const batting = parseBatting(battingTable);
-  const bowling = parseBowling(bowlingTable);
+  const batting2025 = parseBatting(batting2025Table);
+  const bowling2025 = parseBowling(bowling2025Table);
+  const batting2024 = parseBatting(batting2024Table);
+  const bowling2024 = parseBowling(bowling2024Table);
 
-  console.log(`\nParsed: ${batting.length} batters, ${bowling.length} bowlers`);
+  console.log(`\nParsed 2025: ${batting2025.length} batters, ${bowling2025.length} bowlers`);
+  console.log(`Parsed 2024: ${batting2024.length} batters, ${bowling2024.length} bowlers`);
 
   const out = {
     lastUpdated: new Date().toISOString(),
-    t20_2025: { batting, bowling },
+    t20_2025: { batting: batting2025, bowling: bowling2025 },
+    t20_2024: { batting: batting2024, bowling: bowling2024 },
   };
 
   const outPath = path.join(__dirname, '..', 'leather-stats.js');
@@ -139,8 +150,10 @@ async function fetchLeatherStats() {
 
   fs.writeFileSync(outPath, content, 'utf8');
   console.log(`\nWrote ${outPath}`);
-  console.log(`  Madison Tigers batters: ${batting.filter(p => p.team && p.team.includes('Tigers')).length}`);
-  console.log(`  Madison Tigers bowlers: ${bowling.filter(p => p.team && p.team.includes('Tigers')).length}`);
+  const t = p => p.team && p.team.includes('Tigers');
+  console.log(`  2025 Madison Tigers: ${batting2025.filter(t).length} batters, ${bowling2025.filter(t).length} bowlers`);
+  console.log(`  2024 Madison Tigers: ${batting2024.filter(t).length} batters, ${bowling2024.filter(t).length} bowlers`);
+  clearTimeout(hardTimeout);
 }
 
 fetchLeatherStats().catch(e => {
