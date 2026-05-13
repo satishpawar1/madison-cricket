@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="leather-stats.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Madison Leather — Stats Dashboard</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #9B1C1C 0%, #7B0000 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.page-header a:active { color: #fff; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.slbl { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: .06em; }
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; background: #fff; }
+th { background: #FFF5F5; padding: 9px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #FEE2E2; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+th.pcol { text-align: left; }
+td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #F9FAFB; }
+td.pcol { text-align: left; font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+.ca { color: #9B1C1C; font-weight: 700; }
+.cs { color: #7B0000; font-weight: 700; }
+.hl { font-weight: 700; color: #111827; }
+
+.tab-nav { display: flex; gap: 4px; }
+.tab-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer; font-weight: 500; }
+.tab-btn.active { background: #9B1C1C; color: #fff; border-color: #9B1C1C; }
+
+.note { font-size: 13px; color: #9CA3AF; background: #fff; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="leather-t20.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🔴 Madison Leather — Stats</h2>
+    <p>Batting &amp; bowling · 2025 Leather T-20</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section-header">
+    <div class="slbl">2025 Leather T-20</div>
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="showTab('batting',this)">Batting</button>
+      <button class="tab-btn" onclick="showTab('bowling',this)">Bowling</button>
+    </div>
+  </div>
+  <div id="battingStats" class="tbl-wrap"></div>
+  <div id="bowlingStats" class="tbl-wrap" style="display:none"></div>
+  <div id="statsNote" class="note" style="display:none">No stats available. Run <code>node scraper/fetch-leather-stats.js</code> to populate data.</div>
+</div>
+
+<script>
+function showTab(tab, btn) {
+  document.getElementById('battingStats').style.display = tab === 'batting' ? '' : 'none';
+  document.getElementById('bowlingStats').style.display = tab === 'bowling' ? '' : 'none';
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof LEATHER_STATS === 'undefined') {
+    document.getElementById('statsNote').style.display = 'block';
+    document.getElementById('battingStats').style.display = 'none';
+    return;
+  }
+
+  var data = LEATHER_STATS.t20_2025;
+  var batting = (data.batting || []).filter(function(p) { return p.team && p.team.includes('Tigers'); });
+  var bowling = (data.bowling || []).filter(function(p) { return p.team && p.team.includes('Tigers'); });
+
+  // Batting table
+  var bh = '<table><thead><tr>'
+    + '<th class="pcol">Player</th><th>M</th><th>Inn</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>'
+    + '</tr></thead><tbody>';
+  if (batting.length) {
+    batting.forEach(function(p, i) {
+      bh += '<tr>'
+        + '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
+        + '<td>' + p.matches + '</td>'
+        + '<td>' + p.innings + '</td>'
+        + '<td class="hl">' + p.runs + '</td>'
+        + '<td>' + (p.highest || '-') + '</td>'
+        + '<td class="ca">' + (p.average ? p.average.toFixed(1) : '-') + '</td>'
+        + '<td class="cs">' + (p.strikeRate ? p.strikeRate.toFixed(1) : '-') + '</td>'
+        + '<td>' + (p.fours || 0) + '</td>'
+        + '<td>' + (p.sixes || 0) + '</td>'
+        + '<td>' + (p.fifties || 0) + '</td>'
+        + '</tr>';
+    });
+  } else {
+    bh += '<tr><td colspan="10" style="text-align:center;color:#9CA3AF;padding:20px">No batting data available</td></tr>';
+  }
+  document.getElementById('battingStats').innerHTML = bh + '</tbody></table>';
+
+  // Bowling table
+  var bwh = '<table><thead><tr>'
+    + '<th class="pcol">Player</th><th>M</th><th>Ov</th><th>Wkts</th><th>Best</th><th>Avg</th><th>Econ</th><th>SR</th>'
+    + '</tr></thead><tbody>';
+  if (bowling.length) {
+    bowling.forEach(function(p, i) {
+      bwh += '<tr>'
+        + '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
+        + '<td>' + p.matches + '</td>'
+        + '<td>' + p.overs + '</td>'
+        + '<td class="hl">' + p.wickets + '</td>'
+        + '<td>' + (p.bestFigures || '-') + '</td>'
+        + '<td class="ca">' + (p.average ? p.average.toFixed(2) : '-') + '</td>'
+        + '<td class="cs">' + (p.economy ? p.economy.toFixed(2) : '-') + '</td>'
+        + '<td>' + (p.strikeRate ? p.strikeRate.toFixed(1) : '-') + '</td>'
+        + '</tr>';
+    });
+  } else {
+    bwh += '<tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:20px">No bowling data available</td></tr>';
+  }
+  document.getElementById('bowlingStats').innerHTML = bwh + '</tbody></table>';
+});
+</script>
+</body>
+</html>
