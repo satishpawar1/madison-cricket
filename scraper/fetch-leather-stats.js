@@ -5,7 +5,7 @@ const { sleep, createBrowser } = require('./utils');
 setTimeout(() => {
   console.error('Hard timeout reached (6 min) — exiting');
   process.exit(1);
-}, 6 * 60 * 1000);
+}, 10 * 60 * 1000);
 
 const BASE  = 'https://cricclubs.com/NashvilleCricketLeague';
 const CLUB  = '1092658';
