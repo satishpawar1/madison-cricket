@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="config.js"></script>
+<script src="leather-stats.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Madison Leather — T-20 Tournament</title>
@@ -49,6 +50,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .empty-note { font-size: 13px; color: #9CA3AF; font-style: italic; }
 
+.stats-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 4px; }
+.stats-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.stats-table th {
+  text-align: left; font-size: 10px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 6px 8px 6px 0; border-bottom: 1.5px solid #F3F4F6; white-space: nowrap;
+}
+.stats-table th:first-child { min-width: 110px; }
+.stats-table td {
+  padding: 8px 8px 8px 0; border-bottom: 1px solid #F9FAFB;
+  color: #374151; white-space: nowrap;
+}
+.stats-table td:first-child { font-weight: 600; color: #111827; white-space: normal; min-width: 110px; }
+.stats-table tr:last-child td { border-bottom: none; }
+.stat-hl { color: #9B1C1C; font-weight: 700; }
+
 .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
 .nav-link {
   display: inline-flex; align-items: center; gap: 6px;
@@ -87,6 +104,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
+  <div class="card" id="battingCard">
+    <div class="section-label">2025 Leather T-20 — Batting</div>
+    <div id="battingStats"></div>
+  </div>
+
   <div class="card">
     <div class="section-label">Quick Links</div>
     <div class="nav-links">
@@ -111,6 +133,39 @@ window.addEventListener('DOMContentLoaded', function() {
       grid.appendChild(pill);
     });
   }
+
+  // Batting stats
+  var el = document.getElementById('battingStats');
+  var batting = (LEATHER_STATS && LEATHER_STATS.t20_2025 && LEATHER_STATS.t20_2025.batting) || [];
+  var tigers = batting.filter(function(p) { return p.team && p.team.includes('Tigers'); });
+  if (!tigers.length) {
+    el.innerHTML = '<p class="empty-note">Stats will appear once the tournament data is available.</p>';
+    return;
+  }
+  var rows = tigers.map(function(p) {
+    var avg = p.average ? p.average.toFixed(1) : '—';
+    var sr  = p.strikeRate ? p.strikeRate.toFixed(1) : '—';
+    return '<tr>' +
+      '<td>' + p.name + '</td>' +
+      '<td>' + p.matches + '</td>' +
+      '<td>' + p.innings + '</td>' +
+      '<td class="stat-hl">' + p.runs + '</td>' +
+      '<td>' + p.highest + '</td>' +
+      '<td>' + avg + '</td>' +
+      '<td>' + sr + '</td>' +
+      '<td>' + p.fours + '</td>' +
+      '<td>' + p.sixes + '</td>' +
+      '<td>' + p.fifties + '</td>' +
+    '</tr>';
+  }).join('');
+  el.innerHTML = '<div class="stats-table-wrap">' +
+    '<table class="stats-table">' +
+    '<thead><tr>' +
+      '<th>Player</th><th>M</th><th>Inn</th><th>Runs</th>' +
+      '<th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table></div>';
 });
 </script>
 </body>
