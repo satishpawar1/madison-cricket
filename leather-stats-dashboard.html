@@ -22,7 +22,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
 
 .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-.slbl { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: .06em; }
 
 .pill-nav { display: flex; gap: 4px; }
 .pill-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #E5E7EB; background: #fff; color: #6B7280; cursor: pointer; font-weight: 500; -webkit-tap-highlight-color: transparent; }
@@ -30,8 +29,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
 table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; background: #fff; }
-th { background: #FFF5F5; padding: 9px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #FEE2E2; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+th { background: #FFF5F5; padding: 9px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #FEE2E2; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
 th.pcol { text-align: left; }
+th.sortable { cursor: pointer; user-select: none; -webkit-user-select: none; }
+th.sortable:hover { color: #9B1C1C; background: #FEE2E2; }
+th.sort-active { color: #9B1C1C; }
+.sort-icon { margin-left: 3px; font-size: 9px; opacity: 0.5; }
+th.sort-active .sort-icon { opacity: 1; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #F9FAFB; }
 td.pcol { text-align: left; font-weight: 600; }
 tr:last-child td { border-bottom: none; }
@@ -80,6 +84,39 @@ tr:last-child td { border-bottom: none; }
 var activeYear = '2025';
 var activeStat = 'batting';
 
+// sort state: col key + direction ('asc'/'desc')
+var batSort  = { col: 'runs',    dir: 'desc' };
+var bowlSort = { col: 'wickets', dir: 'desc' };
+
+// columns that default to ascending when first clicked (lower = better or alphabetical)
+var ascDefaultCols = { name: true, average: true, economy: true, strikeRate_bowl: true };
+
+// ── batting column definitions ────────────────────────────────────────────────
+var BAT_COLS = [
+  { key: 'name',       label: 'Player',  cls: 'pcol' },
+  { key: 'matches',    label: 'M' },
+  { key: 'innings',    label: 'Inn' },
+  { key: 'runs',       label: 'Runs',    cls: 'hl' },
+  { key: 'highestNum', label: 'HS' },
+  { key: 'average',    label: 'Avg',     cls: 'ca', fmt: function(v) { return v ? v.toFixed(1) : '-'; } },
+  { key: 'strikeRate', label: 'SR',      cls: 'cs', fmt: function(v) { return v ? v.toFixed(1) : '-'; } },
+  { key: 'fours',      label: '4s' },
+  { key: 'sixes',      label: '6s' },
+  { key: 'fifties',    label: '50s' },
+];
+
+// ── bowling column definitions ────────────────────────────────────────────────
+var BOWL_COLS = [
+  { key: 'name',        label: 'Player',  cls: 'pcol' },
+  { key: 'matches',     label: 'M' },
+  { key: 'oversFloat',  label: 'Ov' },
+  { key: 'wickets',     label: 'Wkts',   cls: 'hl' },
+  { key: 'bestSort',    label: 'Best' },
+  { key: 'average',     label: 'Avg',    cls: 'ca', fmt: function(v) { return v ? v.toFixed(2) : '-'; } },
+  { key: 'economy',     label: 'Econ',   cls: 'cs', fmt: function(v) { return v ? v.toFixed(2) : '-'; } },
+  { key: 'strikeRate',  label: 'SR',               fmt: function(v) { return v ? v.toFixed(1) : '-'; } },
+];
+
 function setYear(year, btn) {
   activeYear = year;
   document.querySelectorAll('#yearNav .pill-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -97,41 +134,65 @@ function setStat(stat, btn) {
   document.getElementById('bowlingWrap').style.display = stat === 'bowling' ? '' : 'none';
 }
 
+function sortOn(type, col) {
+  var s = type === 'bat' ? batSort : bowlSort;
+  if (s.col === col) {
+    s.dir = s.dir === 'desc' ? 'asc' : 'desc';
+  } else {
+    s.col = col;
+    // avg/economy/SR lower is better → default asc; everything else → default desc
+    s.dir = (col === 'average' || col === 'economy' || col === 'strikeRate' || col === 'name') ? 'asc' : 'desc';
+  }
+  render();
+}
+
+function applySort(players, sortState, type) {
+  var col = sortState.col;
+  var dir = sortState.dir;
+  return players.slice().sort(function(a, b) {
+    var av = a[col], bv = b[col];
+    // null/undefined always to bottom regardless of direction
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    var cmp = (typeof av === 'string') ? av.localeCompare(bv) : av - bv;
+    return dir === 'desc' ? -cmp : cmp;
+  });
+}
+
+function sortIcon(sortState, col) {
+  if (sortState.col !== col) return '<span class="sort-icon">⇅</span>';
+  return '<span class="sort-icon">' + (sortState.dir === 'desc' ? '▼' : '▲') + '</span>';
+}
+
+// ── helpers ───────────────────────────────────────────────────────────────────
 function getOversFloat(overs) {
   var s = String(overs || '0');
   var parts = s.split('.');
-  var full = parseInt(parts[0]) || 0;
-  var balls = parseInt(parts[1]) || 0;
-  return full + balls / 6;
+  return (parseInt(parts[0]) || 0) + (parseInt(parts[1]) || 0) / 6;
 }
 
 function oversToString(totalBalls) {
-  var overs = Math.floor(totalBalls / 6);
-  var balls = totalBalls % 6;
-  return balls > 0 ? overs + '.' + balls : String(overs);
+  var ov = Math.floor(totalBalls / 6), bl = totalBalls % 6;
+  return bl > 0 ? ov + '.' + bl : String(ov);
 }
 
+function hsNum(v) { return parseInt(String(v || '0').replace('*', '')) || 0; }
+
+// ── aggregate ────────────────────────────────────────────────────────────────
 function aggregateBatting(rows2024, rows2025) {
   var map = {};
   function add(row, year) {
     var key = row.name;
-    if (!map[key]) {
-      map[key] = { name: row.name, team: row.team, matches: 0, innings: 0, notOuts: 0,
-        runs: 0, balls: 0, highest: '0', highestNum: 0, hundreds: 0, fifties: 0,
-        sixes: 0, fours: 0, years: [] };
-    }
+    if (!map[key]) map[key] = { name: row.name, team: row.team, matches: 0, innings: 0, notOuts: 0,
+      runs: 0, balls: 0, highest: '0', highestNum: 0, hundreds: 0, fifties: 0, sixes: 0, fours: 0, years: [] };
     var p = map[key];
-    p.matches  += row.matches  || 0;
-    p.innings  += row.innings  || 0;
-    p.notOuts  += row.notOuts  || 0;
-    p.runs     += row.runs     || 0;
-    p.balls    += row.balls    || 0;
-    p.hundreds += row.hundreds || 0;
-    p.fifties  += row.fifties  || 0;
-    p.sixes    += row.sixes    || 0;
-    p.fours    += row.fours    || 0;
-    var hsNum = parseInt(String(row.highest).replace('*','')) || 0;
-    if (hsNum > p.highestNum) { p.highestNum = hsNum; p.highest = row.highest || '0'; }
+    p.matches += row.matches || 0; p.innings += row.innings || 0; p.notOuts += row.notOuts || 0;
+    p.runs += row.runs || 0; p.balls += row.balls || 0;
+    p.hundreds += row.hundreds || 0; p.fifties += row.fifties || 0;
+    p.sixes += row.sixes || 0; p.fours += row.fours || 0;
+    var n = hsNum(row.highest);
+    if (n > p.highestNum) { p.highestNum = n; p.highest = row.highest || '0'; }
     if (p.years.indexOf(year) < 0) p.years.push(year);
   }
   (rows2024 || []).forEach(function(r) { add(r, '2024'); });
@@ -141,35 +202,25 @@ function aggregateBatting(rows2024, rows2025) {
     p.average    = outs > 0 ? parseFloat((p.runs / outs).toFixed(2)) : (p.runs > 0 ? p.runs : 0);
     p.strikeRate = p.balls > 0 ? parseFloat((p.runs / p.balls * 100).toFixed(2)) : 0;
     return p;
-  }).sort(function(a, b) { return b.runs - a.runs; });
+  });
 }
 
 function aggregateBowling(rows2024, rows2025) {
   var map = {};
   function add(row, year) {
     var key = row.name;
-    if (!map[key]) {
-      map[key] = { name: row.name, team: row.team, matches: 0, innings: 0,
-        totalBalls: 0, runs: 0, wickets: 0, maidens: 0,
-        bestWkts: 0, bestRuns: 999, bestFigures: '-',
-        hattricks: 0, fourWickets: 0, fiveWickets: 0, years: [] };
-    }
+    if (!map[key]) map[key] = { name: row.name, team: row.team, matches: 0, innings: 0,
+      totalBalls: 0, runs: 0, wickets: 0, maidens: 0,
+      bestWkts: 0, bestRuns: 999, bestFigures: '-',
+      hattricks: 0, fourWickets: 0, fiveWickets: 0, years: [] };
     var p = map[key];
-    p.matches   += row.matches   || 0;
-    p.innings   += row.innings   || 0;
+    p.matches += row.matches || 0; p.innings += row.innings || 0;
     p.totalBalls += Math.round(getOversFloat(row.overs) * 6);
-    p.runs      += row.runs      || 0;
-    p.wickets   += row.wickets   || 0;
-    p.maidens   += row.maidens   || 0;
-    p.hattricks  += row.hattricks  || 0;
-    p.fourWickets += row.fourWickets || 0;
-    p.fiveWickets += row.fiveWickets || 0;
-    // best figures: higher wickets wins; on tie, lower runs wins
-    var bf = String(row.bestFigures || '');
-    var parts = bf.split('/');
+    p.runs += row.runs || 0; p.wickets += row.wickets || 0; p.maidens += row.maidens || 0;
+    p.hattricks += row.hattricks || 0; p.fourWickets += row.fourWickets || 0; p.fiveWickets += row.fiveWickets || 0;
+    var bf = String(row.bestFigures || ''), parts = bf.split('/');
     if (parts.length === 2) {
-      var bw = parseInt(parts[0]) || 0;
-      var br = parseInt(parts[1]) || 0;
+      var bw = parseInt(parts[0]) || 0, br = parseInt(parts[1]) || 0;
       if (bw > p.bestWkts || (bw === p.bestWkts && br < p.bestRuns)) {
         p.bestWkts = bw; p.bestRuns = br; p.bestFigures = bf;
       }
@@ -180,90 +231,142 @@ function aggregateBowling(rows2024, rows2025) {
   (rows2025 || []).forEach(function(r) { add(r, '2025'); });
   return Object.values(map).map(function(p) {
     p.overs      = oversToString(p.totalBalls);
+    p.oversFloat = p.totalBalls / 6;
+    p.bestSort   = p.bestWkts * 1000 - p.bestRuns; // higher = better, for sort
     p.economy    = p.totalBalls > 0 ? parseFloat((p.runs / (p.totalBalls / 6)).toFixed(2)) : null;
     p.average    = p.wickets   > 0 ? parseFloat((p.runs / p.wickets).toFixed(2)) : null;
     p.strikeRate = p.wickets   > 0 ? parseFloat((p.totalBalls / p.wickets).toFixed(1)) : null;
     return p;
-  }).sort(function(a, b) { return b.wickets - a.wickets; });
+  });
 }
 
+function enrichBatting(rows) {
+  return rows.map(function(p) {
+    var r = Object.assign({}, p);
+    r.highestNum = hsNum(r.highest);
+    return r;
+  });
+}
+
+function enrichBowling(rows) {
+  return rows.map(function(p) {
+    var r = Object.assign({}, p);
+    r.oversFloat = getOversFloat(r.overs);
+    var bf = String(r.bestFigures || ''), parts = bf.split('/');
+    r.bestSort = parts.length === 2 ? (parseInt(parts[0]) || 0) * 1000 - (parseInt(parts[1]) || 999) : 0;
+    return r;
+  });
+}
+
+// ── table renderers ───────────────────────────────────────────────────────────
 function battingTable(players, showYear) {
-  var h = '<table><thead><tr>'
-    + '<th class="pcol">Player</th>'
-    + (showYear ? '<th>Yrs</th>' : '')
-    + '<th>M</th><th>Inn</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>'
-    + '</tr></thead><tbody>';
-  if (players.length) {
-    players.forEach(function(p, i) {
-      h += '<tr>'
-        + '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
-        + (showYear ? '<td>' + (p.years || []).map(function(y) { return '<span class="year-badge y'+y+'">'+y+'</span>'; }).join('') + '</td>' : '')
-        + '<td>' + p.matches + '</td>'
-        + '<td>' + p.innings + '</td>'
-        + '<td class="hl">' + p.runs + '</td>'
-        + '<td>' + (p.highest || '-') + '</td>'
-        + '<td class="ca">' + (p.average ? (typeof p.average === 'number' ? p.average.toFixed(1) : p.average) : '-') + '</td>'
-        + '<td class="cs">' + (p.strikeRate ? (typeof p.strikeRate === 'number' ? p.strikeRate.toFixed(1) : p.strikeRate) : '-') + '</td>'
-        + '<td>' + (p.fours || 0) + '</td>'
-        + '<td>' + (p.sixes || 0) + '</td>'
-        + '<td>' + (p.fifties || 0) + '</td>'
-        + '</tr>';
+  var sorted = applySort(players, batSort, 'bat');
+  var cols = showYear
+    ? [BAT_COLS[0], { key: 'years', label: 'Yrs', noSort: true }].concat(BAT_COLS.slice(1))
+    : BAT_COLS;
+
+  var h = '<table><thead><tr>';
+  cols.forEach(function(c) {
+    var active = !c.noSort && batSort.col === c.key ? ' sort-active' : '';
+    var sortable = c.noSort ? '' : ' sortable';
+    var click = c.noSort ? '' : ' onclick="sortOn(\'bat\',\'' + c.key + '\')"';
+    var thCls = (c.cls === 'pcol' ? ' pcol' : '') + active + sortable;
+    h += '<th class="' + thCls.trim() + '"' + click + '>'
+      + c.label + (c.noSort ? '' : sortIcon(batSort, c.key)) + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  if (sorted.length) {
+    sorted.forEach(function(p, i) {
+      h += '<tr>';
+      cols.forEach(function(c) {
+        var tdCls = c.cls || '';
+        if (c.key === 'name') {
+          h += '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>';
+        } else if (c.key === 'years') {
+          h += '<td>' + (p.years || []).map(function(y) {
+            return '<span class="year-badge y'+y+'">'+y+'</span>';
+          }).join('') + '</td>';
+        } else if (c.key === 'highestNum') {
+          h += '<td>' + (p.highest || '-') + '</td>';
+        } else if (c.fmt) {
+          h += '<td' + (tdCls ? ' class="'+tdCls+'"' : '') + '>' + c.fmt(p[c.key]) + '</td>';
+        } else {
+          h += '<td' + (tdCls ? ' class="'+tdCls+'"' : '') + '>' + (p[c.key] != null ? p[c.key] : '-') + '</td>';
+        }
+      });
+      h += '</tr>';
     });
   } else {
-    h += '<tr><td colspan="' + (showYear ? 11 : 10) + '" style="text-align:center;color:#9CA3AF;padding:20px">No batting data available</td></tr>';
+    h += '<tr><td colspan="' + cols.length + '" style="text-align:center;color:#9CA3AF;padding:20px">No batting data available</td></tr>';
   }
   return h + '</tbody></table>';
 }
 
 function bowlingTable(players, showYear) {
-  var h = '<table><thead><tr>'
-    + '<th class="pcol">Player</th>'
-    + (showYear ? '<th>Yrs</th>' : '')
-    + '<th>M</th><th>Ov</th><th>Wkts</th><th>Best</th><th>Avg</th><th>Econ</th><th>SR</th>'
-    + '</tr></thead><tbody>';
-  if (players.length) {
-    players.forEach(function(p, i) {
-      h += '<tr>'
-        + '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
-        + (showYear ? '<td>' + (p.years || []).map(function(y) { return '<span class="year-badge y'+y+'">'+y+'</span>'; }).join('') + '</td>' : '')
-        + '<td>' + p.matches + '</td>'
-        + '<td>' + p.overs + '</td>'
-        + '<td class="hl">' + p.wickets + '</td>'
-        + '<td>' + (p.bestFigures || '-') + '</td>'
-        + '<td class="ca">' + (p.average ? p.average.toFixed(2) : '-') + '</td>'
-        + '<td class="cs">' + (p.economy ? p.economy.toFixed(2) : '-') + '</td>'
-        + '<td>' + (p.strikeRate ? p.strikeRate.toFixed(1) : '-') + '</td>'
-        + '</tr>';
+  var sorted = applySort(players, bowlSort, 'bowl');
+  var cols = showYear
+    ? [BOWL_COLS[0], { key: 'years', label: 'Yrs', noSort: true }].concat(BOWL_COLS.slice(1))
+    : BOWL_COLS;
+
+  var h = '<table><thead><tr>';
+  cols.forEach(function(c) {
+    var active = !c.noSort && bowlSort.col === c.key ? ' sort-active' : '';
+    var sortable = c.noSort ? '' : ' sortable';
+    var click = c.noSort ? '' : ' onclick="sortOn(\'bowl\',\'' + c.key + '\')"';
+    var thCls = (c.cls === 'pcol' ? ' pcol' : '') + active + sortable;
+    h += '<th class="' + thCls.trim() + '"' + click + '>'
+      + c.label + (c.noSort ? '' : sortIcon(bowlSort, c.key)) + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  if (sorted.length) {
+    sorted.forEach(function(p, i) {
+      h += '<tr>';
+      cols.forEach(function(c) {
+        var tdCls = c.cls || '';
+        if (c.key === 'name') {
+          h += '<td class="pcol">' + (i+1) + '. ' + p.name + '</td>';
+        } else if (c.key === 'years') {
+          h += '<td>' + (p.years || []).map(function(y) {
+            return '<span class="year-badge y'+y+'">'+y+'</span>';
+          }).join('') + '</td>';
+        } else if (c.key === 'oversFloat') {
+          h += '<td>' + p.overs + '</td>';
+        } else if (c.key === 'bestSort') {
+          h += '<td>' + (p.bestFigures || '-') + '</td>';
+        } else if (c.fmt) {
+          h += '<td' + (tdCls ? ' class="'+tdCls+'"' : '') + '>' + c.fmt(p[c.key]) + '</td>';
+        } else {
+          h += '<td' + (tdCls ? ' class="'+tdCls+'"' : '') + '>' + (p[c.key] != null ? p[c.key] : '-') + '</td>';
+        }
+      });
+      h += '</tr>';
     });
   } else {
-    h += '<tr><td colspan="' + (showYear ? 9 : 8) + '" style="text-align:center;color:#9CA3AF;padding:20px">No bowling data available</td></tr>';
+    h += '<tr><td colspan="' + cols.length + '" style="text-align:center;color:#9CA3AF;padding:20px">No bowling data available</td></tr>';
   }
   return h + '</tbody></table>';
 }
 
+// ── main render ───────────────────────────────────────────────────────────────
 function render() {
   var tigers = function(p) { return p.team && p.team.includes('Tigers'); };
-  var d2025 = (LEATHER_STATS.t20_2025 || {});
-  var d2024 = (LEATHER_STATS.t20_2024 || {});
+  var d2025 = LEATHER_STATS.t20_2025 || {};
+  var d2024 = LEATHER_STATS.t20_2024 || {};
 
   var bat, bowl, showYear;
   if (activeYear === '2025') {
-    bat  = (d2025.batting  || []).filter(tigers);
-    bowl = (d2025.bowling  || []).filter(tigers);
+    bat  = enrichBatting((d2025.batting  || []).filter(tigers));
+    bowl = enrichBowling((d2025.bowling  || []).filter(tigers));
     showYear = false;
   } else if (activeYear === '2024') {
-    bat  = (d2024.batting  || []).filter(tigers);
-    bowl = (d2024.bowling  || []).filter(tigers);
+    bat  = enrichBatting((d2024.batting  || []).filter(tigers));
+    bowl = enrichBowling((d2024.bowling  || []).filter(tigers));
     showYear = false;
   } else {
-    bat  = aggregateBatting(
-      (d2024.batting  || []).filter(tigers),
-      (d2025.batting  || []).filter(tigers)
-    );
-    bowl = aggregateBowling(
-      (d2024.bowling  || []).filter(tigers),
-      (d2025.bowling  || []).filter(tigers)
-    );
+    bat  = aggregateBatting((d2024.batting || []).filter(tigers), (d2025.batting || []).filter(tigers));
+    bowl = aggregateBowling((d2024.bowling || []).filter(tigers), (d2025.bowling || []).filter(tigers));
     showYear = true;
   }
 
