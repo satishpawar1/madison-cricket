@@ -193,7 +193,7 @@ function _rc(i) { return i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''; 
 
 /* ── Batting ── */
 function _batCols() {
-  var cols = [['#',''],['Player','name']];
+  var cols = [['#',''],['Lgue #','leagueBatRank'],['Player','name']];
   if (_showTeam()) cols.push(['Team','team']);
   cols = cols.concat([
     ['Mat','matches'],['Inns','innings'],['Runs','runs'],
@@ -214,6 +214,7 @@ function _batRows(data) {
   return data.map(function(p, i) {
     return '<tr>'
       + '<td><span class="rank-num ' + _rc(i) + '">' + (i+1) + '</span></td>'
+      + '<td style="color:#6B7280;font-size:11px;text-align:center">' + (p.leagueBatRank ? '#' + p.leagueBatRank : '-') + '</td>'
       + '<td class="col-player">' + p.name + '</td>'
       + (_showTeam() ? '<td class="col-player" style="font-size:11px;color:#6B7280;font-weight:400">' + (p.team||'') + '</td>' : '')
       + '<td>' + (p.matches||0) + '</td>'
@@ -232,7 +233,7 @@ function _batRows(data) {
 
 /* ── Bowling ── */
 function _bowlCols() {
-  var cols = [['#',''],['Player','name']];
+  var cols = [['#',''],['Lgue #','leagueBowlRank'],['Player','name']];
   if (_showTeam()) cols.push(['Team','team']);
   cols = cols.concat([
     ['Mat','matches'],['Inns','innings'],['Overs','overs'],['Ovrs/Inn','ovrsPerInn'],
@@ -254,6 +255,7 @@ function _bowlRows(data) {
       ? (_ovrsToDecimal(p.overs) / p.innings / 6).toFixed(1) : '-';
     return '<tr>'
       + '<td><span class="rank-num ' + _rc(i) + '">' + (i+1) + '</span></td>'
+      + '<td style="color:#6B7280;font-size:11px;text-align:center">' + (p.leagueBowlRank ? '#' + p.leagueBowlRank : '-') + '</td>'
       + '<td class="col-player">' + p.name + '</td>'
       + (_showTeam() ? '<td class="col-player" style="font-size:11px;color:#6B7280;font-weight:400">' + (p.team||'') + '</td>' : '')
       + '<td>' + (p.matches||0) + '</td>'
@@ -303,13 +305,13 @@ function _ptsRows(data) {
 
 /* ── Sort handlers ── */
 function sortBat(key) {
-  if (_batSort.key === key) _batSort.dir *= -1; else { _batSort.key = key; _batSort.dir = -1; }
+  if (_batSort.key === key) _batSort.dir *= -1; else { _batSort.key = key; _batSort.dir = key === 'leagueBatRank' ? 1 : -1; }
   var el = document.getElementById('leaderboard');
   el.querySelector('thead tr').innerHTML = _batHeaders(_batSort.key, _batSort.dir);
   el.querySelector('tbody').innerHTML = _batRows(_sortData(_batData, key, _batSort.dir));
 }
 function sortBowl(key) {
-  if (_bowlSort.key === key) _bowlSort.dir *= -1; else { _bowlSort.key = key; _bowlSort.dir = -1; }
+  if (_bowlSort.key === key) _bowlSort.dir *= -1; else { _bowlSort.key = key; _bowlSort.dir = key === 'leagueBowlRank' ? 1 : -1; }
   var el = document.getElementById('leaderboard');
   el.querySelector('thead tr').innerHTML = _bowlHeaders(_bowlSort.key, _bowlSort.dir);
   el.querySelector('tbody').innerHTML = _bowlRows(_sortData(_bowlData, key, _bowlSort.dir));

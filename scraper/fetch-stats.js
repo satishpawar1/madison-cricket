@@ -672,6 +672,18 @@ async function fetchStats() {
   const standings2025   = parse2025Standings(standings2025Tables);
   console.log(`  standings2025: ${standings2025.length} teams`);
 
+  // ── League-wide 2026 ranks (all teams in batting/bowling arrays) ──
+  const allBatSorted = [...batting].sort((a, b) => (b.runs || 0) - (a.runs || 0));
+  const batRankByName = {};
+  allBatSorted.forEach((p, i) => { batRankByName[p.name] = i + 1; });
+
+  const allBowlSorted = [...bowling].sort((a, b) => (b.wickets || 0) - (a.wickets || 0));
+  const bowlRankByName = {};
+  allBowlSorted.forEach((p, i) => { bowlRankByName[p.name] = i + 1; });
+
+  const withBatRank  = (arr) => arr.map(p => ({ ...p, leagueBatRank:  batRankByName[p.name]  || null }));
+  const withBowlRank = (arr) => arr.map(p => ({ ...p, leagueBowlRank: bowlRankByName[p.name] || null }));
+
   // ── Scrape per-game bowling extras from individual scorecards ──
   console.log('\n=== Bowling Extras (per game scorecard scraping) ===');
   const matchesUrl = `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`;
@@ -771,16 +783,16 @@ async function fetchStats() {
     lastUpdated: new Date().toISOString(),
     lions: {
       rankings: filterTeam(rankings, 'Lions'),
-      batting:  lionsBatters2026,
-      bowling:  lionsBosters2026,
+      batting:  withBatRank(lionsBatters2026),
+      bowling:  withBowlRank(lionsBosters2026),
       batting2025: lionsBatting2025,
       bowling2025: lionsBowling2025,
       bowlingGames: lionsExtrasGames,
     },
     tigers: {
       rankings: filterTeam(rankings, 'Tigers'),
-      batting:  tigersBatters2026,
-      bowling:  tigersBosters2026,
+      batting:  withBatRank(tigersBatters2026),
+      bowling:  withBowlRank(tigersBosters2026),
       batting2025: tigersBatting2025,
       bowling2025: tigersBowling2025,
       bowlingGames: tigersExtrasGames,
