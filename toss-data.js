@@ -2,6 +2,78 @@
 // Contains toss results for all 2026 Tape 20 league matches
 var TOSS_DATA = [
   {
+    "matchId": "1820",
+    "date": "2026-05-17",
+    "team1": "MCA",
+    "team2": "Madison Lions",
+    "resultText": null,
+    "tossWinner": "MCA",
+    "electedTo": "bat",
+    "tossText": "MCA won the toss and elected to bat",
+    "playerOfMatch": "Mahesh Vaigunde",
+    "topScorer": null
+  },
+  {
+    "matchId": "1819",
+    "date": "2026-05-17",
+    "team1": "Star Strikers",
+    "team2": "Cool Springs Titans",
+    "resultText": null,
+    "tossWinner": "Star Strikers",
+    "electedTo": "bat",
+    "tossText": "Star Strikers won the toss and elected to bat",
+    "playerOfMatch": "Abhilash Reddy Kallepu",
+    "topScorer": null
+  },
+  {
+    "matchId": "1818",
+    "date": "2026-05-17",
+    "team1": "Game Swingers",
+    "team2": "FSC Raptors",
+    "resultText": null,
+    "tossWinner": "Game Swingers",
+    "electedTo": "bat",
+    "tossText": "Game Swingers won the toss and elected to bat",
+    "playerOfMatch": "Venkatesh Sethuraman",
+    "topScorer": null
+  },
+  {
+    "matchId": "1817",
+    "date": "2026-05-17",
+    "team1": "Shoals Strikers",
+    "team2": "Nashville Underdogs",
+    "resultText": null,
+    "tossWinner": "Shoals Strikers",
+    "electedTo": "bat",
+    "tossText": "Shoals Strikers won the toss and elected to bat",
+    "playerOfMatch": null,
+    "topScorer": null
+  },
+  {
+    "matchId": "1816",
+    "date": "2026-05-17",
+    "team1": "Franklin Falcons",
+    "team2": "Fearless Raiders",
+    "resultText": null,
+    "tossWinner": "Franklin Falcons",
+    "electedTo": "bat",
+    "tossText": "Franklin Falcons won the toss and elected to bat",
+    "playerOfMatch": "Kishore K",
+    "topScorer": null
+  },
+  {
+    "matchId": "1815",
+    "date": "2026-05-17",
+    "team1": "Great Marathas",
+    "team2": "Fearless Fighters",
+    "resultText": null,
+    "tossWinner": "Great Marathas",
+    "electedTo": "bat",
+    "tossText": "Great Marathas won the toss and elected to bat",
+    "playerOfMatch": "Dhiraj Chaudhari",
+    "topScorer": null
+  },
+  {
     "matchId": "1811",
     "date": "2026-05-10",
     "team1": "Franklin Falcons",
