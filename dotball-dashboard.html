@@ -371,6 +371,15 @@ function renderTeam(team) {
     });
   });
 
+  // Sort descending by date using MCC_CONFIG schedule
+  var configGames = (MCC_CONFIG[team] && MCC_CONFIG[team].games) || [];
+  var dateMap = {};
+  configGames.forEach(function(cg) { dateMap[cg.name] = cg.gameDate || ''; });
+  games = games.slice().sort(function(a, b) {
+    var da = dateMap[a.game] || '', db = dateMap[b.game] || '';
+    return db < da ? -1 : db > da ? 1 : 0;
+  });
+
   gamesContainer.innerHTML = games.map(function(g) {
     var gamePlayers = (g.players || []).filter(function(p) { return (p.dots || 0) > 0; });
     var total = gamePlayers.reduce(function(sum, p) { return sum + p.dots; }, 0);
@@ -407,7 +416,7 @@ function renderTeam(team) {
 
     return '<div class="game-card">'
       + '<div class="game-card-header">'
-      + '<span class="game-card-title">' + (g.game || 'Game') + '</span>'
+      + '<span class="game-card-title">Polyplex Red Dot Balls vs ' + (g.game || 'Game') + '</span>'
       + '<span class="game-card-meta">' + total + ' total dots</span>'
       + '</div>'
       + '<div class="game-summary-strip">'
