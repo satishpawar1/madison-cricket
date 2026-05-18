@@ -130,7 +130,7 @@ function renderTeamSection(label, emoji, color, data) {
   const dateStr  = gameDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   let tossLine = '';
-  if (toss) {
+  if (toss && toss.tossWinner) {
     const winner = toss.tossWinner.replace('Madison Lions', 'Lions').replace('Madison Tigers', 'Tigers');
     tossLine = `<div class="info-row"><span class="info-label">Toss</span><span>${winner} won, elected to ${capitalize(toss.electedTo)}</span></div>`;
     if (toss.playerOfMatch) {

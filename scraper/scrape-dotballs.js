@@ -15,6 +15,8 @@ const LIONS_MATCHES = [
   { game: 'Rockvale Risers',     matchId: 1742, battingTeam: 'Madison Lions' },
   // Fearless Fighters (1771) was a walkover — no batting data
   { game: 'Cool Springs Titans', matchId: 1796, battingTeam: 'Madison Lions' },
+  // Franklin Falcons (1811) was a forfeit win — no batting data
+  { game: 'MCA',                 matchId: 1820, battingTeam: 'Madison Lions' },
 ];
 
 const TIGERS_MATCHES = [
