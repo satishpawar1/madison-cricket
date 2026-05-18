@@ -242,7 +242,7 @@ function fetchTeam(team, teamLabel, games) {
     var gd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
     gd.setHours(0,0,0,0);
     return today > gd;
-  });
+  }).sort(function(a, b) { return b.gameDate.localeCompare(a.gameDate); });
 
   if (!pastGames.length) {
     _data[team] = [];
@@ -275,8 +275,8 @@ function finishTeam(team, pastGames, results) {
   results.sort(function(a, b) {
     var ai = 999, bi = 999;
     for (var i = 0; i < pastGames.length; i++) {
-      if (pastGames[i].gameName === a.gameName) ai = i;
-      if (pastGames[i].gameName === b.gameName) bi = i;
+      if (pastGames[i].name === a.gameName) ai = i;
+      if (pastGames[i].name === b.gameName) bi = i;
     }
     return ai - bi;
   });
@@ -426,7 +426,7 @@ function renderTeam(team) {
 
     return '<div class="game-card">'
       + '<div class="game-card-header">'
-      + '<span class="game-card-title">vs ' + g.opponent + '</span>'
+      + '<span class="game-card-title">Catch Efficiency vs ' + g.opponent + '</span>'
       + '<span class="game-card-meta">' + totalTak + ' of ' + totalAtt + ' taken</span>'
       + '</div>'
       + '<div class="game-summary-strip">'
