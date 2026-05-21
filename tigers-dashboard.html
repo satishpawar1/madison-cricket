@@ -88,6 +88,13 @@ function renderCricStats() {
     (data.rankings || []).concat(data[statKey] || []).forEach(function(p) {
       if (!seen[p.name]) { seen[p.name] = true; names.push(p.name); }
     });
+    var roster = (typeof MCC_CONFIG !== 'undefined' && MCC_CONFIG.tigers && MCC_CONFIG.tigers.players) || [];
+    roster.forEach(function(configName) {
+      var fw = configName.replace(/[^a-zA-Z]/g, ' ').trim().split(/\s+/)[0].toLowerCase();
+      if (!fw) return;
+      var covered = names.some(function(n) { return n.toLowerCase().startsWith(fw); });
+      if (!covered) names.push(configName);
+    });
     return names.map(function(n) { return byName[n] || { name: n }; });
   }
 

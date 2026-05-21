@@ -16,7 +16,7 @@ const MCC_CONFIG = {
     players: [
       'Sunny(W) \u00a9', 'Chinmay', 'Hardik', 'Manish', 'Mahesh',
       'Mayur R', 'Nikunj', 'Kirtan', 'Satish', 'Ravi',
-      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth'
+      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen'
     ],
     games: [
       { name: 'FSC',                opponent: 'FSC',                cricclubsTeam: 'FSC Raptors',   day: 'Sunday',   date: 'March 1st',     time: '9:30 AM',  warmup: '8:30 AM',  ground: 'FCF2', gameDate: '2026-03-01' },
