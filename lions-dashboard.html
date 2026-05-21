@@ -80,17 +80,28 @@ function renderCricStats() {
   }
   var data = CRICCLUBS_STATS.lions;
 
+  function mergedPlayers(statKey) {
+    var byName = {};
+    (data[statKey] || []).forEach(function(p) { byName[p.name] = p; });
+    var seen = {}, names = [];
+    (data.rankings || []).concat(data[statKey] || []).forEach(function(p) {
+      if (!seen[p.name]) { seen[p.name] = true; names.push(p.name); }
+    });
+    return names.map(function(n) { return byName[n] || { name: n }; });
+  }
+
   var bh = '<table><thead><tr>'
     + '<th class="pcol">Player</th><th>M</th><th>Inn</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>4s</th><th>6s</th><th>50s</th>'
     + '</tr></thead><tbody>';
-  if (data.batting && data.batting.length) {
-    data.batting.forEach(function(p, i) {
+  var batPlayers = mergedPlayers('batting');
+  if (batPlayers.length) {
+    batPlayers.forEach(function(p, i) {
       bh += '<tr><td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
-        + '<td>' + p.matches + '</td><td>' + p.innings + '</td>'
-        + '<td class="hl">' + p.runs + '</td>'
-        + '<td>' + (p.highest || '-') + '</td>'
-        + '<td class="ca">' + p.average + '</td>'
-        + '<td class="cs">' + p.strikeRate + '</td>'
+        + '<td>' + (p.matches||0) + '</td><td>' + (p.innings||0) + '</td>'
+        + '<td class="hl">' + (p.runs||0) + '</td>'
+        + '<td>' + (p.highest||'-') + '</td>'
+        + '<td class="ca">' + (p.average||'-') + '</td>'
+        + '<td class="cs">' + (p.strikeRate||'-') + '</td>'
         + '<td>' + (p.fours||0) + '</td><td>' + (p.sixes||0) + '</td><td>' + (p.fifties||0) + '</td></tr>';
     });
   } else {
@@ -101,11 +112,12 @@ function renderCricStats() {
   var bwh = '<table><thead><tr>'
     + '<th class="pcol">Player</th><th>M</th><th>Ov</th><th>Wkts</th><th>Runs</th><th>Best</th><th>Avg</th><th>Econ</th><th>SR</th>'
     + '</tr></thead><tbody>';
-  if (data.bowling && data.bowling.length) {
-    data.bowling.forEach(function(p, i) {
+  var bowlPlayers = mergedPlayers('bowling');
+  if (bowlPlayers.length) {
+    bowlPlayers.forEach(function(p, i) {
       bwh += '<tr><td class="pcol">' + (i+1) + '. ' + p.name + '</td>'
-        + '<td>' + p.matches + '</td><td>' + p.overs + '</td>'
-        + '<td class="hl">' + p.wickets + '</td>'
+        + '<td>' + (p.matches||0) + '</td><td>' + (p.overs||0) + '</td>'
+        + '<td class="hl">' + (p.wickets||0) + '</td>'
         + '<td>' + (p.runs||0) + '</td>'
         + '<td>' + (p.bestFigures||'-') + '</td>'
         + '<td class="ca">' + (p.average||'-') + '</td>'
