@@ -18,6 +18,9 @@ const MCC_CONFIG = {
       'Mayur R', 'Nikunj', 'Kirtan', 'Satish', 'Ravi',
       'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen'
     ],
+    playerOverrides: [
+      { name: 'Nikunj', innings: 1, balls: 5 }
+    ],
     games: [
       { name: 'FSC',                opponent: 'FSC',                cricclubsTeam: 'FSC Raptors',   day: 'Sunday',   date: 'March 1st',     time: '9:30 AM',  warmup: '8:30 AM',  ground: 'FCF2', gameDate: '2026-03-01' },
       { name: 'Great Maratha',      opponent: 'Great Maratha',      cricclubsTeam: 'Great Marathas',day: 'Sunday',   date: 'March 15th',    time: '1:00 PM',  warmup: '12:00 PM', ground: 'FCF2', gameDate: '2026-03-15' },
