@@ -16,7 +16,8 @@ const MCC_CONFIG = {
     players: [
       'Sunny(W) \u00a9', 'Chinmay', 'Hardik', 'Manish', 'Mahesh',
       'Mayur R', 'Nikunj', 'Kirtan', 'Satish', 'Ravi',
-      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen'
+      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen',
+      'Yash', 'Murali (sub)'
     ],
     playerOverrides: [
       { name: 'Nikunj', innings: 1, balls: 5 }
