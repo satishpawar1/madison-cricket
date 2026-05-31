@@ -19,7 +19,7 @@ const history = {
     {name:'Saurabh',         attempted:1, taken:1, dropped:0},
     {name:'Amit',            attempted:0, taken:0, dropped:0},
     {name:'KP',              attempted:0, taken:0, dropped:0},
-    {name:'Dyan (N)',        attempted:0, taken:0, dropped:0},
+    {name:'Dhyan (N)',        attempted:0, taken:0, dropped:0},
     {name:'Jeel',            attempted:0, taken:0, dropped:0},
     {name:'Gyan',            attempted:0, taken:0, dropped:0}
   ],
@@ -38,7 +38,7 @@ const history = {
     {name:'Saurabh',         attempted:0, taken:0, dropped:0},
     {name:'Amit',            attempted:1, taken:1, dropped:0},
     {name:'KP',              attempted:0, taken:0, dropped:0},
-    {name:'Dyan (N)',        attempted:1, taken:0, dropped:1},
+    {name:'Dhyan (N)',        attempted:1, taken:0, dropped:1},
     {name:'Jeel',            attempted:0, taken:0, dropped:0},
     {name:'Gyan',            attempted:1, taken:1, dropped:0}
   ]

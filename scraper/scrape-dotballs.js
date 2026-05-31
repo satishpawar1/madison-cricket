@@ -48,7 +48,7 @@ const LIONS_BBB_NAME_MAP = {
   'Saurabh S':   'Saurabh',
   'Amit K':      'Amit',
   'Siddharth T': 'Siddharth',
-  'Dyan P':      'Dyan (N)',
+  'Dhyan P':      'Dhyan (N)',
   'Jeel P':      'Jeel',
   'Gyan P':      'Gyan',
   // Sunny has different abbreviations depending on scorecard

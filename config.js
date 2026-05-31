@@ -16,7 +16,7 @@ const MCC_CONFIG = {
     players: [
       'Sunny(W) \u00a9', 'Chinmay', 'Hardik', 'Manish', 'Mahesh',
       'Mayur R', 'Nikunj', 'Kirtan', 'Satish', 'Ravi',
-      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen',
+      'Prakrut', 'Saurabh', 'Amit', 'KP', 'Dhyan (N)', 'Jeel', 'Gyan', 'Siddharth', 'Naveen',
       'Yash', 'Murali (sub)', 'Abhinav'
     ],
     playerOverrides: [
@@ -62,7 +62,7 @@ const MCC_CONFIG = {
       {name:'Saurabh',    att:1,  tak:1},
       {name:'Amit',       att:2,  tak:2},
       {name:'KP',         att:0,  tak:0},
-      {name:'Dyan (N)',   att:1,  tak:0},
+      {name:'Dhyan (N)',   att:1,  tak:0},
       {name:'Jeel',       att:0,  tak:0},
       {name:'Gyan',       att:1,  tak:1},
       {name:'Siddharth',  att:0,  tak:0}
@@ -83,7 +83,7 @@ const MCC_CONFIG = {
       {name:'Saurabh', att:1, tak:1},
       {name:'Amit', att:0, tak:0},
       {name:'KP', att:0, tak:0},
-      {name:'Dyan (N)', att:0, tak:0},
+      {name:'Dhyan (N)', att:0, tak:0},
       {name:'Jeel', att:0, tak:0},
       {name:'Gyan', att:0, tak:0}
     ],
@@ -102,7 +102,7 @@ const MCC_CONFIG = {
       {name:'Siddharth', att:0, tak:0},
       {name:'Amit', att:1, tak:1},
       {name:'KP', att:0, tak:0},
-      {name:'Dyan (N)', att:1, tak:0},
+      {name:'Dhyan (N)', att:1, tak:0},
       {name:'Jeel', att:0, tak:0},
       {name:'Gyan', att:1, tak:1}
     ],
@@ -121,7 +121,7 @@ const MCC_CONFIG = {
       {name:'Saurabh', att:0, tak:0},
       {name:'Amit', att:1, tak:1},
       {name:'KP', att:0, tak:0},
-      {name:'Dyan (N)', att:0, tak:0},
+      {name:'Dhyan (N)', att:0, tak:0},
       {name:'Jeel', att:0, tak:0},
       {name:'Gyan', att:0, tak:0},
       {name:'Siddharth', att:0, tak:0}
@@ -141,15 +141,15 @@ const MCC_CONFIG = {
       {name:'Saurabh', att:0, tak:0},
       {name:'Amit', att:0, tak:0},
       {name:'KP', att:0, tak:0},
-      {name:'Dyan (N)', att:0, tak:0},
+      {name:'Dhyan (N)', att:0, tak:0},
       {name:'Jeel', att:0, tak:0},
       {name:'Gyan', att:0, tak:0},
       {name:'Siddharth', att:0, tak:0}
     ]
     },
     preloaded: {
-      'FSC':          { av: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Prakrut','Saurabh','Amit','KP','Dyan (N)','Jeel'], sel: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Saurabh','Amit'] },
-      'Great Maratha':{ av: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Kirtan','Ravi','Amit','Dyan (N)','Gyan'], sel: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mayur R','Kirtan','Ravi','Amit','Dyan (N)','Gyan'] }
+      'FSC':          { av: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Prakrut','Saurabh','Amit','KP','Dhyan (N)','Jeel'], sel: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Nikunj','Kirtan','Satish','Ravi','Saurabh','Amit'] },
+      'Great Maratha':{ av: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mahesh','Mayur R','Kirtan','Ravi','Amit','Dhyan (N)','Gyan'], sel: ['Sunny(W) \u00a9','Chinmay','Hardik','Manish','Mayur R','Kirtan','Ravi','Amit','Dhyan (N)','Gyan'] }
     }
   },
 
