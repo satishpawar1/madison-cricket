@@ -118,10 +118,18 @@ const SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
 const TEAM = 'Lions';
 let catchData = MCC_CONFIG.lions.catchData || [];
 
+function normalizePlayer(p) {
+  return {
+    name: p.name,
+    att: p.att !== undefined ? +p.att : (p.attempted !== undefined ? +p.attempted : (p.caught !== undefined ? +p.caught : 0)),
+    tak: p.tak !== undefined ? +p.tak : (p.taken !== undefined ? +p.taken : (p.caught !== undefined ? +p.caught : 0))
+  };
+}
+
 function fetchData() {
   fetch(SCRIPT_URL+'?type=catches&team='+TEAM)
     .then(r=>r.json())
-    .then(d=>{ if(d.status==='ok'&&d.data&&d.data.length) catchData=d.data; showContent(); })
+    .then(d=>{ if(d.status==='ok'&&d.data&&d.data.length) catchData=d.data.map(normalizePlayer); showContent(); })
     .catch(()=>showContent());
 }
 
@@ -157,7 +165,7 @@ function fetchGameBreakdowns() {
   Promise.all(pastGames.map(function(g) {
     return fetch(SCRIPT_URL + '?type=catches&team=' + TEAM + '&game=' + encodeURIComponent(g.name))
       .then(function(r) { return r.json(); })
-      .then(function(d) { return { game: g, data: (d.status==='ok' && d.data && d.data.length) ? d.data : [] }; })
+      .then(function(d) { return { game: g, data: (d.status==='ok' && d.data && d.data.length) ? d.data.map(normalizePlayer) : [] }; })
       .catch(function() { return { game: g, data: [] }; });
   })).then(function(results) {
     var html = results.map(function(r) {
