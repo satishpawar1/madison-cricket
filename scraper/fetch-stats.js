@@ -697,8 +697,9 @@ async function fetchStats() {
   await browser.close().catch(() => {});
 
   if (!batting.length && !bowling.length) {
-    console.error('\nFailed to capture 2026 batting/bowling data.');
-    process.exit(1);
+    console.warn('\nWarning: 0 rows returned for 2026 batting/bowling — CricClubs may have changed its endpoint structure.');
+    console.warn('Keeping existing cricclubs-stats.js unchanged. Run explore-endpoints.js to investigate.');
+    process.exit(0);
   }
 
   const groupByTeam = (arr) => {
