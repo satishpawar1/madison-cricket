@@ -316,10 +316,11 @@ async function extractAllTables(page, url, minCols = 4) {
 // ── Column parsers ──
 
 function parseBatting(table) {
-  // Headers: "#", "Player", "Team", "Mat", "Inns", "NO", "Runs", "4's", "6's", "50's", "100's", "HS", "SR", "Avg", "Points"
+  // Headers from viewLeagueBatting.do:
+  // "#","Player","Team","Mat","Ins","No","Runs","Balls","Avg","Sr","Hs","100's","75's","50's","25's","0","6's","4's"
   if (!table) return [];
   return table.rows
-    .filter(r => r.length >= 9 && /^\d+$/.test(r[0]))
+    .filter(r => r.length >= 14 && /^\d+$/.test(r[0]))
     .map(r => ({
       name: r[1],
       team: r[2],
@@ -327,13 +328,13 @@ function parseBatting(table) {
       innings: +r[4] || 0,
       notOuts: +r[5] || 0,
       runs: +r[6] || 0,
-      fours: +r[7] || 0,
-      sixes: +r[8] || 0,
-      fifties: +r[9] || 0,
-      hundreds: +r[10] || 0,
-      highest: r[11] || '0',
-      strikeRate: parseFloat(r[12]) || 0,
-      average: parseFloat(r[13]) || 0,
+      fours: +r[17] || 0,
+      sixes: +r[16] || 0,
+      fifties: +r[13] || 0,
+      hundreds: +r[11] || 0,
+      highest: r[10] || '0',
+      strikeRate: parseFloat(r[9]) || 0,
+      average: parseFloat(r[8]) || 0,
     }))
     .sort((a, b) => b.runs - a.runs);
 }
@@ -626,11 +627,11 @@ async function fetchStats() {
   console.log('\n=== 2026 Season ===');
 
   const batting2026Table = await extractTable(page,
-    `${BASE}/battingRecords.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
+    `${BASE}/viewLeagueBatting.do?league=${LEAGUE_2026}&clubId=${CLUB}`, 8);
   console.log(`  batting: ${batting2026Table ? batting2026Table.rows.length : 0} rows`);
 
   const bowling2026Table = await extractTable(page,
-    `${BASE}/bowlingRecords.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
+    `${BASE}/viewLeagueBowling.do?league=${LEAGUE_2026}&clubId=${CLUB}`, 8);
   console.log(`  bowling: ${bowling2026Table ? bowling2026Table.rows.length : 0} rows`);
 
   const rankings2026Table = await extractTable(page,
