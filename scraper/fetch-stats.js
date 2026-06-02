@@ -89,7 +89,7 @@ function applyBowlingCorrections(bowlingArr, rankingsArr) {
 }
 
 // Old JSP interface league IDs:
-const LEAGUE_2026 = '28'; // 2026 - Tape 20
+const LEAGUE_2026 = '28'; // 2026 - Tape T20 (league=28); standings work, batting rows may be empty if CricClubs hasn't updated
 // 2025 Tape T20 tournament — uses viewLeagueBatting.do / viewLeagueBowling.do with league=17
 const LEAGUE_2025_T20 = '17';
 
@@ -626,23 +626,23 @@ async function fetchStats() {
   console.log('\n=== 2026 Season ===');
 
   const batting2026Table = await extractTable(page,
-    `${BASE}/battingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+    `${BASE}/battingRecords.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
   console.log(`  batting: ${batting2026Table ? batting2026Table.rows.length : 0} rows`);
 
   const bowling2026Table = await extractTable(page,
-    `${BASE}/bowlingRecords.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+    `${BASE}/bowlingRecords.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
   console.log(`  bowling: ${bowling2026Table ? bowling2026Table.rows.length : 0} rows`);
 
   const rankings2026Table = await extractTable(page,
-    `${BASE}/playerRankings.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+    `${BASE}/playerRankings.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
   console.log(`  rankings: ${rankings2026Table ? rankings2026Table.rows.length : 0} rows`);
 
   const standings2026Table = await extractTable(page,
-    `${BASE}/viewPointsTable.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`);
+    `${BASE}/viewPointsTable.do?clubId=${CLUB}&league=${LEAGUE_2026}`);
   console.log(`  standings: ${standings2026Table ? standings2026Table.rows.length : 0} rows`);
 
   const matches2026Table = await extractTable(page,
-    `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`, 7);
+    `${BASE}/listMatches.do?clubId=${CLUB}&league=${LEAGUE_2026}`, 7);
   console.log(`  matches: ${matches2026Table ? matches2026Table.rows.length : 0} rows`);
 
   // ── 2025 Tape T20 Tournament (league=17) — all-player lookup ──
@@ -686,7 +686,7 @@ async function fetchStats() {
 
   // ── Scrape per-game bowling extras from individual scorecards ──
   console.log('\n=== Bowling Extras (per game scorecard scraping) ===');
-  const matchesUrl = `${BASE}/listMatches.do?clubId=${CLUB}&leagueId=${LEAGUE_2026}`;
+  const matchesUrl = `${BASE}/listMatches.do?clubId=${CLUB}&league=${LEAGUE_2026}`;
   const lionsBowlerNames  = filterTeam(bowling, 'Lions').map(p => p.name);
   const tigersBowlerNames = filterTeam(bowling, 'Tigers').map(p => p.name);
   const lionsExtrasGames  = await fetchExtrasGames(page, matchesUrl, 'Lions',  lionsBowlerNames,  existingLionsExtras);
