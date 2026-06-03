@@ -168,7 +168,7 @@ var GAMES = CFG.t30Games || [];
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var activeGame = null;
 
-/* ── Embedded batting data: 2026 L-40 Nashville Cricket League ── */
+/* ── Embedded data: 2026 L-40 Nashville Cricket League ── */
 var DRAGONS_BATTING = [
   {name:'Anil Reddy Gudi',            mat:6,  inns:6, no:2, runs:311, fours:15, sixes:12, fifties:3, hundreds:0, hs:'97',  sr:'88.86',  avg:'77.75'},
   {name:'Venkata Sai Kamalammagari',  mat:7,  inns:6, no:2, runs:160, fours:10, sixes:6,  fifties:0, hundreds:0, hs:'45',  sr:'134.45', avg:'40.00'},
@@ -189,8 +189,27 @@ var DRAGONS_BATTING = [
   {name:'Nived Reddy',                mat:1,  inns:1, no:1, runs:1,   fours:0,  sixes:0,  fifties:0, hundreds:0, hs:'1',   sr:'100.00', avg:'--'},
 ];
 
+/* BBF in CSV is "runs/ wkts" — stored here as wkts/runs for display */
+var DRAGONS_BOWLING = [
+  {name:'Shashanka Donikeni',        mat:9, inns:8, overs:'47.2', runs:244, wkts:15, bbf:'4/44', econ:'5.15', avg:'16.27', wides:26, nb:3,  fw4:1, fw5:0},
+  {name:'Santosh Silla',             mat:7, inns:7, overs:'41.1', runs:216, wkts:11, bbf:'4/19', econ:'5.25', avg:'19.64', wides:25, nb:1,  fw4:2, fw5:0},
+  {name:'Venkata Sai Kamalammagari', mat:7, inns:7, overs:'40.0', runs:270, wkts:9,  bbf:'4/48', econ:'6.75', avg:'30.00', wides:20, nb:1,  fw4:1, fw5:0},
+  {name:'Nandagopal Ravulapally',    mat:7, inns:7, overs:'31.3', runs:181, wkts:8,  bbf:'2/23', econ:'5.75', avg:'22.62', wides:56, nb:2,  fw4:0, fw5:0},
+  {name:'Vivek Batham',              mat:8, inns:5, overs:'21.0', runs:121, wkts:8,  bbf:'3/31', econ:'5.76', avg:'15.12', wides:19, nb:2,  fw4:0, fw5:0},
+  {name:'Shiva Rdy',                 mat:9, inns:6, overs:'22.4', runs:141, wkts:7,  bbf:'3/24', econ:'6.22', avg:'20.14', wides:19, nb:1,  fw4:0, fw5:0},
+  {name:'Hkishore Nidiganti',        mat:6, inns:6, overs:'32.0', runs:150, wkts:5,  bbf:'3/25', econ:'4.69', avg:'30.00', wides:17, nb:2,  fw4:0, fw5:0},
+  {name:'Daswanth Ginni',            mat:8, inns:7, overs:'28.0', runs:180, wkts:5,  bbf:'2/28', econ:'6.43', avg:'36.00', wides:29, nb:2,  fw4:0, fw5:0},
+  {name:'Satheesh Vidyam',           mat:7, inns:7, overs:'32.3', runs:191, wkts:4,  bbf:'2/29', econ:'5.88', avg:'47.75', wides:26, nb:1,  fw4:0, fw5:0},
+  {name:'Rishi Sivapu',              mat:2, inns:2, overs:'12.0', runs:55,  wkts:3,  bbf:'3/27', econ:'4.58', avg:'18.33', wides:8,  nb:0,  fw4:0, fw5:0},
+  {name:'Satwik Chandra',            mat:6, inns:4, overs:'10.0', runs:75,  wkts:2,  bbf:'2/30', econ:'7.50', avg:'37.50', wides:4,  nb:3,  fw4:0, fw5:0},
+];
+
 var OPP_DATA = {
-  'Dragons Cricket Club': { batting: DRAGONS_BATTING, source: '2026 L-40 · Nashville Cricket League' }
+  'Dragons Cricket Club': {
+    batting: DRAGONS_BATTING,
+    bowling: DRAGONS_BOWLING,
+    source: '2026 L-40 · Nashville Cricket League'
+  }
 };
 
 function parseDate(gameDate) {
@@ -272,22 +291,23 @@ function renderComingSoon(oppName) {
 
 function renderBattingStats(data) {
   var batting = data.batting;
-
-  /* Key threats: avg > 25 (parseable) and inns >= 3 */
-  var threats = batting.filter(function(p) {
-    return p.inns >= 3 && parseFloat(p.avg) >= 25;
-  });
+  var bowling = data.bowling || [];
 
   var html = '<div class="stats-inner">';
 
   /* Source badge */
-  html += '<div class="source-note">📋 <span><strong>Source:</strong> ' + escHtml(data.source) + ' · Batting records only</span></div>';
+  html += '<div class="source-note">📋 <span><strong>Source:</strong> ' + escHtml(data.source) + '</span></div>';
 
-  /* Key threats */
-  if (threats.length) {
+  /* ── BATTING ── */
+  /* Key bat threats: avg > 25 (parseable) and inns >= 3 */
+  var batThreats = batting.filter(function(p) {
+    return p.inns >= 3 && parseFloat(p.avg) >= 25;
+  });
+
+  if (batThreats.length) {
     html += '<div class="threat-label">⚠️ Watch These Batters</div>';
     html += '<div class="threat-grid">';
-    threats.forEach(function(p) {
+    batThreats.forEach(function(p) {
       var badges = '';
       if (p.hundreds > 0) badges += ' <span style="font-size:10px;background:#FEE2E2;color:#9B1C1C;border-radius:4px;padding:1px 5px">💯×' + p.hundreds + '</span>';
       if (p.fifties > 0) badges += ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 5px">50×' + p.fifties + '</span>';
@@ -304,7 +324,6 @@ function renderBattingStats(data) {
     html += '</div>';
   }
 
-  /* Full batting table */
   html += '<div class="table-label">Full Batting — ' + batting.length + ' players</div>';
   html += '<div style="overflow-x:auto"><table class="bat-table">';
   html += '<tr><th>Player</th><th>M</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>50s</th><th>6s</th></tr>';
@@ -322,8 +341,53 @@ function renderBattingStats(data) {
   });
   html += '</table></div>';
 
-  /* Bowling note */
-  html += '<div class="bowling-note">🎳 Bowling stats not available — will add when NCL publishes bowling records.</div>';
+  /* ── BOWLING ── */
+  if (bowling.length) {
+    html += '<div style="border-top:1px solid #F3F4F6;margin-top:20px;padding-top:20px">';
+
+    /* Key bowl threats: 7+ wickets */
+    var bowlThreats = bowling.filter(function(p) { return p.wkts >= 7; });
+    if (bowlThreats.length) {
+      html += '<div class="threat-label" style="color:#1D4ED8">🎳 Key Bowlers to Watch</div>';
+      html += '<div class="threat-grid">';
+      bowlThreats.forEach(function(p) {
+        var badges = '';
+        if (p.fw5 > 0) badges += ' <span style="font-size:10px;background:#EFF6FF;color:#1D4ED8;border-radius:4px;padding:1px 5px">5w×' + p.fw5 + '</span>';
+        if (p.fw4 > 0) badges += ' <span style="font-size:10px;background:#EFF6FF;color:#1D4ED8;border-radius:4px;padding:1px 5px">4w×' + p.fw4 + '</span>';
+        html += '<div class="threat-card" style="background:#EFF6FF;border-color:#BFDBFE">'
+          + '<div class="threat-name" style="color:#1E3A8A">' + escHtml(p.name) + badges + '</div>'
+          + '<div class="threat-stats">'
+          + statChip2(String(p.wkts), 'Wkts')
+          + statChip2(p.bbf, 'BBF')
+          + statChip2(p.avg, 'Avg')
+          + statChip2(p.econ, 'Econ')
+          + '</div>'
+          + '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="table-label">Full Bowling — ' + bowling.length + ' bowlers</div>';
+    html += '<div style="overflow-x:auto"><table class="bat-table">';
+    html += '<tr><th>Player</th><th>M</th><th>Ov</th><th>Wkts</th><th>BBF</th><th>Avg</th><th>Econ</th><th>Wd</th></tr>';
+    bowling.forEach(function(p) {
+      var wideWarn = p.wides >= 30 ? ' style="color:#DC2626;font-weight:700"' : '';
+      html += '<tr>'
+        + '<td>' + escHtml(p.name) + '</td>'
+        + '<td>' + p.mat + '</td>'
+        + '<td>' + p.overs + '</td>'
+        + '<td style="font-weight:700;color:#111827">' + p.wkts + '</td>'
+        + '<td>' + p.bbf + '</td>'
+        + '<td>' + p.avg + '</td>'
+        + '<td>' + p.econ + '</td>'
+        + '<td' + wideWarn + '>' + p.wides + '</td>'
+        + '</tr>';
+    });
+    html += '</table></div>';
+    html += '<div style="font-size:11px;color:#9CA3AF;margin-top:8px">Wd column: wides bowled in the tournament — red = 30+ wides (loose).</div>';
+
+    html += '</div>';
+  }
 
   html += '</div>';
   document.getElementById('oppContent').innerHTML = html;
@@ -331,6 +395,9 @@ function renderBattingStats(data) {
 
 function statChip(val, lbl) {
   return '<div class="threat-stat"><div class="val">' + val + '</div><div class="lbl">' + lbl + '</div></div>';
+}
+function statChip2(val, lbl) {
+  return '<div class="threat-stat"><div class="val" style="color:#1D4ED8">' + val + '</div><div class="lbl">' + lbl + '</div></div>';
 }
 
 function escHtml(s) {
