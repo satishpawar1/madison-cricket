@@ -1,20 +1,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // LEATHER TEAM — Availability support for Apps Script
+// Fixes: "Error: Game not found: Dragons CC"
 //
-// The availability save fails with "Game not found: Dragons CC" because
-// handlePostAvailability / handleGetAvailability only handle Lions and Tigers.
-//
-// APPLY IN 3 STEPS:
-//   1. Open Apps Script: script.google.com → open Code.gs
-//   2. Add the two functions below anywhere in Code.gs
-//   3. Add the two routing lines into doGet and doPost (see markers below)
+// DO THIS IN CODE.GS:
+//   1. Paste BLOCK A (the two functions) anywhere — e.g. at the very bottom
+//   2. Paste BLOCK B (one line) inside doGet, right after getRemovedPlayers line
+//   3. Paste BLOCK C (one line) inside doPost, right after saveRemovedPlayers line
 //   4. Redeploy: Deploy → Manage deployments → Edit → New version → Deploy
-//
-// No Google Sheet tab needed — data is stored in auto-created ExtraAvail_Leather
 // ─────────────────────────────────────────────────────────────────────────────
 
 
-// ── ADD these two functions anywhere in Code.gs ───────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// BLOCK A — Paste these two complete functions anywhere in Code.gs
+// ══════════════════════════════════════════════════════════════════════════════
 
 function handleGetLeatherAvailability(e) {
   var game = e.parameter.game;
@@ -42,7 +40,6 @@ function handlePostLeatherAvailability(data) {
     sh = ss.insertSheet('ExtraAvail_Leather');
     sh.getRange(1, 1, 1, 4).setValues([['Game', 'Player', 'Available', 'Selected']]);
   }
-  // Delete existing rows for this game
   var lastRow = sh.getLastRow();
   if (lastRow > 1) {
     var rows = sh.getRange(2, 1, lastRow - 1, 4).getValues();
@@ -50,7 +47,6 @@ function handlePostLeatherAvailability(data) {
       if (String(rows[i][0]) === game) sh.deleteRow(i + 2);
     }
   }
-  // Write new rows
   players.forEach(function(p) {
     sh.appendRow([game, p.name, p.available ? 1 : 0, p.selected ? 1 : 0]);
   });
@@ -58,16 +54,23 @@ function handlePostLeatherAvailability(data) {
 }
 
 
-// ── In doGet — add this line just before the existing:  if (!type && team && game) ──
+// ══════════════════════════════════════════════════════════════════════════════
+// BLOCK B — Inside doGet, find this existing line:
+//
+//   if (params.action === 'getRemovedPlayers') return handleGetRemovedPlayers(e);
+//
+// Paste the line below IMMEDIATELY AFTER it:
+// ══════════════════════════════════════════════════════════════════════════════
 
 //   if (team === 'Leather' && e.parameter.game) return handleGetLeatherAvailability(e);
 
 
-// ── In doPost — add this line just after the writeTable check ─────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// BLOCK C — Inside doPost, find this existing line:
+//
+//   if (payload.action === 'saveRemovedPlayers') return handleSaveRemovedPlayers(payload);
+//
+// Paste the line below IMMEDIATELY AFTER it:
+// ══════════════════════════════════════════════════════════════════════════════
 
-//   if (payload.team === 'Leather' && !payload.type && payload.game) return handlePostLeatherAvailability(payload);
-
-
-// ── STEP 4: Redeploy ──────────────────────────────────────────────────────────
-//   Deploy → Manage deployments → Edit (pencil) → Version: New version → Deploy
-// ─────────────────────────────────────────────────────────────────────────────
+//   if (payload.team === 'Leather' && payload.game && !payload.type) return handlePostLeatherAvailability(payload);
