@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Leather Opponent Analysis — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #9B1C1C 0%, #7B0000 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.page-header a:active { color: #fff; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 600px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1rem; overflow: hidden;
+}
+
+.section-label {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 14px 16px 10px; border-bottom: 1px solid #F3F4F6;
+}
+
+/* ── Game selector ── */
+.game-list { padding: 8px 0; }
+.game-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px; cursor: pointer;
+  border-bottom: 1px solid #F9FAFB; transition: background 0.1s;
+}
+.game-row:last-child { border-bottom: none; }
+.game-row:active { background: #FFF5F5; }
+.game-row.active { background: #FFF5F5; border-left: 3px solid #9B1C1C; padding-left: 13px; }
+
+.date-box {
+  background: #9B1C1C; color: #fff; border-radius: 8px;
+  text-align: center; padding: 6px 8px; min-width: 40px; flex-shrink: 0;
+}
+.date-box.past { background: #9CA3AF; }
+.date-day { font-size: 15px; font-weight: 700; line-height: 1; }
+.date-mon { font-size: 9px; font-weight: 600; opacity: 0.9; margin-top: 1px; text-transform: uppercase; }
+
+.game-info { flex: 1; }
+.game-opp { font-size: 13px; font-weight: 700; color: #111827; }
+.game-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.game-arrow { color: #D1D5DB; font-size: 18px; }
+
+/* ── Opponent detail panel ── */
+.opp-header {
+  padding: 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+.opp-name { font-size: 18px; font-weight: 700; color: #9B1C1C; }
+.opp-meta { font-size: 12px; color: #6B7280; margin-top: 4px; }
+
+.coming-soon-panel {
+  padding: 2.5rem 1.5rem; text-align: center;
+}
+.coming-soon-icon { font-size: 44px; margin-bottom: 14px; }
+.coming-soon-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+.coming-soon-body { font-size: 13px; color: #6B7280; line-height: 1.6; }
+.coming-soon-body strong { color: #9B1C1C; }
+
+.info-pill {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px; margin-top: 12px;
+  background: #FEE2E2; color: #9B1C1C;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="leather-t30.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🔍 Opponent Analysis</h2>
+    <p>Scout the opposition · T30 2026</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="section-label">Upcoming Games</div>
+    <div class="game-list" id="gameList"></div>
+  </div>
+
+  <div class="card" id="oppPanel" style="display:none">
+    <div class="opp-header">
+      <div class="opp-name" id="oppName"></div>
+      <div class="opp-meta" id="oppMeta"></div>
+    </div>
+    <div class="coming-soon-panel">
+      <div class="coming-soon-icon">📊</div>
+      <div class="coming-soon-title">Stats Coming Soon</div>
+      <div class="coming-soon-body">
+        We're building the pipeline to pull batting &amp; bowling data for
+        <strong id="oppNameInline"></strong>.<br><br>
+        Check back before game day for key batters, bowlers, and scouting notes.
+      </div>
+      <div class="info-pill">Data collection in progress</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var CFG = MCC_CONFIG.leather;
+var GAMES = CFG.t30Games || [];
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var activeGame = null;
+
+function parseDate(gameDate) {
+  var parts = gameDate.split('-');
+  return new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+}
+
+function buildGameList() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var list = document.getElementById('gameList');
+
+  if (!GAMES.length) {
+    list.innerHTML = '<div style="padding:16px;font-size:13px;color:#9CA3AF;font-style:italic">No games scheduled yet.</div>';
+    return;
+  }
+
+  GAMES.forEach(function(g, i) {
+    var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
+    var past = today > d;
+    var row = document.createElement('div');
+    row.className = 'game-row';
+    row.innerHTML =
+      '<div class="date-box' + (past ? ' past' : '') + '">'
+      + '<div class="date-day">' + d.getDate() + '</div>'
+      + '<div class="date-mon">' + MONTHS[d.getMonth()] + '</div>'
+      + '</div>'
+      + '<div class="game-info">'
+      + '<div class="game-opp">vs ' + g.opponent + '</div>'
+      + '<div class="game-meta">' + g.day + ' · ' + g.time + ' · ' + g.ground + '</div>'
+      + '</div>'
+      + '<span class="game-arrow">›</span>';
+    row.addEventListener('click', (function(game, pastFlag) {
+      return function() { selectGame(game, pastFlag); };
+    })(g, past));
+    list.appendChild(row);
+  });
+
+  // Auto-select the first upcoming game
+  var firstUpcoming = GAMES.find(function(g) {
+    var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
+    return today <= d;
+  }) || GAMES[0];
+  if (firstUpcoming) {
+    var d = parseDate(firstUpcoming.gameDate); d.setHours(0,0,0,0);
+    selectGame(firstUpcoming, today > d);
+  }
+}
+
+function selectGame(game, past) {
+  activeGame = game;
+
+  document.querySelectorAll('.game-row').forEach(function(r) { r.classList.remove('active'); });
+  var rows = document.querySelectorAll('.game-row');
+  var idx = GAMES.indexOf(game);
+  if (rows[idx]) rows[idx].classList.add('active');
+
+  document.getElementById('oppName').textContent = game.opponent;
+  document.getElementById('oppNameInline').textContent = game.opponent;
+  document.getElementById('oppMeta').textContent =
+    game.day + ' ' + game.date + ' · ' + game.time + ' · ' + game.ground
+    + (past ? ' (played)' : '');
+  document.getElementById('oppPanel').style.display = '';
+}
+
+window.addEventListener('DOMContentLoaded', buildGameList);
+</script>
+</body>
+</html>
