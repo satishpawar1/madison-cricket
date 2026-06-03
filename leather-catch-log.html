@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Madison Leather — Log Catches</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #9B1C1C 0%, #7B0000 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+
+.card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  padding: 16px; margin-bottom: 1rem;
+}
+
+.gs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.gs label { font-size: 13px; color: #6B7280; white-space: nowrap; font-weight: 500; }
+.gs select {
+  font-size: 14px; padding: 10px 12px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  background: #fff; flex: 1; min-width: 200px; color: #111827;
+  -webkit-appearance: none; appearance: none;
+}
+.gs select:focus { outline: none; border-color: #9B1C1C; }
+
+.banner { border-radius: 10px; padding: 11px 14px; font-size: 13px; margin-bottom: 1rem; display: none; line-height: 1.5; font-weight: 500; }
+.b-lock { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
+.b-pre  { background: #FFF5F5; color: #9B1C1C; border-left: 3px solid #9B1C1C; }
+.b-past { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
+.b-new  { background: #E2F5EE; color: #0F5C43; border-left: 3px solid #1A8F6A; }
+.b-load { background: #F3F4F6; color: #9CA3AF; border-left: 3px solid #D1D5DB; }
+
+.slbl { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+
+.col-hdr {
+  display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px;
+  padding: 6px 14px 8px; margin-bottom: 4px;
+  border-bottom: 1.5px solid #F3F4F6;
+}
+.col-hdr span { font-size: 11px; font-weight: 600; color: #9CA3AF; text-align: center; text-transform: uppercase; letter-spacing: 0.04em; }
+.col-hdr span:first-child { text-align: left; }
+
+.prows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.pr {
+  display: grid; grid-template-columns: 1fr 72px 72px 72px; gap: 8px;
+  align-items: center; background: #fff;
+  border: 1.5px solid #F3F4F6; border-radius: 10px; padding: 10px 14px;
+}
+.pr.pre { border-color: #9B1C1C; background: #FFF8F8; }
+.pr.locked { opacity: 0.55; }
+
+.prname { font-size: 14px; font-weight: 600; }
+
+.pr input {
+  font-size: 15px; padding: 7px 4px; border: 1.5px solid #E5E7EB;
+  border-radius: 8px; text-align: center; width: 100%;
+  background: #fff; color: #111827; font-weight: 500;
+}
+.pr input:focus { outline: none; border-color: #9B1C1C; }
+.pr.pre input { border-color: #FCA5A5; }
+.pr input:disabled { background: #F9FAFB; color: #374151; border-color: #E5E7EB; cursor: not-allowed; }
+
+.summary {
+  background: #FFF8F8; border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; color: #6B7280; margin-bottom: 1.25rem; line-height: 1.7;
+  border: 1px solid #FEE2E2;
+}
+.summary strong { color: #111827; font-weight: 700; }
+
+.sep { border: none; border-top: 1px solid #F3F4F6; margin: 1.25rem 0; }
+
+.acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  font-size: 14px; padding: 11px 20px; border-radius: 10px;
+  cursor: pointer; border: none; font-weight: 500; touch-action: manipulation;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: #9B1C1C; color: #fff; }
+.btn-primary:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
+.btn-clear { background: #F3F4F6; color: #6B7280; }
+
+.msg { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 10px; display: none; font-weight: 500; }
+.msg.ok   { background: #E2F5EE; color: #0F5C43; display: block; }
+.msg.err  { background: #FEE2E2; color: #991B1B; display: block; }
+.msg.info { background: #FFF5F5; color: #9B1C1C; display: block; }
+
+.loading-note { font-size: 13px; color: #9CA3AF; font-style: italic; padding: 4px 0; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="leather-t30.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>🔴 Leather — Log Catches</h2>
+    <p>Record catch efficiency per game</p>
+  </div>
+</div>
+
+<div class="content">
+  <div class="card">
+    <div class="gs">
+      <label>Game</label>
+      <select id="gs"><option value="">— pick a game —</option></select>
+    </div>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div id="playerSection" style="display:none">
+    <div class="card" style="padding:12px 16px">
+      <div class="slbl">Catches per player</div>
+      <div class="col-hdr">
+        <span>Player</span><span>Attempted</span><span>Taken</span><span>Dropped</span>
+      </div>
+      <div class="loading-note" id="playersLoading" style="display:none">Loading players…</div>
+      <div class="prows" id="prows"></div>
+      <div class="summary" id="summary"></div>
+      <hr class="sep">
+      <div class="acts">
+        <button class="btn btn-primary" id="saveBtn" onclick="submitCatches()">Save to Sheets</button>
+        <button class="btn btn-clear" onclick="clearAll()">Clear all</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var CFG = MCC_CONFIG.leather;
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var PL = [];
+var isLocked = false;
+var playersReady = false;
+
+window.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('gs');
+  var today = new Date(); today.setHours(0,0,0,0);
+  CFG.t30Games.forEach(function(g) {
+    var opt = document.createElement('option');
+    opt.value = g.name;
+    var parts = g.gameDate.split('-');
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    opt.textContent = g.name + ' - ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'})
+                    + (today > d ? ' (played)' : '');
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', onGameChange);
+
+  // Load players from Sheets
+  Promise.all([
+    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=Leather').then(function(r) { return r.json(); }).catch(function() { return { status: 'ok', players: [] }; }),
+    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=Leather').then(function(r) { return r.json(); }).catch(function() { return { status: 'ok', players: [] }; })
+  ]).then(function(results) {
+    var extra   = (results[0].status === 'ok' && results[0].players) ? results[0].players : [];
+    var removed = (results[1].status === 'ok' && results[1].players) ? results[1].players : [];
+
+    // Core config players minus removed
+    CFG.players.forEach(function(p) {
+      if (removed.indexOf(p) < 0) PL.push(p);
+    });
+    // Extra Sheets players
+    extra.forEach(function(p) {
+      if (PL.indexOf(p) < 0) PL.push(p);
+    });
+
+    playersReady = true;
+    // If a game was already selected while players were loading, rebuild rows now
+    var game = document.getElementById('gs').value;
+    if (game) {
+      document.getElementById('playersLoading').style.display = 'none';
+      var today2 = new Date(); today2.setHours(0,0,0,0);
+      var gCfg = CFG.t30Games.filter(function(g) { return g.name === game; })[0];
+      var parts = gCfg.gameDate.split('-');
+      var gameDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+      gameDate.setHours(0,0,0,0);
+      var daysSince = Math.floor((today2 - gameDate) / (1000*60*60*24));
+      var isPast = today2 > gameDate;
+      buildRows(game, isPast, daysSince, null);
+    }
+  });
+});
+
+function onGameChange() {
+  var game = this.value;
+  var section = document.getElementById('playerSection');
+  if (!game) { section.style.display='none'; hideBanner(); return; }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var gCfg = CFG.t30Games.filter(function(g) { return g.name === game; })[0];
+  var parts = gCfg.gameDate.split('-');
+  var gameDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  gameDate.setHours(0,0,0,0);
+  var daysSince = Math.floor((today - gameDate) / (1000*60*60*24));
+  var isPast = today > gameDate;
+  isLocked = isPast && daysSince > 5;
+
+  section.style.display = 'block';
+  document.getElementById('saveBtn').disabled = true;
+
+  if (!playersReady) {
+    showBanner('b-load', 'Loading players and catch data…');
+    document.getElementById('playersLoading').style.display = 'block';
+    document.getElementById('prows').innerHTML = '';
+    document.getElementById('summary').innerHTML = '';
+    return;
+  }
+
+  showBanner('b-load', 'Loading catch data from Google Sheets…');
+  fetch(SCRIPT_URL + '?type=catches&team=Leather&game=' + encodeURIComponent(game))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var liveData = (d.status === 'ok' && d.data && d.data.length) ? d.data : null;
+      buildRows(game, isPast, daysSince, liveData);
+    })
+    .catch(function() {
+      buildRows(game, isPast, daysSince, null);
+    });
+}
+
+function buildRows(game, isPast, daysSince, data) {
+  var hasPrefill = data && data.some(function(p) { return p.att > 0 || p.attempted > 0; });
+
+  if (isLocked) {
+    showBanner('b-lock', '🔒 This game was played ' + daysSince + ' days ago — catch data is locked.');
+  } else if (hasPrefill) {
+    showBanner('b-pre', 'Pre-filled with recorded data. Edit and save to update.');
+  } else if (isPast) {
+    showBanner('b-past', 'Past game — enter catch data below.');
+  } else {
+    showBanner('b-new', 'Upcoming game — enter catch data after the match.');
+  }
+
+  var rows = document.getElementById('prows');
+  rows.innerHTML = '';
+
+  PL.forEach(function(p) {
+    var pre = null;
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        if (data[i].name === p) { pre = data[i]; break; }
+      }
+    }
+    var att  = pre ? (pre.att  || pre.attempted || 0) : 0;
+    var tak  = pre ? (pre.tak  || pre.taken    || 0) : 0;
+    var drop = att - tak;
+    var cls  = isLocked ? 'pr locked' : (pre && att > 0 ? 'pr pre' : 'pr');
+
+    var row = document.createElement('div');
+    row.className = cls;
+
+    var nameEl = document.createElement('span');
+    nameEl.className = 'prname';
+    nameEl.textContent = p;
+
+    var attEl = document.createElement('input');
+    attEl.type='number'; attEl.min='0'; attEl.max='20';
+    attEl.value=att; attEl.id='att-'+p; attEl.disabled=isLocked;
+
+    var takEl = document.createElement('input');
+    takEl.type='number'; takEl.min='0'; takEl.max='20';
+    takEl.value=tak; takEl.id='tak-'+p; takEl.disabled=isLocked;
+
+    var drpEl = document.createElement('input');
+    drpEl.type='number'; drpEl.min='0'; drpEl.max='20';
+    drpEl.value=drop; drpEl.id='drp-'+p; drpEl.disabled=isLocked;
+
+    (function(player) {
+      attEl.addEventListener('input', function() { syncDropped(player); });
+      takEl.addEventListener('input', function() { syncDropped(player); });
+      drpEl.addEventListener('input', function() { syncFromDropped(player); });
+    })(p);
+
+    row.appendChild(nameEl);
+    row.appendChild(attEl);
+    row.appendChild(takEl);
+    row.appendChild(drpEl);
+    rows.appendChild(row);
+  });
+
+  document.getElementById('saveBtn').disabled = isLocked;
+  updateSummary();
+}
+
+function syncDropped(p) {
+  var att = parseInt(document.getElementById('att-'+p).value)||0;
+  var tak = parseInt(document.getElementById('tak-'+p).value)||0;
+  if (tak>att) { tak=att; document.getElementById('tak-'+p).value=tak; }
+  document.getElementById('drp-'+p).value = att-tak;
+  updateSummary();
+}
+function syncFromDropped(p) {
+  var att = parseInt(document.getElementById('att-'+p).value)||0;
+  var drp = parseInt(document.getElementById('drp-'+p).value)||0;
+  if (drp>att) { drp=att; document.getElementById('drp-'+p).value=drp; }
+  document.getElementById('tak-'+p).value = att-drp;
+  updateSummary();
+}
+function updateSummary() {
+  var att=0, tak=0;
+  PL.forEach(function(p) {
+    att += parseInt(document.getElementById('att-'+p) ? document.getElementById('att-'+p).value : 0)||0;
+    tak += parseInt(document.getElementById('tak-'+p) ? document.getElementById('tak-'+p).value : 0)||0;
+  });
+  var eff = att ? Math.round(tak/att*100) : 0;
+  document.getElementById('summary').innerHTML =
+    '<strong>'+att+'</strong> attempted &nbsp;&middot;&nbsp; '
+    +'<strong>'+tak+'</strong> taken &nbsp;&middot;&nbsp; '
+    +'<strong>'+(att-tak)+'</strong> dropped &nbsp;&middot;&nbsp; '
+    +'<strong>'+eff+'%</strong> efficiency';
+}
+function clearAll() {
+  if (isLocked) { show('This game is locked.','err'); return; }
+  PL.forEach(function(p) {
+    var a = document.getElementById('att-'+p);
+    var t = document.getElementById('tak-'+p);
+    var d = document.getElementById('drp-'+p);
+    if (a) a.value=0; if (t) t.value=0; if (d) d.value=0;
+  });
+  updateSummary();
+}
+function submitCatches() {
+  if (isLocked) { show('This game is locked.','err'); return; }
+  var game = document.getElementById('gs').value;
+  if (!game) { show('Pick a game first!','err'); return; }
+  var catches = [];
+  PL.forEach(function(p) {
+    var att = parseInt(document.getElementById('att-'+p).value)||0;
+    var tak = parseInt(document.getElementById('tak-'+p).value)||0;
+    catches.push({name:p, attempted:att, taken:tak, dropped:att-tak});
+  });
+  show('Saving...','info');
+  fetch(SCRIPT_URL, {
+    method:'POST',
+    body:JSON.stringify({type:'catches', team:'Leather', game:game, catches:catches})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.status==='ok') show('Saved! Google Sheet updated.','ok');
+    else show('Error: '+d.message,'err');
+  })
+  .catch(function(){show('Network error. Try again.','err');});
+}
+function showBanner(cls, txt) {
+  var b=document.getElementById('banner');
+  b.className='banner '+cls; b.textContent=txt; b.style.display='block';
+}
+function hideBanner() {
+  var b=document.getElementById('banner');
+  b.style.display='none'; b.className='banner';
+}
+function show(t,type) {
+  var e=document.getElementById('msg');
+  e.textContent=t; e.className='msg '+type;
+  setTimeout(function(){e.className='msg';},4000);
+}
+</script>
+</body>
+</html>

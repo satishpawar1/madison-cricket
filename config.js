@@ -189,9 +189,18 @@ const MCC_CONFIG = {
 
   // \u2500\u2500 Madison Leather \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   leather: {
-    players: [],     // populated once selections are confirmed
-    t30Games: [],    // T-30 schedule (June 2026, TBD)
+    players: [],     // players live in Google Sheets (added via leather-roster.html)
+    t30Games: [
+      { name: 'Dragons CC', opponent: 'Dragons Cricket Club', day: 'Saturday', date: 'June 6th', time: '8:30 AM', warmup: '7:30 AM', ground: 'CFCG', gameDate: '2026-06-06' }
+    ],
     t20Games: [],    // T-20 schedule (August 2026, TBD)
-    gameNameMap: {}
+    gameNameMap: {},
+    closers: [
+      "Let's show them what leather cricket is all about! 🔴🏏",
+      "Come on Leather — play hard, play smart! 🔴🔥",
+      "Back yourselves and let's bring this one home. Good luck! 🏆",
+      "One team, one goal — let's get the win! 🔴",
+      "Time to make our mark on leather cricket! 🔴🏏💪"
+    ]
   }
 };
