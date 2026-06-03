@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script src="config.js"></script>
+<title>Leather Availability Dashboard — MCC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.page-header {
+  background: linear-gradient(150deg, #9B1C1C 0%, #7B0000 100%);
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header a { font-size: 26px; text-decoration: none; color: rgba(255,255,255,0.8); line-height: 1; flex-shrink: 0; }
+.page-header a:active { color: #fff; }
+.hdr-text h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.hdr-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+.content { padding: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+/* ── Summary tiles ── */
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc {
+  background: #fff; border-radius: 14px; padding: 16px 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sn { font-size: 26px; font-weight: 700; }
+.sl { font-size: 11px; color: #9CA3AF; margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Table card ── */
+.lb-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem; overflow-x: auto;
+}
+.lb-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 12px; border-bottom: 1.5px solid #F3F4F6;
+  flex-wrap: wrap; gap: 8px;
+}
+.lb-title { font-size: 13px; font-weight: 700; color: #111827; }
+
+.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 360px; }
+.stats-table th {
+  font-size: 11px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 10px; text-align: right;
+  border-bottom: 1.5px solid #F3F4F6;
+  white-space: nowrap; cursor: pointer; user-select: none;
+  background: #FAFAFA;
+}
+.stats-table th:first-child  { text-align: left; padding-left: 16px; }
+.stats-table th:nth-child(2) { text-align: left; }
+.stats-table th.sort-asc::after  { content: ' ↑'; color: #9B1C1C; }
+.stats-table th.sort-desc::after { content: ' ↓'; color: #9B1C1C; }
+.stats-table td {
+  padding: 9px 10px; text-align: right;
+  border-bottom: 1px solid #F9FAFB;
+  color: #111827; white-space: nowrap;
+}
+.stats-table td:first-child  { text-align: left; padding-left: 16px; color: #9CA3AF; font-size: 12px; }
+.stats-table td:nth-child(2) { text-align: left; font-weight: 600; }
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: #F9FAFB; }
+
+/* ── Per-game breakdown ── */
+.game-section { margin-bottom: 1.25rem; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.game-cards { display: flex; flex-direction: column; gap: 8px; }
+.game-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.game-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #FAFAFA;
+  border-bottom: 1px solid #F3F4F6;
+}
+.game-card-title { font-size: 13px; font-weight: 700; }
+.game-card-meta { font-size: 11px; color: #9CA3AF; }
+.game-summary-strip {
+  display: flex; gap: 16px; padding: 7px 14px;
+  background: #FFF8F8; border-bottom: 1px solid #F3F4F6;
+}
+.gss-item { display: flex; flex-direction: column; align-items: center; }
+.gss-val { font-weight: 700; font-size: 15px; line-height: 1; }
+.gss-val.green { color: #16A34A; }
+.gss-val.red   { color: #9B1C1C; }
+.gss-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.gss-div { width: 1px; background: #E5E7EB; align-self: stretch; margin: 2px 0; }
+
+.game-player-rows { padding: 4px 0; }
+.gpr {
+  display: flex; align-items: center;
+  padding: 5px 14px; gap: 10px;
+}
+.gpr-name { font-size: 13px; color: #374151; flex: 1; }
+.gpr-name.unavail { color: #C4C9D4; }
+.gpr-tags { display: flex; gap: 5px; }
+.gpr-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.tag-avail { background: #C6F0E0; color: #0F5C43; }
+.tag-sel   { background: #FEE2E2; color: #9B1C1C; }
+.tag-none  { font-size: 12px; color: #D1D5DB; }
+
+.loading { text-align: center; color: #9CA3AF; font-size: 14px; padding: 3rem; }
+.no-data { text-align: center; color: #9CA3AF; font-size: 13px; padding: 2rem 1rem; background: #fff; border-radius: 12px; }
+.live-tag { font-size: 11px; font-weight: 500; color: #9CA3AF; }
+.live-tag.ok { color: #6EE7B7; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="leather-t30.html">&#8249;</a>
+  <div class="hdr-text">
+    <h2>📋 Leather Availability Dashboard</h2>
+    <p>Availability &amp; selection · T30 2026</p>
+  </div>
+</div>
+
+<div class="content">
+  <div id="loadingMsg" class="loading">Loading&hellip;</div>
+
+  <div id="mainView" style="display:none">
+    <div class="stat-cards">
+      <div class="sc"><div class="sn" id="s-games" style="color:#9B1C1C">—</div><div class="sl">Games</div></div>
+      <div class="sc"><div class="sn" id="s-avail" style="color:#1A8F6A">—</div><div class="sl">Avg Availability</div></div>
+      <div class="sc"><div class="sn" id="s-sel"   style="color:#9B1C1C">—</div><div class="sl">Avg Selection</div></div>
+    </div>
+
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-title">🔴 Madison Leather — Player Summary</div>
+        <span class="live-tag" id="liveTag"></span>
+      </div>
+      <table class="stats-table" id="leatherTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('name')">Player</th>
+            <th onclick="sortTable('avail')">Avail</th>
+            <th onclick="sortTable('sel')">Sel</th>
+            <th onclick="sortTable('avPct')">Avail %</th>
+            <th onclick="sortTable('selPct')">Sel %</th>
+          </tr>
+        </thead>
+        <tbody id="leatherTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="game-section">
+      <div class="section-label">Game-by-game breakdown</div>
+      <div class="game-cards" id="gameCards"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = MCC_CONFIG.SCRIPT_URL;
+var CFG = MCC_CONFIG.leather;
+var GAMES = CFG.t30Games || [];
+
+var _sort = { key: 'avPct', dir: -1 };
+var _data = null; // { players: [name,...], games: [{game, dateStr, players:[{name,available,selected}]}] }
+
+function makeDate(gameDate) {
+  if (!gameDate) return '';
+  var dp = gameDate.split('-');
+  return new Date(parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]))
+    .toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+function buildPlayerSummary() {
+  var gamesPlayed = _data.games.length;
+  return _data.players.map(function(pname) {
+    var avail = 0, sel = 0;
+    _data.games.forEach(function(g) {
+      var pd = g.players.filter(function(p){return p.name === pname;})[0];
+      if (pd) { avail += pd.available || 0; sel += pd.selected || 0; }
+    });
+    return { name: pname, avail: avail, sel: sel,
+      avPct: gamesPlayed ? avail / gamesPlayed : 0,
+      selPct: avail ? sel / avail : 0 };
+  });
+}
+
+function sortTable(key) {
+  if (_sort.key === key) _sort.dir *= -1; else { _sort.key = key; _sort.dir = key === 'name' ? 1 : -1; }
+  render();
+}
+
+function render() {
+  if (!_data) return;
+  var gamesPlayed = _data.games.length;
+  var players = buildPlayerSummary();
+
+  players.sort(function(a, b) {
+    if (_sort.key === 'name') return _sort.dir * a.name.localeCompare(b.name);
+    return _sort.dir * ((b[_sort.key] || 0) - (a[_sort.key] || 0));
+  });
+
+  document.getElementById('leatherTable').querySelectorAll('th').forEach(function(th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    var m = (th.getAttribute('onclick') || '').match(/'([^']+)'\)$/);
+    if (m && m[1] === _sort.key) th.classList.add(_sort.dir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+
+  // Summary tiles
+  var rosterSize = _data.players.length || 1;
+  var totalAvailPct = 0, totalSelPct = 0;
+  _data.games.forEach(function(g) {
+    var av  = g.players.reduce(function(sum, p){return sum + (p.available||0);}, 0);
+    var sel = g.players.reduce(function(sum, p){return sum + (p.selected||0);}, 0);
+    totalAvailPct += av / rosterSize * 100;
+    totalSelPct   += sel / rosterSize * 100;
+  });
+  var ng = gamesPlayed || 1;
+  document.getElementById('s-games').textContent = gamesPlayed || '—';
+  document.getElementById('s-avail').textContent = gamesPlayed ? Math.round(totalAvailPct / ng) + '%' : '—';
+  document.getElementById('s-sel').textContent   = gamesPlayed ? Math.round(totalSelPct   / ng) + '%' : '—';
+
+  // Player summary table
+  var tbody = document.getElementById('leatherTbody');
+  if (!players.length || !gamesPlayed) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:2rem">No data recorded yet.</td></tr>';
+  } else {
+    tbody.innerHTML = players.map(function(p, i) {
+      return '<tr>'
+        + '<td>' + (i+1) + '</td>'
+        + '<td>' + p.name + '</td>'
+        + '<td>' + p.avail + '/' + gamesPlayed + '</td>'
+        + '<td>' + p.sel + '/' + (p.avail || 0) + '</td>'
+        + '<td style="color:#1A8F6A;font-weight:700">' + Math.round(p.avPct * 100) + '%</td>'
+        + '<td style="color:#9B1C1C;font-weight:700">' + Math.round(p.selPct * 100) + '%</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  // Game-by-game breakdown cards
+  var container = document.getElementById('gameCards');
+  if (!_data.games.length) {
+    container.innerHTML = '<div class="no-data">No games recorded yet.</div>';
+    return;
+  }
+  container.innerHTML = _data.games.map(function(g) {
+    var availPlayers   = g.players.filter(function(p){return p.available;});
+    var unavailPlayers = g.players.filter(function(p){return !p.available;});
+    var selCount = g.players.filter(function(p){return p.selected;}).length;
+
+    var rows = availPlayers.map(function(p) {
+      var tags = '<span class="gpr-tag tag-avail">Available</span>';
+      if (p.selected) tags += '<span class="gpr-tag tag-sel">Selected</span>';
+      return '<div class="gpr"><span class="gpr-name">' + p.name + '</span><div class="gpr-tags">' + tags + '</div></div>';
+    }).join('');
+    rows += unavailPlayers.map(function(p) {
+      return '<div class="gpr"><span class="gpr-name unavail">' + p.name + '</span><div class="gpr-tags"><span class="tag-none">&mdash;</span></div></div>';
+    }).join('');
+
+    return '<div class="game-card">'
+      + '<div class="game-card-header">'
+      +   '<span class="game-card-title">vs ' + g.game + '</span>'
+      +   '<span class="game-card-meta">' + g.dateStr + '</span>'
+      + '</div>'
+      + '<div class="game-summary-strip">'
+      +   '<div class="gss-item"><div class="gss-val green">' + availPlayers.length + '</div><div class="gss-lbl">Available</div></div>'
+      +   '<div class="gss-div"></div>'
+      +   '<div class="gss-item"><div class="gss-val red">' + selCount + '</div><div class="gss-lbl">Selected</div></div>'
+      +   '<div class="gss-div"></div>'
+      +   '<div class="gss-item"><div class="gss-val" style="color:#6B7280">' + g.players.length + '</div><div class="gss-lbl">Roster</div></div>'
+      + '</div>'
+      + '<div class="game-player-rows">' + rows + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function normName(n) {
+  return (n || '').replace(/[­ ​‌‍‎‏﻿]/g, '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  Promise.all([
+    fetch(SCRIPT_URL + '?action=getExtraPlayers&team=Leather').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};}),
+    fetch(SCRIPT_URL + '?action=getRemovedPlayers&team=Leather').then(function(r){return r.json();}).catch(function(){return {status:'ok',players:[]};})
+  ].concat(GAMES.map(function(g) {
+    return fetch(SCRIPT_URL + '?team=Leather&game=' + encodeURIComponent(g.name))
+      .then(function(r){return r.json();})
+      .catch(function(){return {status:'ok',data:[]};});
+  }))).then(function(results) {
+    var extra   = (results[0].status==='ok' && results[0].players) ? results[0].players : [];
+    var removed = (results[1].status==='ok' && results[1].players) ? results[1].players : [];
+    var gameResults = results.slice(2);
+
+    var activePlayers = CFG.players
+      .filter(function(p){return removed.indexOf(p) < 0;})
+      .concat(extra.filter(function(p){return CFG.players.indexOf(p) < 0;}));
+
+    activePlayers = activePlayers
+      .map(function(n){return n.trim();})
+      .filter(function(n, i, arr){return arr.indexOf(n) === i;});
+
+    var liveGames = [];
+    var hasData = false;
+    gameResults.forEach(function(res, gi) {
+      var g = GAMES[gi];
+      if (!res.data || !res.data.length) return;
+      if (!res.data.some(function(p){return p.available > 0 || p.selected > 0;})) return;
+      hasData = true;
+
+      // Merge any players from the game response not yet in activePlayers
+      res.data.forEach(function(pd) {
+        var pname = (pd.name || '').trim();
+        if (!pname) return;
+        if (!activePlayers.some(function(ap){return normName(ap) === normName(pname);})) {
+          activePlayers.push(pname);
+        }
+      });
+
+      liveGames.push({
+        game: g.name,
+        dateStr: makeDate(g.gameDate),
+        players: activePlayers.map(function(pname) {
+          var pd = res.data.filter(function(d){return normName(d.name) === normName(pname);})[0];
+          return { name: pname, available: pd ? pd.available : 0, selected: pd ? pd.selected : 0 };
+        })
+      });
+    });
+
+    _data = { players: activePlayers, games: liveGames };
+
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('mainView').style.display = '';
+
+    var tag = document.getElementById('liveTag');
+    if (hasData) { tag.textContent = 'live'; tag.className = 'live-tag ok'; }
+    else { tag.textContent = 'no data yet'; }
+
+    render();
+  }).catch(function() {
+    document.getElementById('loadingMsg').textContent = 'Could not load data. Check connection.';
+  });
+});
+</script>
+</body>
+</html>
