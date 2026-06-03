@@ -65,6 +65,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .opp-name { font-size: 18px; font-weight: 700; color: #9B1C1C; }
 .opp-meta { font-size: 12px; color: #6B7280; margin-top: 4px; }
 
+/* ── Coming soon ── */
 .coming-soon-panel {
   padding: 2.5rem 1.5rem; text-align: center;
 }
@@ -72,11 +73,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .coming-soon-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 8px; }
 .coming-soon-body { font-size: 13px; color: #6B7280; line-height: 1.6; }
 .coming-soon-body strong { color: #9B1C1C; }
-
 .info-pill {
   display: inline-block; font-size: 11px; font-weight: 600;
   padding: 4px 10px; border-radius: 20px; margin-top: 12px;
   background: #FEE2E2; color: #9B1C1C;
+}
+
+/* ── Stats panel ── */
+.stats-inner { padding: 16px; }
+
+.source-note {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: #6B7280;
+  background: #F9FAFB; border: 1px solid #E5E7EB;
+  border-radius: 8px; padding: 8px 12px; margin-bottom: 16px;
+}
+.source-note strong { color: #374151; }
+
+.threat-label {
+  font-size: 11px; font-weight: 700; color: #9B1C1C;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
+}
+.threat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+@media(max-width:420px) { .threat-grid { grid-template-columns: 1fr; } }
+
+.threat-card {
+  background: #FFF5F5; border: 1.5px solid #FEE2E2; border-radius: 10px;
+  padding: 12px;
+}
+.threat-name { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.threat-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.threat-stat { text-align: center; }
+.threat-stat .val { font-size: 15px; font-weight: 700; color: #9B1C1C; }
+.threat-stat .lbl { font-size: 10px; color: #9CA3AF; margin-top: 1px; }
+
+.table-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
+}
+.bat-table { width: 100%; border-collapse: collapse; }
+.bat-table th {
+  font-size: 10px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 6px 6px; border-bottom: 1.5px solid #E5E7EB;
+  text-align: right; white-space: nowrap;
+}
+.bat-table th:first-child { text-align: left; }
+.bat-table td {
+  font-size: 12px; color: #374151;
+  padding: 8px 6px; border-bottom: 1px solid #F3F4F6;
+  text-align: right; white-space: nowrap;
+}
+.bat-table td:first-child { text-align: left; font-weight: 600; color: #111827; }
+.bat-table tr:last-child td { border-bottom: none; }
+.bat-table tr:hover td { background: #FAFAFA; }
+
+.bowling-note {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: #6B7280;
+  border-top: 1px solid #F3F4F6; padding-top: 14px; margin-top: 14px;
 }
 </style>
 </head>
@@ -102,16 +157,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="opp-name" id="oppName"></div>
       <div class="opp-meta" id="oppMeta"></div>
     </div>
-    <div class="coming-soon-panel">
-      <div class="coming-soon-icon">📊</div>
-      <div class="coming-soon-title">Stats Coming Soon</div>
-      <div class="coming-soon-body">
-        We're building the pipeline to pull batting &amp; bowling data for
-        <strong id="oppNameInline"></strong>.<br><br>
-        Check back before game day for key batters, bowlers, and scouting notes.
-      </div>
-      <div class="info-pill">Data collection in progress</div>
-    </div>
+    <div id="oppContent"></div>
   </div>
 
 </div>
@@ -121,6 +167,31 @@ var CFG = MCC_CONFIG.leather;
 var GAMES = CFG.t30Games || [];
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var activeGame = null;
+
+/* ── Embedded batting data: 2026 L-40 Nashville Cricket League ── */
+var DRAGONS_BATTING = [
+  {name:'Anil Reddy Gudi',            mat:6,  inns:6, no:2, runs:311, fours:15, sixes:12, fifties:3, hundreds:0, hs:'97',  sr:'88.86',  avg:'77.75'},
+  {name:'Venkata Sai Kamalammagari',  mat:7,  inns:6, no:2, runs:160, fours:10, sixes:6,  fifties:0, hundreds:0, hs:'45',  sr:'134.45', avg:'40.00'},
+  {name:'Sai Charan Sutharapu',       mat:8,  inns:5, no:0, runs:139, fours:13, sixes:1,  fifties:1, hundreds:0, hs:'58',  sr:'99.29',  avg:'27.80'},
+  {name:'Shashanka Donikeni',         mat:9,  inns:7, no:1, runs:121, fours:13, sixes:0,  fifties:1, hundreds:0, hs:'54',  sr:'85.21',  avg:'20.17'},
+  {name:'Prasanth Raghupatruni',      mat:8,  inns:8, no:1, runs:106, fours:8,  sixes:0,  fifties:0, hundreds:0, hs:'32',  sr:'42.40',  avg:'15.14'},
+  {name:'Shiva Rdy',                  mat:9,  inns:6, no:0, runs:97,  fours:12, sixes:1,  fifties:0, hundreds:0, hs:'46',  sr:'95.10',  avg:'16.17'},
+  {name:'Nandagopal Ravulapally',     mat:7,  inns:6, no:2, runs:90,  fours:4,  sixes:5,  fifties:0, hundreds:0, hs:'47',  sr:'104.65', avg:'22.50'},
+  {name:'Satwik Chandra',             mat:6,  inns:5, no:1, runs:80,  fours:9,  sixes:0,  fifties:0, hundreds:0, hs:'35',  sr:'111.11', avg:'20.00'},
+  {name:'Vivek Batham',               mat:8,  inns:7, no:0, runs:71,  fours:10, sixes:1,  fifties:0, hundreds:0, hs:'18',  sr:'72.45',  avg:'10.14'},
+  {name:'Hkishore Nidiganti',         mat:6,  inns:4, no:0, runs:55,  fours:5,  sixes:1,  fifties:0, hundreds:0, hs:'27',  sr:'67.07',  avg:'13.75'},
+  {name:'Rohit V',                    mat:3,  inns:3, no:1, runs:49,  fours:9,  sixes:0,  fifties:0, hundreds:0, hs:'33',  sr:'94.23',  avg:'24.50'},
+  {name:'Satheesh Vidyam',            mat:7,  inns:3, no:0, runs:31,  fours:2,  sixes:0,  fifties:0, hundreds:0, hs:'29',  sr:'51.67',  avg:'10.33'},
+  {name:'Santosh Silla',              mat:7,  inns:3, no:1, runs:30,  fours:1,  sixes:0,  fifties:0, hundreds:0, hs:'29',  sr:'63.83',  avg:'15.00'},
+  {name:'Daswanth Ginni',             mat:8,  inns:5, no:3, runs:7,   fours:0,  sixes:0,  fifties:0, hundreds:0, hs:'4',   sr:'43.75',  avg:'3.50'},
+  {name:'Saradhi Gurram',             mat:3,  inns:1, no:0, runs:7,   fours:1,  sixes:0,  fifties:0, hundreds:0, hs:'7',   sr:'43.75',  avg:'7.00'},
+  {name:'Ashish Reddy',               mat:1,  inns:1, no:0, runs:3,   fours:0,  sixes:0,  fifties:0, hundreds:0, hs:'3',   sr:'33.33',  avg:'3.00'},
+  {name:'Nived Reddy',                mat:1,  inns:1, no:1, runs:1,   fours:0,  sixes:0,  fifties:0, hundreds:0, hs:'1',   sr:'100.00', avg:'--'},
+];
+
+var OPP_DATA = {
+  'Dragons CC': { batting: DRAGONS_BATTING, source: '2026 L-40 · Nashville Cricket League' }
+};
 
 function parseDate(gameDate) {
   var parts = gameDate.split('-');
@@ -136,7 +207,7 @@ function buildGameList() {
     return;
   }
 
-  GAMES.forEach(function(g, i) {
+  GAMES.forEach(function(g) {
     var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
     var past = today > d;
     var row = document.createElement('div');
@@ -157,7 +228,6 @@ function buildGameList() {
     list.appendChild(row);
   });
 
-  // Auto-select the first upcoming game
   var firstUpcoming = GAMES.find(function(g) {
     var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
     return today <= d;
@@ -177,11 +247,94 @@ function selectGame(game, past) {
   if (rows[idx]) rows[idx].classList.add('active');
 
   document.getElementById('oppName').textContent = game.opponent;
-  document.getElementById('oppNameInline').textContent = game.opponent;
   document.getElementById('oppMeta').textContent =
     game.day + ' ' + game.date + ' · ' + game.time + ' · ' + game.ground
     + (past ? ' (played)' : '');
   document.getElementById('oppPanel').style.display = '';
+
+  var data = OPP_DATA[game.opponent];
+  if (data) {
+    renderBattingStats(data);
+  } else {
+    renderComingSoon(game.opponent);
+  }
+}
+
+function renderComingSoon(oppName) {
+  document.getElementById('oppContent').innerHTML =
+    '<div class="coming-soon-panel">'
+    + '<div class="coming-soon-icon">📊</div>'
+    + '<div class="coming-soon-title">Stats Coming Soon</div>'
+    + '<div class="coming-soon-body">We\'re building the pipeline to pull batting &amp; bowling data for <strong>' + escHtml(oppName) + '</strong>.<br><br>Check back before game day for key batters, bowlers, and scouting notes.</div>'
+    + '<div class="info-pill">Data collection in progress</div>'
+    + '</div>';
+}
+
+function renderBattingStats(data) {
+  var batting = data.batting;
+
+  /* Key threats: avg > 25 (parseable) and inns >= 3 */
+  var threats = batting.filter(function(p) {
+    return p.inns >= 3 && parseFloat(p.avg) >= 25;
+  });
+
+  var html = '<div class="stats-inner">';
+
+  /* Source badge */
+  html += '<div class="source-note">📋 <span><strong>Source:</strong> ' + escHtml(data.source) + ' · Batting records only</span></div>';
+
+  /* Key threats */
+  if (threats.length) {
+    html += '<div class="threat-label">⚠️ Watch These Batters</div>';
+    html += '<div class="threat-grid">';
+    threats.forEach(function(p) {
+      var badges = '';
+      if (p.hundreds > 0) badges += ' <span style="font-size:10px;background:#FEE2E2;color:#9B1C1C;border-radius:4px;padding:1px 5px">💯×' + p.hundreds + '</span>';
+      if (p.fifties > 0) badges += ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 5px">50×' + p.fifties + '</span>';
+      html += '<div class="threat-card">'
+        + '<div class="threat-name">' + escHtml(p.name) + badges + '</div>'
+        + '<div class="threat-stats">'
+        + statChip(p.avg, 'Avg')
+        + statChip(p.sr, 'SR')
+        + statChip(p.hs, 'HS')
+        + statChip(String(p.runs), 'Runs')
+        + '</div>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  /* Full batting table */
+  html += '<div class="table-label">Full Batting — ' + batting.length + ' players</div>';
+  html += '<div style="overflow-x:auto"><table class="bat-table">';
+  html += '<tr><th>Player</th><th>M</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>50s</th><th>6s</th></tr>';
+  batting.forEach(function(p) {
+    html += '<tr>'
+      + '<td>' + escHtml(p.name) + '</td>'
+      + '<td>' + p.mat + '</td>'
+      + '<td style="font-weight:700;color:#111827">' + p.runs + '</td>'
+      + '<td>' + p.hs + '</td>'
+      + '<td>' + p.avg + '</td>'
+      + '<td>' + p.sr + '</td>'
+      + '<td>' + (p.fifties + p.hundreds > 0 ? p.fifties + (p.hundreds ? '+' + p.hundreds + '💯' : '') : '—') + '</td>'
+      + '<td>' + (p.sixes > 0 ? p.sixes : '—') + '</td>'
+      + '</tr>';
+  });
+  html += '</table></div>';
+
+  /* Bowling note */
+  html += '<div class="bowling-note">🎳 Bowling stats not available — will add when NCL publishes bowling records.</div>';
+
+  html += '</div>';
+  document.getElementById('oppContent').innerHTML = html;
+}
+
+function statChip(val, lbl) {
+  return '<div class="threat-stat"><div class="val">' + val + '</div><div class="lbl">' + lbl + '</div></div>';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 window.addEventListener('DOMContentLoaded', buildGameList);
