@@ -98,6 +98,28 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  if (type === 'bowlingdots') {
+    var team    = payload.team || 'Leather';
+    var game    = payload.game || '';
+    var bowlers = payload.bowlers || [];
+    var sheetName = 'BowlingDots_' + team;
+    var sh = ss.getSheetByName(sheetName);
+    if (!sh) {
+      sh = ss.insertSheet(sheetName);
+      sh.appendRow(['Game', 'Player', 'Dots', 'Runs', 'Balls', 'Wickets', 'Wides', 'NoBalls', 'Timestamp']);
+    }
+    var data = sh.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 1; i--) {
+      if (data[i][0] === game) sh.deleteRow(i + 1);
+    }
+    var ts = new Date().toISOString();
+    bowlers.forEach(function(b) {
+      sh.appendRow([game, b.name, b.dots||0, b.runs||0, b.balls||0, b.wickets||0, b.wides||0, b.noballs||0, ts]);
+    });
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (type === 'availability') {
     var team  = payload.team;
     var game  = payload.game;
@@ -171,6 +193,25 @@ function doGet(e) {
       if (game && g !== game) continue;
       if (!gamesMap[g]) { gamesMap[g] = []; gamesOrder.push(g); }
       gamesMap[g].push({ name: r[1], dots: Number(r[2]) || 0, runs: Number(r[3]) || 0, balls: Number(r[4]) || 0, isOut: r[5] === 'TRUE' });
+    }
+    var games = gamesOrder.map(function(g) { return { game: g, players: gamesMap[g] }; });
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ok', games: games }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (type === 'bowlingdots') {
+    var sheetName = 'BowlingDots_' + team;
+    var sh = ss.getSheetByName(sheetName);
+    if (!sh) return ContentService.createTextOutput(JSON.stringify({ status: 'ok', games: [] }))
+      .setMimeType(ContentService.MimeType.JSON);
+    var rows = sh.getDataRange().getValues();
+    var gamesMap = {}, gamesOrder = [];
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      var g = r[0];
+      if (game && g !== game) continue;
+      if (!gamesMap[g]) { gamesMap[g] = []; gamesOrder.push(g); }
+      gamesMap[g].push({ name: r[1], dots: Number(r[2])||0, runs: Number(r[3])||0, balls: Number(r[4])||0, wickets: Number(r[5])||0, wides: Number(r[6])||0, noballs: Number(r[7])||0 });
     }
     var games = gamesOrder.map(function(g) { return { game: g, players: gamesMap[g] }; });
     return ContentService.createTextOutput(JSON.stringify({ status: 'ok', games: games }))
