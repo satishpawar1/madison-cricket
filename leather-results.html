@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="config.js"></script>
+<script src="leather-stats.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Madison Leather — 2026 L-30 Results</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F4F8; color: #111827; min-height: 100vh; }
+
+.hero {
+  background: linear-gradient(150deg, #9B1C1C 0%, #7B0000 100%);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+}
+.hero-back {
+  position: absolute; left: 1.2rem; top: 1.4rem;
+  color: rgba(255,255,255,0.8); font-size: 15px; text-decoration: none;
+  display: flex; align-items: center; gap: 5px;
+}
+.hero-badge { display: inline-flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); font-size: 26px; margin-bottom: 10px; }
+.hero h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+.hero p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+
+.content { padding: 1rem 1rem 2.5rem; max-width: 500px; margin: 0 auto; }
+
+.section-label {
+  font-size: 11px; font-weight: 700; color: #6B7280;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin: 1.2rem 0 0.6rem;
+}
+
+.match-card {
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 10px; overflow: hidden;
+}
+.match-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px 8px; border-bottom: 1px solid #F3F4F6;
+}
+.match-meta { font-size: 11px; color: #9CA3AF; }
+.match-meta strong { color: #6B7280; }
+
+.result-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 9px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0;
+}
+.badge-won  { background: #E2F5EE; color: #0F5C43; }
+.badge-lost { background: #FEE2E2; color: #991B1B; }
+.badge-nr   { background: #F3F4F6; color: #6B7280; }
+
+.score-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 14px; border-bottom: 1px solid #F9FAFB;
+}
+.score-row:last-child { border-bottom: none; }
+.score-row.winner { background: #FFFCF0; }
+
+.team-name-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; color: #111827; flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.team-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-leather  { background: #9B1C1C; }
+.dot-opponent { background: #D1D5DB; }
+
+.score-num  { font-size: 15px; font-weight: 800; color: #111827; white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
+.score-num.won-score { color: #0F5C43; }
+.score-overs { font-size: 11px; color: #9CA3AF; margin-left: 5px; flex-shrink: 0; }
+
+.standings-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 10px;
+}
+.standings-card table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.standings-card th {
+  background: #FFF5F5; padding: 8px 10px; text-align: center;
+  font-weight: 600; border-bottom: 1px solid #FEE2E2; color: #6B7280;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.standings-card th:first-child { text-align: left; padding-left: 14px; }
+.standings-card td { padding: 9px 10px; text-align: center; border-bottom: 1px solid #F9FAFB; }
+.standings-card td:first-child { text-align: left; font-weight: 600; padding-left: 14px; }
+.standings-card tr:last-child td { border-bottom: none; }
+.standings-card td.highlight { font-weight: 700; color: #9B1C1C; }
+.standings-card tr.our-team td { background: #FFF5F5; }
+
+.no-data { text-align: center; color: #9CA3AF; font-size: 13px;
+  padding: 2rem 1rem; background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.updated { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a class="hero-back" href="leather-t30.html">‹ Back</a>
+  <div class="hero-badge">🏆</div>
+  <h1>2026 L-30 Results</h1>
+  <p>Madison Leather · 30-Over Tournament</p>
+</div>
+
+<div class="content">
+  <div id="standingsSection"></div>
+  <div id="resultsSection"></div>
+  <div id="updatedNote" class="updated" style="display:none"></div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof LEATHER_STATS === 'undefined' || !LEATHER_STATS.t30_2026) {
+    document.querySelector('.content').innerHTML =
+      '<div class="no-data">No stats yet. Run <em>Update Leather Stats</em> in GitHub Actions after a game.</div>';
+    return;
+  }
+
+  var t30 = LEATHER_STATS.t30_2026;
+
+  // ── Standings ──────────────────────────────────────────────────────────────
+  var standingsHtml = '';
+  if (t30.standings && t30.standings.length) {
+    standingsHtml += '<div class="section-label">Standings</div>';
+    standingsHtml += '<div class="standings-card"><table><thead><tr>'
+      + '<th>Team</th><th>M</th><th>W</th><th>L</th><th>Pts</th><th>NRR</th>'
+      + '</tr></thead><tbody>';
+    t30.standings.forEach(function(row) {
+      var isMadison = /leather|madison/i.test(row.team);
+      standingsHtml += '<tr' + (isMadison ? ' class="our-team"' : '') + '>'
+        + '<td>' + row.team + '</td>'
+        + '<td>' + row.matches + '</td>'
+        + '<td>' + row.won + '</td>'
+        + '<td>' + row.lost + '</td>'
+        + '<td class="highlight">' + row.points + '</td>'
+        + '<td>' + (row.nrr >= 0 ? '+' : '') + row.nrr.toFixed(3) + '</td>'
+        + '</tr>';
+    });
+    standingsHtml += '</tbody></table></div>';
+  }
+  document.getElementById('standingsSection').innerHTML = standingsHtml;
+
+  // ── Results ────────────────────────────────────────────────────────────────
+  var results = t30.results || {};
+  var madisonKey = Object.keys(results).find(function(k) { return /leather|madison/i.test(k); });
+  var madisonData = madisonKey ? results[madisonKey] : null;
+
+  var resultsHtml = '<div class="section-label">Match Results</div>';
+
+  if (!madisonData || !madisonData.games || !madisonData.games.length) {
+    // Fall back to config schedule — show games without scores yet
+    var games = (MCC_CONFIG.leather && MCC_CONFIG.leather.t30Games) || [];
+    var today = new Date(); today.setHours(0,0,0,0);
+    var played = games.filter(function(g) {
+      var parts = g.gameDate.split('-');
+      var gd = new Date(+parts[0], +parts[1]-1, +parts[2]);
+      return today >= gd;
+    });
+    if (!played.length) {
+      resultsHtml += '<div class="no-data">No completed games yet.</div>';
+    } else {
+      played.forEach(function(g) {
+        resultsHtml += '<div class="match-card">'
+          + '<div class="match-header">'
+          + '<div class="match-meta"><strong>vs ' + g.opponent + '</strong> &nbsp;·&nbsp; ' + g.date + '</div>'
+          + '<span class="result-badge badge-nr">Pending</span>'
+          + '</div></div>';
+      });
+    }
+  } else {
+    var games = madisonData.games.slice().reverse(); // newest first
+    games.forEach(function(g) {
+      var dateStr = '';
+      if (g.date) {
+        var parts = g.date.split('-');
+        var d = new Date(+parts[0], +parts[1]-1, +parts[2]);
+        dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+
+      var badgeClass = g.noResult ? 'badge-nr' : (g.won ? 'badge-won' : 'badge-lost');
+      var badgeText  = g.noResult ? 'No Result' : (g.won ? 'Won' : 'Lost');
+
+      var mccScore = g.runsScored
+        ? g.runsScored + (g.wickets != null && g.wickets < 10 ? '/' + g.wickets : '')
+          + (g.overs ? ' (' + g.overs + ' ov)' : '')
+        : '';
+      var oppScore = g.runsConceded
+        ? g.runsConceded + ''
+        : '';
+
+      resultsHtml += '<div class="match-card">';
+      resultsHtml += '<div class="match-header">'
+        + '<div class="match-meta"><strong>vs ' + g.opponent + '</strong>'
+        + (dateStr ? ' &nbsp;·&nbsp; ' + dateStr : '') + '</div>'
+        + '<span class="result-badge ' + badgeClass + '">' + badgeText + '</span>'
+        + '</div>';
+
+      if (mccScore) {
+        resultsHtml += '<div class="score-row' + (g.won ? ' winner' : '') + '">'
+          + '<div class="team-name-row"><div class="team-dot dot-leather"></div>Madison Leather</div>'
+          + '<span class="score-num' + (g.won ? ' won-score' : '') + '">'
+          + mccScore.split(' ')[0] + '</span>'
+          + '<span class="score-overs">'
+          + (mccScore.indexOf('(') > -1 ? mccScore.slice(mccScore.indexOf('(')) : '') + '</span>'
+          + '</div>';
+      }
+      if (oppScore) {
+        resultsHtml += '<div class="score-row' + (!g.won && !g.noResult ? ' winner' : '') + '">'
+          + '<div class="team-name-row"><div class="team-dot dot-opponent"></div>' + g.opponent + '</div>'
+          + '<span class="score-num' + (!g.won && !g.noResult ? ' won-score' : '') + '">' + oppScore + '</span>'
+          + '<span class="score-overs"></span>'
+          + '</div>';
+      }
+
+      resultsHtml += '</div>';
+    });
+  }
+
+  document.getElementById('resultsSection').innerHTML = resultsHtml;
+
+  if (LEATHER_STATS.lastUpdated) {
+    var note = document.getElementById('updatedNote');
+    note.textContent = 'Stats updated ' + new Date(LEATHER_STATS.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    note.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>
