@@ -1,11 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// LEATHER CATCHES HANDLER
+// LEATHER CATCHES HANDLER  (generic — no hardcoded game list, never needs editing)
 //
 // Stores each game's catch data in a tab named "LC_<game>" (e.g. "LC_Dragons CC").
-// Works for both reads (dashboard + log) and writes (log → save).
+// Auto-creates the tab on first save, so no Apps Script changes are needed for
+// new games.
 //
-// INSTALLATION — add the three functions below to your Apps Script, then wire
-// them in as follows:
+// INSTALLATION — add the two functions below to your Apps Script, then wire
+// them in:
 //
 //   Inside doGet(), in the block that handles type === 'catches':
 //     if (e.parameter.team === 'Leather') return handleLeatherCatchesGet(e.parameter);
@@ -18,30 +19,16 @@
 // Then re-deploy: Deploy → Manage deployments → edit → New version → Deploy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// All valid Leather L-30 game names (must match MCC_CONFIG.leather.t30Games[].name)
-var LEATHER_CATCH_GAMES = ['Dragons CC'];
-
-function leatherCatchTabName_(game) {
-  return 'LC_' + game;
-}
-
 // ── GET handler ──────────────────────────────────────────────────────────────
-// Called for both:
-//   ?type=catches&team=Leather&game=Dragons CC   → single-game data for log page
-//   ?type=catches&team=Leather                   → aggregate data for dashboard
+// ?type=catches&team=Leather&game=Dragons CC  → single-game data for log page
+// ?type=catches&team=Leather                 → aggregate across all LC_* tabs
 function handleLeatherCatchesGet(params) {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
   var game = params.game;
 
   if (game) {
-    // Single-game read
-    if (LEATHER_CATCH_GAMES.indexOf(game) === -1) {
-      return jsonOut_({ status: 'error', message: 'game not found' });
-    }
-    var sh = ss.getSheetByName(leatherCatchTabName_(game));
-    if (!sh || sh.getLastRow() < 2) {
-      return jsonOut_({ status: 'ok', data: [] });
-    }
+    var sh = ss.getSheetByName('LC_' + game);
+    if (!sh || sh.getLastRow() < 2) return jsonOut_({ status: 'ok', data: [] });
     var rows = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues();
     var data = rows
       .filter(function(r) { return r[0]; })
@@ -51,13 +38,13 @@ function handleLeatherCatchesGet(params) {
     return jsonOut_({ status: 'ok', data: data });
   }
 
-  // Aggregate read — merge all game tabs into per-player totals
+  // Aggregate: scan all LC_* tabs and sum per player
+  var allSheets = ss.getSheets();
   var totals = {};
-  LEATHER_CATCH_GAMES.forEach(function(g) {
-    var sh = ss.getSheetByName(leatherCatchTabName_(g));
-    if (!sh || sh.getLastRow() < 2) return;
-    var rows = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues();
-    rows.forEach(function(r) {
+  allSheets.forEach(function(sh) {
+    if (sh.getName().indexOf('LC_') !== 0) return;
+    if (sh.getLastRow() < 2) return;
+    sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues().forEach(function(r) {
       var name = String(r[0]);
       if (!name) return;
       if (!totals[name]) totals[name] = { name: name, attempted: 0, taken: 0, dropped: 0 };
@@ -70,17 +57,13 @@ function handleLeatherCatchesGet(params) {
 }
 
 // ── POST handler ─────────────────────────────────────────────────────────────
-// Called when the catch log page saves: { type:'catches', team:'Leather', game, catches:[...] }
+// { type:'catches', team:'Leather', game, catches:[{name, attempted, taken, dropped}] }
 function handleLeatherCatchesPost(data) {
   var ss   = SpreadsheetApp.getActiveSpreadsheet();
   var game = data.game;
+  if (!game) return jsonOut_({ status: 'error', message: 'game name required' });
 
-  if (!game || LEATHER_CATCH_GAMES.indexOf(game) === -1) {
-    return jsonOut_({ status: 'error', message: 'game not found' });
-  }
-
-  var tabName = leatherCatchTabName_(game);
-  var sh      = ss.getSheetByName(tabName) || ss.insertSheet(tabName);
+  var sh = ss.getSheetByName('LC_' + game) || ss.insertSheet('LC_' + game);
   sh.clearContents();
   sh.getRange(1, 1, 1, 4).setValues([['Player', 'Attempted', 'Taken', 'Dropped']]);
 
@@ -91,7 +74,6 @@ function handleLeatherCatchesPost(data) {
     });
     sh.getRange(2, 1, rows.length, 4).setValues(rows);
   }
-
   return jsonOut_({ status: 'ok' });
 }
 

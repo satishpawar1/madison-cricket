@@ -14,3 +14,4 @@ scraper/extract-bbb-nashville.js
 
 # Node
 scraper/node_modules/
+scraper/.env
