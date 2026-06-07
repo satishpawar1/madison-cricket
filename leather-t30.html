@@ -50,14 +50,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .empty-note { font-size: 13px; color: #9CA3AF; font-style: italic; }
 
-.nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.nav-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .nav-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 500; color: #9B1C1C;
-  text-decoration: none; padding: 10px 14px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  font-size: 13px; font-weight: 600; color: #9B1C1C;
+  text-decoration: none; padding: 12px 14px;
   background: #FFF5F5; border: 1.5px solid #FEE2E2; border-radius: 10px;
   transition: background 0.12s;
 }
+.nav-link .nav-desc { font-size: 11px; font-weight: 400; color: #9CA3AF; line-height: 1.3; }
 .nav-link:active { background: #FEE2E2; }
 </style>
 </head>
@@ -81,10 +82,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="card">
     <div class="section-label">Team</div>
     <div class="nav-links">
-      <a class="nav-link" href="leather.html">📋 Availability &amp; XI</a>
-      <a class="nav-link" href="leather-catch-log.html">🤲 Log Catches</a>
-      <a class="nav-link" href="leather-catch-dashboard.html">📊 Catch Efficiency</a>
-      <a class="nav-link" href="leather-roster.html">👥 Team Roster</a>
+      <a class="nav-link" href="leather.html">📋 Availability &amp; XI<span class="nav-desc">Mark availability &amp; pick the XI</span></a>
+      <a class="nav-link" href="leather-catch-log.html">🤲 Log Catches<span class="nav-desc">Record catch attempts per game</span></a>
+      <a class="nav-link" href="leather-roster.html">👥 Team Roster<span class="nav-desc">View &amp; manage squad members</span></a>
     </div>
   </div>
 
