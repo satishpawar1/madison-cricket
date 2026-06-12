@@ -342,7 +342,7 @@ function buildSchedule(games, containerId, recordId, upcomingBadgeClass, teamRes
       + '</div>'
       + '<div class="game-divider"></div>'
       + '<div class="game-info">'
-      +   '<div class="game-opponent">vs ' + g.opponent + '</div>'
+      +   '<div class="game-opponent">vs <a href="opponent-analysis.html?opponent=' + encodeURIComponent(g.name) + '" style="color:inherit;text-decoration:none;border-bottom:1px solid #D1D5DB">' + g.opponent + '</a></div>'
       +   '<div class="game-meta">' + g.day + ' · ' + g.time + ' · ' + g.ground + '</div>'
       + '</div>'
       + '<span class="game-badge ' + badgeClass + '">' + badge + '</span>'

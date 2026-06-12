@@ -321,13 +321,21 @@ function buildGameList() {
     list.appendChild(row);
   });
 
-  var firstUpcoming = GAMES.find(function(g) {
-    var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
-    return today <= d;
-  }) || GAMES[0];
-  if (firstUpcoming) {
-    var d = parseDate(firstUpcoming.gameDate); d.setHours(0,0,0,0);
-    selectGame(firstUpcoming, today > d);
+  var urlOpponent = new URLSearchParams(window.location.search).get('opponent');
+  var autoSelect = urlOpponent
+    ? GAMES.find(function(g) { return g.opponent === urlOpponent; })
+    : null;
+
+  if (!autoSelect) {
+    autoSelect = GAMES.find(function(g) {
+      var d = parseDate(g.gameDate); d.setHours(0,0,0,0);
+      return today <= d;
+    }) || GAMES[0];
+  }
+
+  if (autoSelect) {
+    var d = parseDate(autoSelect.gameDate); d.setHours(0,0,0,0);
+    selectGame(autoSelect, today > d);
   }
 }
 

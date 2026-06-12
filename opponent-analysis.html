@@ -879,6 +879,12 @@ window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('lbUpdated').textContent = 'Stats updated '
     + updated.toLocaleDateString('en-US', {month:'short', day:'numeric'})
     + ' at ' + updated.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+
+  var urlOpponent = new URLSearchParams(window.location.search).get('opponent');
+  if (urlOpponent) {
+    var match = allGames.find(function(g) { return g.name === urlOpponent; });
+    if (match) selectGame(match.name);
+  }
 });
 </script>
 </body>
