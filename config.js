@@ -191,7 +191,12 @@ const MCC_CONFIG = {
   leather: {
     players: [],     // players live in Google Sheets (added via leather-roster.html)
     t30Games: [
-      { name: 'Dragons CC', opponent: 'Dragons Cricket Club', day: 'Saturday', date: 'June 6th', time: '8:30 AM', warmup: '7:30 AM', ground: 'CFCG', gameDate: '2026-06-06' }
+      { name: 'Dragons CC',      opponent: 'Dragons Cricket Club',  day: 'Saturday', date: 'June 6th',   time: '8:30 AM', warmup: '7:30 AM', ground: 'CFCG', gameDate: '2026-06-06' },
+      { name: 'Carnivals CC',    opponent: 'Carnivals Cricket Club', day: 'Saturday', date: 'June 13th',  time: '8:30 AM', warmup: '7:30 AM', ground: 'CFCG', gameDate: '2026-06-13' },
+      { name: 'FSC Gladiators',  opponent: 'FSC Gladiators',         day: 'Saturday', date: 'June 20th',  time: '8:30 AM', warmup: '7:30 AM', ground: 'CBF',  gameDate: '2026-06-20' },
+      { name: 'Lascassas Lions', opponent: 'Lascassas Lions',        day: 'Sunday',   date: 'June 28th',  time: '8:30 AM', warmup: '7:30 AM', ground: 'CFCG', gameDate: '2026-06-28' },
+      { name: 'NCA',             opponent: 'NCA',                    day: 'Saturday', date: 'July 18th',  time: '8:30 AM', warmup: '7:30 AM', ground: 'CBF',  gameDate: '2026-07-18' },
+      { name: 'Predators',       opponent: 'Predators',              day: 'Saturday', date: 'July 25th',  time: '8:30 AM', warmup: '7:30 AM', ground: 'FCF3', gameDate: '2026-07-25' }
     ],
     t20Games: [],    // T-20 schedule (August 2026, TBD)
     gameNameMap: {},
