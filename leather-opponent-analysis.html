@@ -436,7 +436,11 @@ function renderStats(data, fmtKey) {
   if (fmt.bowling && fmt.bowling.length) {
     html += '<div class="section-divider">';
 
-    var bowlThreats = fmt.bowling.filter(function(p) { return p.wkts >= 7; });
+    var is40ov = fmt.key.indexOf('40') !== -1;
+    var bowlThreats = fmt.bowling.filter(function(p) {
+      if (is40ov) return parseFloat(p.econ) < 6 && p.inns > 0 && (p.wkts / p.inns) >= 2;
+      return p.wkts >= 7;
+    });
     if (bowlThreats.length) {
       html += '<div class="threat-label" style="color:#1D4ED8">🎳 Key Bowlers to Watch</div>';
       html += '<div class="threat-grid">';
