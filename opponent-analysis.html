@@ -404,7 +404,7 @@ function renderStrength(team, opp) {
   var bat = opp.batting || [];
   var bowl = opp.bowling || [];
 
-  var mainBatters = bat.filter(function(p) { return (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100); }).length;
+  var mainBatters = bat.filter(function(p) { return (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100) || p.fifties > 1; }).length;
   function oversToAverageBallsStr(oversStr, innings) {
     var parts = String(oversStr).split('.');
     var balls = parseInt(parts[0]) * 6 + (parts[1] ? parseInt(parts[1]) : 0);
@@ -476,7 +476,7 @@ function renderStrength(team, opp) {
 function renderStats(opp) {
   var bat  = opp.batting  || [];
   var bowl = opp.bowling  || [];
-  var activeBatters = bat.filter(function(p) { return (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100); }).length;
+  var activeBatters = bat.filter(function(p) { return (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100) || p.fifties > 1; }).length;
   document.getElementById('statBatters').textContent  = activeBatters;
   // Parse "4.3" overs string → total balls (4*6 + 3 = 27)
   function oversToAverageBalls(oversStr, innings) {
@@ -600,7 +600,7 @@ function _bowlHeaders(sortKey, sortDir) {
 
 function _renderBatRows(data) {
   return data.map(function(p, i) {
-    var isThreat = (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100);
+    var isThreat = (p.average >= 25 && p.strikeRate >= 100) || (parseInt(p.highest) >= 50 && p.strikeRate >= 100) || p.fifties > 1;
     var rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
     return '<tr' + (isThreat ? ' class="threat-row"' : '') + '>'
       + '<td><span class="rank-num ' + rc + '">' + (i+1) + '</span></td>'

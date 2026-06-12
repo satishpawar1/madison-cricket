@@ -400,7 +400,7 @@ function renderStats(data, fmtKey) {
 
   /* ── Batting ── */
   var batThreats = fmt.batting.filter(function(p) {
-    return p.inns >= 3 && (parseFloat(p.avg) >= 25 || (parseInt(p.hs) >= 50 && parseFloat(p.sr) >= 100));
+    return p.inns >= 3 && (parseFloat(p.avg) >= 25 || (parseInt(p.hs) >= 50 && parseFloat(p.sr) >= 100) || p.fifties > 1);
   });
 
   if (batThreats.length) {
